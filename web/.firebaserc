@@ -1,0 +1,6 @@
+{
+  "projects": {
+    "staging": "limo-ai",
+    "prod": "ingeniti-ai"
+  }
+}

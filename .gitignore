@@ -1,0 +1,7 @@
+node_modules/
+.DS_Store
+
+deepeval/venv/
+deepeval/__pycache__
+deepeval/.*.json
+deepeval/.pytest_cache

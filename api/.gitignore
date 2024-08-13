@@ -1,0 +1,11 @@
+node_modules
+.env
+dist
+
+playwright-report
+tests
+.env.production
+db-svc-acc.json
+test-results
+storage-svc-acc.json
+.DS_Store

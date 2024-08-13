@@ -1,0 +1,87 @@
+services:
+  database:
+    image: 'postgres:latest'
+    container_name: ingeniti-database
+    restart: always
+    ports:
+      - '5436:5436'
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - database_data:/var/lib/postgresql/data
+    command: -p 5436
+
+  shared:
+    container_name: ingeniti-shared
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    volumes:
+      - ./:/app/
+      - shared_node_modules:/app/shared/node_modules
+      - global_node_modules:/app/node_modules
+    command: sh -c "cd /app/shared && pnpm run dev"
+
+  api:
+    container_name: ingeniti-api
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    ports:
+      - '8080:8080'
+    depends_on:
+      # - shared
+      - database
+    volumes:
+      - ./:/app/
+    command: sh -c "cd /app/api && pnpm run dev"
+
+  taskworker:
+    container_name: ingeniti-taskworker
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    ports:
+      - '8082:8082'
+    depends_on:
+      # - shared
+      - database
+    volumes:
+      - ./:/app/
+    command: sh -c "cd /app/api && pnpm run task-worker"
+
+  web:
+    container_name: ingeniti-web
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    ports:
+      - '5173:5173'
+    depends_on:
+      - api
+    volumes:
+      - ./:/app/
+      - web_node_modules:/app/web/node_modules
+      - global_node_modules:/app/node_modules
+    command: sh -c "cd /app/web && pnpm run dev"
+
+  runner:
+    container_name: ingeniti-runner
+    build:
+      context: .
+      dockerfile: Dockerfile.runner
+    ports:
+      - '8081:8081'
+    depends_on:
+      # - shared
+      - database
+    volumes:
+      - ./:/app/
+      # These directories are created in build process but the local dir mount replaces them, hence the need to create them here
+    command: sh -c "mkdir -p /app/runner/tests /app/runner/test-results && pnpm run dev"
+
+volumes:
+  database_data:
+  web_node_modules:
+  shared_node_modules:
+  global_node_modules:
