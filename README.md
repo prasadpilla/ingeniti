@@ -10,11 +10,7 @@
 - node v20.13.1
 - pnpm v8.10.2
 
-## ⚡ Why is it fast?
-
-This repository uses both [pnpm](https://pnpm.io/) and [Turborepo](https://turbo.build/repo) to speed things up, _by a lot_. With pnpm, we leverage the installation performance using the global store cache. Turborepo helps us to run certain tasks, and cache the result if we rerun tasks with the same input or code. In the workflows we cache the [pnpm store](./.github/actions/setup-monorepo/action.yml#L37) and [Turborepo cache](./.github/actions/setup-monorepo/action.yml#L50-L56) using GitHub Actions built-in cache, resulting in the best performance possible.
-
-### What about Metro?
+#### Note about Metro Cache
 
 In **apps/mobile** we leverage the Metro cache to speed up building and publishing. We use Turborepo to restore or invalidate this cache. To populate this Metro cache, the **apps/mobile** has a [`$ pnpm build`](./apps/mobile/package.json#L9) script that exports React Native bundles. The resulting Metro cache is then reused when [publishing previews](./.github/workflows/preview.yml#L26-L28).
 
@@ -61,7 +57,7 @@ $ pnpm install
 
 #### Start the development server
 
-Run the below commmand to start the development servers for all **apps**.
+Run the below command to start the development servers for all **apps**.
 
 ```bash
 $ pnpm dev
@@ -151,18 +147,6 @@ This monorepo uses a simple npm script convention of `dev:<app-name>` and `build
 - `$ pnpm dev:web` - Build and watch **app/web** and all **packages** used in web, for development.
 - `$ pnpm build:mobile` - Build **apps/mobile** and all **packages** used in mobile, for production deployments
 - `$ pnpm build:web` - Build **apps/web** and all **packages** used in web, for production deployments
-
-### Switching to bun, yarn or npm
-
-You can use any package manager with Expo. If you want to use bun, yarn, or pnpm, instead of pnpm, all you have to do is:
-
-- Remove **.npmrc**, **pnpm-lock.yaml**, and **pnpm-workspace.yaml**.
-- Remove the `pnpm` property from the root **package.json** file.
-- Add the [`workspaces`](https://docs.npmjs.com/cli/v8/using-npm/workspaces) property to the root **package.json** file.
-- Update the workflows to use bun, yarn, or npm instead.
-
-> [!WARNING]
-> Unfortunately, npm does not support the [workspace protocol](https://yarnpkg.com/protocol/workspace). You also have to change the `"<package>": "workspace:*"` references to just `"<package>": "*"` for npm.
 
 ## 👷 Workflows
 
