@@ -1,21 +1,9 @@
-<div align="center">
-  <h1>Expo monorepo</h1>
-  <p>Fast pnpm monorepo for cross-platform apps built with Expo and React</p>
-</div>
+# inGeniti: Energy grid optimization platform
 
-<p align="center">
-  <a href="https://github.com/byCedric/expo-monorepo-example#-why-is-it-fast"><b>Why is it fast?</b></a>
-  &ensp;&mdash;&ensp;
-  <a href="https://github.com/byCedric/expo-monorepo-example#-how-to-use-it"><b>How to use it</b></a>
-  &ensp;&mdash;&ensp;
-  <a href="https://github.com/byCedric/expo-monorepo-example#-structure"><b>Structure</b></a>
-  &ensp;&mdash;&ensp;
-  <a href="https://github.com/byCedric/expo-monorepo-example#-workflows"><b>Workflows</b></a>
-  &ensp;&mdash;&ensp;
-  <a href="https://github.com/byCedric/expo-monorepo-example#%EF%B8%8F-caveats"><b>Caveats & Issues</b></a>
-</p>
+## Requirements
 
-<br />
+- node v20.13.1
+- pnpm v8.10.2
 
 ## ⚡ Why is it fast?
 
@@ -31,14 +19,121 @@ This repository demonstrates a working stack using [Expo](https://docs.expo.dev/
 
 - [`create-t3-turbo`](https://github.com/t3-oss/create-t3-turbo) → [Expo](https://docs.expo.dev/), [Next.js](https://nextjs.org/), [pnpm](https://pnpm.io/), [Turborepo](https://turbo.build/repo), [NextAuth.js](https://next-auth.js.org/), [Prisma](https://www.prisma.io/), and [tRPC](https://trpc.io/).
 
+## 📁 Structure
+
+- [`apps`](./apps) - Apps that only use packages and aren't aware of other apps.
+- [`packages`](./packages) - Packages that may use external and/or other monorepo packages.
+
+### Apps
+
+- [`apps/api`](./apps/api) - NodeJS backend in TypeScript.
+
+- [`apps/mobile`](./apps/mobile) - React Native Expo app for iOS and Android.
+- [`apps/web`](./apps/web) - ReactJS Web frontend app.
+
+### Packages
+
+- [`packages/eslint-config`](./packages/eslint-config) - Preconfigured ESLint configuration for each app or package.
+- [`packages/shared`](./packages/shared) - Shared schemas and types for all our apps.
+
 ## 🚀 How to use it
 
-You can use and modify this repository however you want. If you want to use EAS to build your app, you'll need to create an [Expo access token](https://expo.dev/accounts/[account]/settings/access-tokens) and set it as `EXPO_TOKEN` GitHub actions secret.
+We use `.env` files to store environment variables. Ask a fellow dev for the env files and place them under `/apps/api` and `/apps/web` and `/apps/mobile`.
+
+### Setup
 
 To run the repository locally, run these two commands:
 
-- `$ pnpm install` - This installs all required Node libraries using [pnpm](https://pnpm.io/).
-- `$ pnpm dev` - Starts the development servers for all **apps**.
+#### Build the shared package
+
+Our apps are using a shared package for common types and functions. We need to build the shared package before installing the dependencies in the root directory.
+
+```bash
+cd shared; pnpm build
+```
+
+#### Install dependencies
+
+Run the below command in the root directory to install dependencies for all apps and packages.
+
+```bash
+$ pnpm install
+```
+
+#### Start the development server
+
+Run the below commmand to start the development servers for all **apps**.
+
+```bash
+$ pnpm dev
+```
+
+### Database
+
+Update the `.env` file in `/apps/api` with the correct credentials to your local postgres database if you want to use a local database.
+
+Run `docker-compose up database` to run the database locally and use credentials from the `.env` file.
+
+##### Run migrations
+
+```bash
+cd apps/api; pnpm db:migrate
+```
+
+#### Generating database migrations
+
+When you make changes to the database schema, you need to generate a migration file.
+
+```bash
+cd apps/api; pnpm db:generate
+```
+
+### Adding new dependencies
+
+Web app:
+
+```bash
+pnpm add --filter ./apps/web <package_name>
+```
+
+Backend:
+
+```bash
+pnpm add --filter ./apps/api <package_name>
+```
+
+Mobile:
+
+```bash
+pnpm add --filter ./apps/mobile <package_name>
+```
+
+Shadcn package:
+
+```bash
+cd apps/web; pnpm dlx shadcn-ui@latest add <package_name>
+```
+
+### Docker compose - !! Ignore this for now, there are issues with it
+
+Building the stack
+
+```bash
+docker-compose up build
+
+```
+
+Running the stack
+
+```
+docker-compose up
+```
+
+Migrate the database
+
+```
+cd api; pnpm db:migrate
+```
 
 ### Commands
 
@@ -69,22 +164,6 @@ You can use any package manager with Expo. If you want to use bun, yarn, or pnpm
 
 > [!WARNING]
 > Unfortunately, npm does not support the [workspace protocol](https://yarnpkg.com/protocol/workspace). You also have to change the `"<package>": "workspace:*"` references to just `"<package>": "*"` for npm.
-
-## 📁 Structure
-
-- [`apps`](./apps) - Apps that only use packages and aren't aware of other apps.
-- [`packages`](./packages) - Packages that may use external and/or other monorepo packages.
-
-### Apps
-
-- [`apps/mobile`](./apps/mobile) - Expo app using `eslint-config` and `feature-home` packages.
-- [`apps/web`](./apps/web) - Next.js app using `eslint-config` and `feature-home` packages.
-
-### Packages
-
-- [`packages/eslint-config`](./packages/eslint-config) - Preconfigured ESLint configuration for each app or package.
-- [`packages/feature-home`](./packages/feature-home) - Shared React Native domain-logic for apps, using both `ui` and `eslint-config` packages.
-- [`packages/ui`](./packages/ui) - Shared React Native UI components for apps, using the `eslint-config` package.
 
 ## 👷 Workflows
 
@@ -138,7 +217,6 @@ To workaround these issues, we have to change some config:
 
 3. Update the **metro.config.js** configuration for usage in monorepos. Full explanation per configuration option can be found in the [Expo docs](https://docs.expo.dev/guides/monorepos/#modify-the-metro-config). The only addition in this repository is the [`config.cacheStores`](./apps/mobile/metro.config.js#L22-L24). This change moves the Metro cache to a place which is accessible by Turborepo, our main cache handler (see [Why is it fast?](#-why-is-it-fast)).
 
-
 ### Precompile packages
 
 EAS only sends the files which are committed to the repository. That means [the `packages/*/build` folders](.gitignore#L3) need to be generated before building our apps. To tell EAS how to compile our packages, we can [use the `postinstall` hook](https://docs.expo.dev/build-reference/how-tos/#how-to-set-up-eas-build-with).
@@ -152,13 +230,3 @@ As of writing, the `eas build` command needs to be executed from the package fol
 If you want to maintain the keystore or certificates yourself, you have to [configure EAS with local credentials](https://docs.expo.dev/app-signing/local-credentials/#credentialsjson). When your CI provider doesn't allow you to add "secret files", you can [encode these files to base64 strings](https://docs.expo.dev/app-signing/local-credentials/#using-local-credentials-on-builds-triggered-from) and decode whenever you need it.
 
 > It's highly recommended to keep keystores and certificates out of your repository to avoid security issues.
-
-## ❌ Common issues
-
-_No ongoing issues, we are actively monitoring and fixing potential issues_
-
-<div align="center">
-  <br />
-  with&nbsp;:heart:&nbsp;&nbsp;<strong>byCedric</strong>
-  <br />
-</div>
