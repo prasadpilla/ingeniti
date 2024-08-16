@@ -1,4 +1,9 @@
-# inGeniti: Energy grid optimization platform
+<div align="center" style="display: flex; align-items: center; justify-content: center; column-gap: 10px">
+  <img src="./apps/web/public/logo.png" alt="Ingeniti Logo" width="50" height="50">
+  <span style="font-size: 48px; font-weight: 700">ingeniti</span>
+</div>
+
+<h3 align="center">Energy Grid Optimization Platform</h3>
 
 ## Requirements
 
@@ -12,12 +17,6 @@ This repository uses both [pnpm](https://pnpm.io/) and [Turborepo](https://turbo
 ### What about Metro?
 
 In **apps/mobile** we leverage the Metro cache to speed up building and publishing. We use Turborepo to restore or invalidate this cache. To populate this Metro cache, the **apps/mobile** has a [`$ pnpm build`](./apps/mobile/package.json#L9) script that exports React Native bundles. The resulting Metro cache is then reused when [publishing previews](./.github/workflows/preview.yml#L26-L28).
-
-## ℹ️ Should I use it?
-
-This repository demonstrates a working stack using [Expo](https://docs.expo.dev/) in a fast monorepo, while sharing most of the codebase with web. The primary goal of this repository is to showcase what is possible with Expo while keeping the code as "vanilla" as possible. Feel free to use this repository however you prefer, but when starting a project from scratch, consider a template with more assumptions. Those assumptions should help you develop your project faster than this repository can.
-
-- [`create-t3-turbo`](https://github.com/t3-oss/create-t3-turbo) → [Expo](https://docs.expo.dev/), [Next.js](https://nextjs.org/), [pnpm](https://pnpm.io/), [Turborepo](https://turbo.build/repo), [NextAuth.js](https://next-auth.js.org/), [Prisma](https://www.prisma.io/), and [tRPC](https://trpc.io/).
 
 ## 📁 Structure
 
