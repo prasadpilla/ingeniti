@@ -1,12 +1,13 @@
+import { useSignUp } from '@clerk/clerk-expo';
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import Background from '../components/Background';
-import Header from '../components/Header';
 import Button from '../components/Button';
+import Header from '../components/Header';
 import TextInput from '../components/TextInput';
 import { Themes } from '../styles/themes';
 import { Navigation } from '../types';
-import { useSignUp } from '@clerk/clerk-expo';
 
 interface Props {
   navigation: Navigation;
@@ -90,7 +91,7 @@ const SignUpScreen = ({ navigation }: Props) => {
             value={emailAddress}
             onChangeText={(email) => setEmailAddress(email)}
             autoCapitalize="none"
-            autoCompleteType="email"
+            autoComplete="email"
             textContentType="emailAddress"
             keyboardType="email-address"
           />

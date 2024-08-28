@@ -1,14 +1,15 @@
+import { useAuth } from '@clerk/clerk-expo';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation';
+
 import DashboardScreen from './screens/Dashboard';
-import ProfileScreen from './screens/Profile';
-import SettingsScreen from './screens/Settings';
-import { useAuth } from '@clerk/clerk-expo';
-import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from './screens/Home';
 import LoginScreen from './screens/Login';
+import ProfileScreen from './screens/Profile';
+import SettingsScreen from './screens/Settings';
 import SignUpScreen from './screens/SignUp';
 
 const Tab = createMaterialBottomTabNavigator();
@@ -52,7 +53,7 @@ const Navigation = ({ theme }) => {
 
   return (
     <NavigationContainer theme={theme}>
-      <Stack.Navigator>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
         {isSignedIn ? (
           <Stack.Screen name="Dashboard" component={TabNavigation} />
         ) : (

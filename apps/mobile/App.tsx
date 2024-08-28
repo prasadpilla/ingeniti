@@ -1,7 +1,7 @@
+import { ClerkLoaded, ClerkProvider } from '@clerk/clerk-expo';
+import * as SecureStore from 'expo-secure-store';
 import React from 'react';
 import { PaperProvider } from 'react-native-paper';
-import { ClerkProvider, ClerkLoaded } from '@clerk/clerk-expo';
-import * as SecureStore from 'expo-secure-store';
 
 import Navigation from './Navigation';
 import { Themes } from './styles/themes';

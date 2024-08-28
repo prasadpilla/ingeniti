@@ -26,3 +26,4 @@ dist-ssr
 .firebase
 .env.production
 .env.staging
+.env
