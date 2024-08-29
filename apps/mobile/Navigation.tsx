@@ -53,7 +53,7 @@ const Navigation = ({ theme }) => {
 
   return (
     <NavigationContainer theme={theme}>
-      <Stack.Navigator>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
         {isSignedIn ? (
           <Stack.Screen name="Dashboard" component={TabNavigation} />
         ) : (

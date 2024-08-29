@@ -1,8 +1,9 @@
+import { useClerk } from '@clerk/clerk-expo';
 import React from 'react';
 import { Switch } from 'react-native-paper';
-import Button from '../components/Button';
-import { useClerk } from '@clerk/clerk-expo';
+
 import Background from '../components/Background';
+import Button from '../components/Button';
 import Header from '../components/Header';
 
 export default function SettingsScreen() {
