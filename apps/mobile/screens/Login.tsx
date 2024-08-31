@@ -16,8 +16,11 @@ interface Props {
 const LoginScreen = ({ navigation }: Props) => {
   const { signIn, setActive, isLoaded } = useSignIn();
 
-  const [emailAddress, setEmailAddress] = useState('');
-  const [password, setPassword] = useState('');
+  const [emailAddress, setEmailAddress] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [countryCode, setCountryCode] = useState<string>('+91');
+  const [phoneNumber, setPhoneNumber] = useState<string>('');
+  const [usePhone, setUsePhone] = useState(false);
 
   const onSignInPress = React.useCallback(async () => {
     if (!isLoaded) {
@@ -46,30 +49,64 @@ const LoginScreen = ({ navigation }: Props) => {
     <Background>
       <Header>Welcome back.</Header>
 
-      <TextInput
-        label="Email"
-        returnKeyType="next"
-        value={emailAddress}
-        onChangeText={(email) => setEmailAddress(email)}
-        autoCapitalize="none"
-        autoComplete="email"
-        textContentType="emailAddress"
-        keyboardType="email-address"
-      />
-
-      <TextInput
-        label="Password"
-        returnKeyType="done"
-        value={password}
-        onChangeText={(password) => setPassword(password)}
-        secureTextEntry
-      />
-
-      <View style={styles.forgotPassword}>
-        <TouchableOpacity onPress={() => navigation.navigate('ForgotPasswordScreen')}>
-          <Text style={styles.label}>Forgot your password?</Text>
+      <View style={styles.usePhone}>
+        <TouchableOpacity onPress={() => setUsePhone(!usePhone)}>
+          <Text style={styles.usePhoneLabel}>{!usePhone ? 'Use Phone' : 'Use email'}</Text>
         </TouchableOpacity>
       </View>
+
+      {!usePhone ? (
+        <>
+          <TextInput
+            label="Email"
+            returnKeyType="next"
+            value={emailAddress}
+            onChangeText={(email) => setEmailAddress(email)}
+            autoCapitalize="none"
+            autoComplete="email"
+            textContentType="emailAddress"
+            keyboardType="email-address"
+          />
+
+          <TextInput
+            label="Password"
+            returnKeyType="done"
+            value={password}
+            onChangeText={(password) => setPassword(password)}
+            isPassword
+          />
+
+          <View style={styles.forgotPassword}>
+            <TouchableOpacity onPress={() => navigation.navigate('ForgotPasswordScreen')}>
+              <Text style={styles.label}>Forgot your password?</Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      ) : (
+        <View style={styles.inpuContainer}>
+          <TextInput
+            label="Code"
+            returnKeyType="next"
+            value={countryCode}
+            onChangeText={setCountryCode}
+            containerStyles={{ width: '20%' }}
+            style={styles.countryCodeInput}
+          />
+
+          <TextInput
+            label="Phone number"
+            returnKeyType="done"
+            value={phoneNumber}
+            onChangeText={setPhoneNumber}
+            containerStyles={{ flex: 1 }}
+            style={styles.phoneNumberInput}
+            keyboardType="number-pad"
+            selectionColor={Themes.colors.primary}
+            underlineColor="transparent"
+            mode="outlined"
+          />
+        </View>
+      )}
 
       <Button mode="contained" onPress={onSignInPress}>
         Login
@@ -86,10 +123,15 @@ const LoginScreen = ({ navigation }: Props) => {
 };
 
 const styles = StyleSheet.create({
+  usePhone: { width: '100%', alignItems: 'flex-end', marginBottom: -8, zIndex: 10 },
+  usePhoneLabel: {
+    color: Themes.colors.primary,
+    fontWeight: '500',
+  },
   forgotPassword: {
     width: '100%',
     alignItems: 'flex-end',
-    marginBottom: 24,
+    marginBottom: 16,
   },
   row: {
     flexDirection: 'row',
@@ -101,6 +143,23 @@ const styles = StyleSheet.create({
   link: {
     fontWeight: 'bold',
     color: Themes.colors.primary,
+  },
+  inpuContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    backgroundColor: Themes.colors.surface,
+    padding: 0,
+    marginBottom: 10,
+  },
+  countryCodeInput: {
+    marginVertical: 0,
+    backgroundColor: '#eee',
+  },
+  phoneNumberInput: {
+    flex: 1,
+    marginVertical: 0,
   },
 });
 

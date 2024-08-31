@@ -181,7 +181,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: Themes.colors.primary,
   },
-
   inpuContainer: {
     width: '100%',
     flexDirection: 'row',
