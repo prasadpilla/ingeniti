@@ -19,7 +19,10 @@ const SignUpScreen = ({ navigation }: Props) => {
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
   const [emailAddress, setEmailAddress] = useState<string>('');
+  const [countryCode, setCountryCode] = useState<string>('+91');
+  const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+
   const [pendingVerification, setPendingVerification] = useState<boolean>(false);
   const [code, setCode] = useState<string>('');
 
@@ -76,6 +79,7 @@ const SignUpScreen = ({ navigation }: Props) => {
             returnKeyType="next"
             value={firstName}
             onChangeText={(firstName) => setFirstName(firstName)}
+            required
           />
 
           <TextInput
@@ -83,25 +87,52 @@ const SignUpScreen = ({ navigation }: Props) => {
             returnKeyType="next"
             value={lastName}
             onChangeText={(lastName) => setLastName(lastName)}
+            required
           />
 
           <TextInput
             label="Email"
             returnKeyType="next"
             value={emailAddress}
-            onChangeText={(email) => setEmailAddress(email)}
+            onChangeText={setEmailAddress}
             autoCapitalize="none"
             autoComplete="email"
             textContentType="emailAddress"
             keyboardType="email-address"
+            required
           />
+
+          <View style={styles.inpuContainer}>
+            <TextInput
+              label="Code"
+              returnKeyType="next"
+              value={countryCode}
+              onChangeText={setCountryCode}
+              containerStyles={{ width: '20%' }}
+              style={styles.countryCodeInput}
+            />
+
+            <TextInput
+              label="Phone number"
+              returnKeyType="next"
+              value={phoneNumber}
+              onChangeText={setPhoneNumber}
+              containerStyles={{ flex: 1 }}
+              style={styles.phoneNumberInput}
+              keyboardType="number-pad"
+              selectionColor={Themes.colors.primary}
+              underlineColor="transparent"
+              mode="outlined"
+            />
+          </View>
 
           <TextInput
             label="Password"
             returnKeyType="done"
             value={password}
-            onChangeText={(password) => setPassword(password)}
-            secureTextEntry
+            onChangeText={setPassword}
+            isPassword
+            required
           />
 
           <Button mode="contained" onPress={onSignUpPress} style={styles.button}>
@@ -149,6 +180,23 @@ const styles = StyleSheet.create({
   link: {
     fontWeight: 'bold',
     color: Themes.colors.primary,
+  },
+
+  inpuContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    backgroundColor: Themes.colors.surface,
+    marginVertical: 10,
+  },
+  countryCodeInput: {
+    marginVertical: 0,
+    backgroundColor: '#eee',
+  },
+  phoneNumberInput: {
+    flex: 1,
+    marginVertical: 0,
   },
 });
 
