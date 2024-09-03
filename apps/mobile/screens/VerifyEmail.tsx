@@ -10,14 +10,14 @@ import Paragraph from '../components/Paragraph';
 import TextInput from '../components/TextInput';
 import { Themes } from '../styles/themes';
 
-interface VerifyScreenProps {
+interface VerifyEmailScreenProps {
   route: any;
   navigation: any;
 }
 
-const VerifyScreen = ({ route, navigation }: VerifyScreenProps) => {
-  const { isLoaded, signUp, setActive } = useSignUp();
-  const { usePhone, emailAddress, phoneNumber } = route.params;
+const VerifyEmailScreen = ({ route, navigation }: VerifyEmailScreenProps) => {
+  const { isLoaded, signUp } = useSignUp();
+  const { emailAddress, phoneNumber, countryCode } = route.params;
 
   const [verificationCode, setVerificationCode] = useState<string>('');
 
@@ -27,19 +27,16 @@ const VerifyScreen = ({ route, navigation }: VerifyScreenProps) => {
     }
 
     try {
-      let completeSignUp;
-      if (usePhone && phoneNumber) {
-        completeSignUp = await signUp.attemptPhoneNumberVerification({
-          code: verificationCode,
-        });
-      } else if (!usePhone && emailAddress) {
-        completeSignUp = await signUp.attemptEmailAddressVerification({
-          code: verificationCode,
-        });
-      }
+      const completeSignUp = await signUp.attemptEmailAddressVerification({
+        code: verificationCode,
+      });
 
-      if (completeSignUp && completeSignUp.status === 'complete') {
-        await setActive({ session: completeSignUp.createdSessionId });
+      if (completeSignUp.status === 'complete') {
+        await signUp.preparePhoneNumberVerification();
+        navigation.navigate('VerifyPhone', {
+          phoneNumber,
+          countryCode,
+        });
       } else {
         console.error(JSON.stringify(completeSignUp, null, 2));
       }
@@ -50,14 +47,14 @@ const VerifyScreen = ({ route, navigation }: VerifyScreenProps) => {
 
   return (
     <Background>
-      <Header>Verify Your {usePhone ? 'Phone' : 'Email'}</Header>
+      <Header>Verify Your Email</Header>
 
       <View>
         <Paragraph style={styles.paragraph}>
-          Enter the verification code sent to your {usePhone ? 'phone' : 'email'}
+          Enter the verification code sent to your email
         </Paragraph>
         <View style={styles.credentialContainer}>
-          <Paragraph style={styles.credential}>{usePhone ? phoneNumber : emailAddress}</Paragraph>
+          <Paragraph style={styles.credential}>{emailAddress}</Paragraph>
           <TouchableOpacity onPress={() => {}}>
             <MaterialCommunityIcons name="pencil" size={20} style={styles.editIcon} />
           </TouchableOpacity>
@@ -104,4 +101,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default VerifyScreen;
+export default VerifyEmailScreen;

@@ -18,44 +18,27 @@ const SignUpScreen = ({ navigation }: SignUpScreenProps) => {
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
   const [emailAddress, setEmailAddress] = useState<string>('');
-  const [countryCode, setCountryCode] = useState<string>('91');
+  const [countryCode, setCountryCode] = useState<string>('+91');
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [usePhone, setUsePhone] = useState(true);
 
   const onSignUpPress = async () => {
     if (!isLoaded) return;
 
-    const phone = `+${countryCode}${phoneNumber.replace(/\D/g, '')}`;
-
     try {
-      if (usePhone && phoneNumber) {
-        console.log('phone nunber', phone, typeof phone);
-        await signUp.create({
-          firstName,
-          lastName,
-          phoneNumber: phone,
-        });
-
-        await signUp.preparePhoneNumberVerification();
-      } else if (!usePhone && emailAddress) {
-        await signUp.create({
-          firstName,
-          lastName,
-          emailAddress,
-          password,
-        });
-
-        await signUp.prepareEmailAddressVerification({
-          strategy: 'email_code',
-        });
-      }
-
-      navigation.navigate('Verify', {
-        usePhone,
-        phoneNumber: usePhone ? phone : undefined,
-        emailAddress: !usePhone ? emailAddress : undefined,
+      await signUp.create({
+        firstName,
+        lastName,
+        emailAddress,
+        phoneNumber: `${countryCode}${phoneNumber}`,
+        password,
       });
+
+      await signUp.prepareEmailAddressVerification({
+        strategy: 'email_code',
+      });
+
+      navigation.navigate('VerifyEmail', { emailAddress, phoneNumber, countryCode });
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
     }
@@ -64,11 +47,6 @@ const SignUpScreen = ({ navigation }: SignUpScreenProps) => {
   return (
     <Background>
       <Header>Create Account</Header>
-      <View style={styles.usePhone}>
-        <TouchableOpacity onPress={() => setUsePhone(!usePhone)}>
-          <Text style={styles.usePhoneLabel}>{!usePhone ? 'Use Phone' : 'Use email'}</Text>
-        </TouchableOpacity>
-      </View>
       <TextInput
         label="First name"
         returnKeyType="next"
@@ -83,52 +61,45 @@ const SignUpScreen = ({ navigation }: SignUpScreenProps) => {
         onChangeText={(lastName) => setLastName(lastName)}
         required
       />
-      {!usePhone ? (
-        <>
-          <TextInput
-            label="Email"
-            returnKeyType="next"
-            value={emailAddress}
-            onChangeText={(email) => setEmailAddress(email)}
-            autoCapitalize="none"
-            autoComplete="email"
-            textContentType="emailAddress"
-            keyboardType="email-address"
-          />
-
-          <TextInput
-            label="Password"
-            returnKeyType="done"
-            value={password}
-            onChangeText={(password) => setPassword(password)}
-            isPassword
-          />
-        </>
-      ) : (
-        <View style={styles.inpuContainer}>
-          <TextInput
-            label="Code"
-            returnKeyType="next"
-            value={countryCode}
-            onChangeText={setCountryCode}
-            containerStyles={{ width: '20%' }}
-            style={styles.countryCodeInput}
-          />
-          <TextInput
-            label="Phone number"
-            returnKeyType="done"
-            value={phoneNumber}
-            onChangeText={setPhoneNumber}
-            containerStyles={{ flex: 1 }}
-            style={styles.phoneNumberInput}
-            keyboardType="number-pad"
-            selectionColor={Themes.colors.primary}
-            underlineColor="transparent"
-            mode="outlined"
-          />
-        </View>
-      )}
-
+      <TextInput
+        label="Email"
+        returnKeyType="next"
+        value={emailAddress}
+        onChangeText={(email) => setEmailAddress(email)}
+        autoCapitalize="none"
+        autoComplete="email"
+        textContentType="emailAddress"
+        keyboardType="email-address"
+      />
+      <View style={styles.inpuContainer}>
+        <TextInput
+          label="Code"
+          returnKeyType="next"
+          value={countryCode}
+          onChangeText={setCountryCode}
+          containerStyles={{ width: '20%' }}
+          style={styles.countryCodeInput}
+        />
+        <TextInput
+          label="Phone number"
+          returnKeyType="done"
+          value={phoneNumber}
+          onChangeText={setPhoneNumber}
+          containerStyles={{ flex: 1 }}
+          style={styles.phoneNumberInput}
+          keyboardType="number-pad"
+          selectionColor={Themes.colors.primary}
+          underlineColor="transparent"
+          mode="outlined"
+        />
+      </View>
+      <TextInput
+        label="Password"
+        returnKeyType="done"
+        value={password}
+        onChangeText={(password) => setPassword(password)}
+        isPassword
+      />
       <Button mode="contained" onPress={onSignUpPress} style={styles.button}>
         Sign Up
       </Button>
@@ -156,11 +127,6 @@ const styles = StyleSheet.create({
   link: {
     fontWeight: 'bold',
     color: Themes.colors.primary,
-  },
-  usePhone: { width: '100%', alignItems: 'flex-end', marginBottom: -8, zIndex: 10 },
-  usePhoneLabel: {
-    color: Themes.colors.primary,
-    fontWeight: '500',
   },
   inpuContainer: {
     width: '100%',
