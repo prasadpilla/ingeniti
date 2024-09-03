@@ -19,7 +19,7 @@ const TextInput = ({
   label,
   ...props
 }: Props) => {
-  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
 
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);

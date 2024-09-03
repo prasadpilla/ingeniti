@@ -11,6 +11,7 @@ import LoginScreen from './screens/Login';
 import ProfileScreen from './screens/Profile';
 import SettingsScreen from './screens/Settings';
 import SignUpScreen from './screens/SignUp';
+import VerifyScreen from './screens/Verify';
 
 const Tab = createMaterialBottomTabNavigator();
 function TabNavigation() {
@@ -61,6 +62,7 @@ const Navigation = ({ theme }) => {
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="SignUp" component={SignUpScreen} />
+            <Stack.Screen name="Verify" component={VerifyScreen} />
           </>
         )}
       </Stack.Navigator>
