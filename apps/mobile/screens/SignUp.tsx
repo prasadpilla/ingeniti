@@ -1,5 +1,8 @@
 import { useSignUp } from '@clerk/clerk-expo';
+import { signUpFormSchema, SignUpForm } from '@ingeniti/shared';
+import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import Background from '../components/Background';
@@ -18,6 +21,19 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
   const [countryCode, setCountryCode] = useState<string>('+91');
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+
+  const signUpForm = useForm<SignUpForm>({
+    resolver: zodResolver(signUpFormSchema),
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      emailAddress: '',
+      countryCode: '+91',
+      phoneNumber: '',
+      password: '',
+    },
+    mode: 'onBlur',
+  });
 
   const onSignUpPress = async () => {
     if (!isLoaded) return;
@@ -44,59 +60,114 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
   return (
     <Background>
       <Header>Create Account</Header>
-      <FormInput
-        label="First name"
-        returnKeyType="next"
-        value={firstName}
-        onChangeText={(firstName) => setFirstName(firstName)}
-        required
+      <Controller
+        control={signUpForm.control}
+        name="firstName"
+        render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+          <FormInput
+            label="First name"
+            returnKeyType="next"
+            value={value}
+            onChangeText={onChange}
+            onBlur={onBlur}
+            required
+          />
+        )}
       />
-      <FormInput
-        label="Last name"
-        returnKeyType="next"
-        value={lastName}
-        onChangeText={(lastName) => setLastName(lastName)}
-        required
+
+      <Controller
+        control={signUpForm.control}
+        name="lastName"
+        render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+          <FormInput
+            label="Last name"
+            returnKeyType="next"
+            value={value}
+            onBlur={onBlur}
+            onChangeText={onChange}
+            required
+          />
+        )}
       />
-      <FormInput
-        label="Email"
-        returnKeyType="next"
-        value={emailAddress}
-        onChangeText={(email) => setEmailAddress(email)}
-        autoCapitalize="none"
-        autoComplete="email"
-        textContentType="emailAddress"
-        keyboardType="email-address"
+
+      <Controller
+        control={signUpForm.control}
+        name="emailAddress"
+        render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+          <FormInput
+            label="Email"
+            returnKeyType="next"
+            value={value}
+            onBlur={onBlur}
+            onChangeText={onChange}
+            autoCapitalize="none"
+            autoComplete="email"
+            textContentType="emailAddress"
+            keyboardType="email-address"
+          />
+        )}
       />
+
+      {/* <Controller
+        control={signUpForm.control}
+        name="lastName"
+        render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+         
+        )}
+      /> */}
       <View style={styles.inpuContainer}>
-        <FormInput
-          label="Code"
-          returnKeyType="next"
-          value={countryCode}
-          onChangeText={setCountryCode}
-          containerStyles={{ width: '20%' }}
-          style={styles.countryCodeInput}
+        <Controller
+          control={signUpForm.control}
+          name="countryCode"
+          render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+            <FormInput
+              label="Code"
+              returnKeyType="next"
+              value={value}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              containerStyles={{ width: '20%' }}
+              style={styles.countryCodeInput}
+            />
+          )}
         />
-        <FormInput
-          label="Phone number"
-          returnKeyType="done"
-          value={phoneNumber}
-          onChangeText={setPhoneNumber}
-          containerStyles={{ flex: 1 }}
-          style={styles.phoneNumberInput}
-          keyboardType="number-pad"
-          selectionColor={Themes.colors.primary}
-          underlineColor="transparent"
-          mode="outlined"
+
+        <Controller
+          control={signUpForm.control}
+          name="phoneNumber"
+          render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+            <FormInput
+              label="Phone number"
+              returnKeyType="done"
+              value={value}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              containerStyles={{ flex: 1 }}
+              style={styles.phoneNumberInput}
+              keyboardType="number-pad"
+              selectionColor={Themes.colors.primary}
+              underlineColor="transparent"
+              mode="outlined"
+            />
+          )}
         />
       </View>
-      <FormInput
-        label="Password"
-        returnKeyType="done"
-        value={password}
-        onChangeText={(password) => setPassword(password)}
-        isPassword
+
+      <Controller
+        control={signUpForm.control}
+        name="lastName"
+        render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+          <FormInput
+            label="Password"
+            returnKeyType="done"
+            value={value}
+            onBlur={onBlur}
+            onChangeText={onChange}
+            isPassword
+          />
+        )}
       />
+
       <Button mode="contained" onPress={onSignUpPress} style={styles.button}>
         Sign Up
       </Button>

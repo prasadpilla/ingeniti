@@ -7,7 +7,7 @@
   "module": "./dist/shared.js",
   "types": "./dist/main.d.ts",
   "scripts": {
-    "dev": "vite",
+    "dev": "tsc && vite build --watch",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },

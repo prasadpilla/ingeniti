@@ -4,7 +4,7 @@ const REQUIRED_ERROR = 'This field is required!';
 const COUNTRY_CODE_REGEX = /^\+?[1-9]\d{1,3}$/;
 const PHONE_NUMBER_REGEX = /^\d{7,14}$/;
 
-const signUpForm = z.object({
+const signUpFormSchema = z.object({
   firstName: z.string({
     invalid_type_error: 'First name must be a string!',
     required_error: REQUIRED_ERROR,
@@ -37,6 +37,6 @@ const signUpForm = z.object({
     .max(30, 'Password cannot exceed 30 characters!'),
 });
 
-export { signUpForm };
+export { signUpFormSchema };
 
-export type SignUpForm = z.infer<typeof signUpForm>;
+export type SignUpForm = z.infer<typeof signUpFormSchema>;
