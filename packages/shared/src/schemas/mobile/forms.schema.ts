@@ -16,6 +16,23 @@ const signUpFormSchema = z.object({
     .max(30, 'Password cannot exceed 30 characters!'),
 });
 
-export { signUpFormSchema };
+const loginFormEmailSchema = z.object({
+  emailAddress: z.string().min(1, 'Email is required!').email('Email is invalid!'),
+  password: z
+    .string()
+    .min(6, 'Password must contain minimum 6 characters!')
+    .max(30, 'Password cannot exceed 30 characters!'),
+});
+
+const loginFormPhoneSchema = z.object({
+  phoneNumber: z
+    .string()
+    .min(1, 'Phone number is required!')
+    .regex(PHONE_NUMBER_REGEX, 'Invalid phone number format!'),
+});
+
+export { signUpFormSchema, loginFormEmailSchema, loginFormPhoneSchema };
 
 export type SignUpForm = z.infer<typeof signUpFormSchema>;
+export type LoginFormEmail = z.infer<typeof loginFormEmailSchema>;
+export type LoginFormPhone = z.infer<typeof loginFormPhoneSchema>;

@@ -31,13 +31,14 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
     if (!isLoaded) return;
 
     const { firstName, lastName, emailAddress, phoneNumber, password } = data;
+    const phone = phoneNumber.startsWith('+') ? phoneNumber : `+${phoneNumber}`;
 
     try {
       await signUp.create({
         firstName,
         lastName,
         emailAddress,
-        phoneNumber,
+        phoneNumber: phone,
         password,
       });
 

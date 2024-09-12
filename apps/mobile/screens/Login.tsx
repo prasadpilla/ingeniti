@@ -1,31 +1,48 @@
 import { useSignIn } from '@clerk/clerk-expo';
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  LoginFormEmail,
+  loginFormEmailSchema,
+  LoginFormPhone,
+  loginFormPhoneSchema,
+} from '@ingeniti/shared';
 import React, { useState } from 'react';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
-import Header from '../components/Header';
 import FormInput from '../components/FormInput';
+import Header from '../components/Header';
 import { Themes } from '../styles/themes';
-import { Navigation } from '../types';
+import { LoginProps } from '../types';
 
-interface Props {
-  navigation: Navigation;
-}
-
-const LoginScreen = ({ navigation }: Props) => {
+const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
   const { signIn, setActive, isLoaded } = useSignIn();
 
-  const [emailAddress, setEmailAddress] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [countryCode, setCountryCode] = useState<string>('+91');
-  const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [usePhone, setUsePhone] = useState(false);
 
-  const onSignInPress = React.useCallback(async () => {
+  const loginEmailForm = useForm<LoginFormEmail>({
+    resolver: zodResolver(loginFormEmailSchema),
+    defaultValues: {
+      emailAddress: '',
+      password: '',
+    },
+  });
+
+  const loginPhoneForm = useForm<LoginFormPhone>({
+    resolver: zodResolver(loginFormPhoneSchema),
+    defaultValues: {
+      phoneNumber: '',
+    },
+  });
+
+  const onEmailSignInPress: SubmitHandler<LoginFormEmail> = async (data) => {
     if (!isLoaded) {
       return;
     }
+
+    const { emailAddress, password } = data;
 
     try {
       const signInAttempt = await signIn.create({
@@ -36,79 +53,130 @@ const LoginScreen = ({ navigation }: Props) => {
       if (signInAttempt.status === 'complete') {
         await setActive({ session: signInAttempt.createdSessionId });
       } else {
-        // See https://clerk.com/docs/custom-flows/error-handling
-        // for more info on error handling
         console.error(JSON.stringify(signInAttempt, null, 2));
       }
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
     }
-  }, [isLoaded, emailAddress, password]);
+  };
+
+  const onPhoneSignInPress: SubmitHandler<LoginFormPhone> = async (data) => {
+    if (!isLoaded) {
+      return;
+    }
+
+    const { phoneNumber } = data;
+    const phone = phoneNumber.startsWith('+') ? phoneNumber : `+${phoneNumber}`;
+
+    try {
+      const signInAttempt = await signIn.create({
+        strategy: 'phone_code',
+        identifier: phone,
+      });
+
+      if (signInAttempt.status === 'complete') {
+        await setActive({ session: signInAttempt.createdSessionId });
+      } else {
+        console.error(JSON.stringify(signInAttempt, null, 2));
+      }
+    } catch (err: any) {
+      console.error(JSON.stringify(err, null, 2));
+    }
+  };
 
   return (
     <Background>
       <Header>Welcome back.</Header>
 
       <View style={styles.usePhone}>
-        <TouchableOpacity onPress={() => setUsePhone(!usePhone)}>
+        <TouchableOpacity
+          onPress={() => {
+            loginEmailForm.reset();
+            loginPhoneForm.reset();
+            setUsePhone(!usePhone);
+          }}
+        >
           <Text style={styles.usePhoneLabel}>{!usePhone ? 'Use Phone' : 'Use email'}</Text>
         </TouchableOpacity>
       </View>
 
       {!usePhone ? (
         <>
-          <FormInput
-            label="Email"
-            returnKeyType="next"
-            value={emailAddress}
-            onChangeText={(email) => setEmailAddress(email)}
-            autoCapitalize="none"
-            autoComplete="email"
-            textContentType="emailAddress"
-            keyboardType="email-address"
+          <Controller
+            control={loginEmailForm.control}
+            name="emailAddress"
+            render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+              <FormInput
+                label="Email"
+                returnKeyType="next"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                errorText={error?.message && error.message}
+                autoCapitalize="none"
+                autoComplete="email"
+                textContentType="emailAddress"
+                keyboardType="email-address"
+              />
+            )}
           />
 
-          <FormInput
-            label="Password"
-            returnKeyType="done"
-            value={password}
-            onChangeText={(password) => setPassword(password)}
-            isPassword
+          <Controller
+            control={loginEmailForm.control}
+            name="password"
+            render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+              <FormInput
+                label="Password"
+                returnKeyType="done"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                errorText={error?.message && error.message}
+                isPassword
+              />
+            )}
           />
 
           <View style={styles.forgotPassword}>
-            <TouchableOpacity onPress={() => navigation.navigate('ForgotPasswordScreen')}>
+            <TouchableOpacity
+              onPress={() => {
+                // TODO: Create Forgot password screen, Add to RootStack list
+                navigation.navigate('ForgotPasswordScreen');
+              }}
+            >
               <Text style={styles.label}>Forgot your password?</Text>
             </TouchableOpacity>
           </View>
         </>
       ) : (
-        <View style={styles.inpuContainer}>
-          <FormInput
-            label="Code"
-            returnKeyType="next"
-            value={countryCode}
-            onChangeText={setCountryCode}
-            containerStyles={{ width: '20%' }}
-            style={styles.countryCodeInput}
-          />
-
-          <FormInput
-            label="Phone number"
-            returnKeyType="done"
-            value={phoneNumber}
-            onChangeText={setPhoneNumber}
-            containerStyles={{ flex: 1 }}
-            style={styles.phoneNumberInput}
-            keyboardType="number-pad"
-            selectionColor={Themes.colors.primary}
-            underlineColor="transparent"
-            mode="outlined"
-          />
-        </View>
+        <Controller
+          control={loginPhoneForm.control}
+          name="phoneNumber"
+          render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+            <FormInput
+              label="Phone number"
+              returnKeyType="done"
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              errorText={error?.message && error.message}
+              keyboardType="phone-pad"
+              selectionColor={Themes.colors.primary}
+              underlineColor="transparent"
+              mode="outlined"
+            />
+          )}
+        />
       )}
 
-      <Button mode="contained" onPress={onSignInPress}>
+      <Button
+        mode="contained"
+        onPress={
+          !usePhone
+            ? loginEmailForm.handleSubmit(onEmailSignInPress)
+            : loginPhoneForm.handleSubmit(onPhoneSignInPress)
+        }
+      >
         Login
       </Button>
 
