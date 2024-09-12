@@ -1,8 +1,8 @@
 import { useSignUp } from '@clerk/clerk-expo';
-import { signUpFormSchema, SignUpForm } from '@ingeniti/shared';
 import { zodResolver } from '@hookform/resolvers/zod';
-import React, { useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { signUpFormSchema, SignUpForm } from '@ingeniti/shared';
+import React from 'react';
+import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import Background from '../components/Background';
@@ -15,35 +15,29 @@ import { SignupProps } from '../types';
 const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
   const { isLoaded, signUp } = useSignUp();
 
-  const [firstName, setFirstName] = useState<string>('');
-  const [lastName, setLastName] = useState<string>('');
-  const [emailAddress, setEmailAddress] = useState<string>('');
-  const [countryCode, setCountryCode] = useState<string>('+91');
-  const [phoneNumber, setPhoneNumber] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-
   const signUpForm = useForm<SignUpForm>({
     resolver: zodResolver(signUpFormSchema),
     defaultValues: {
       firstName: '',
       lastName: '',
       emailAddress: '',
-      countryCode: '+91',
       phoneNumber: '',
       password: '',
     },
     mode: 'onBlur',
   });
 
-  const onSignUpPress = async () => {
+  const onSignUpPress: SubmitHandler<SignUpForm> = async (data) => {
     if (!isLoaded) return;
+
+    const { firstName, lastName, emailAddress, phoneNumber, password } = data;
 
     try {
       await signUp.create({
         firstName,
         lastName,
         emailAddress,
-        phoneNumber: `${countryCode}${phoneNumber}`,
+        phoneNumber,
         password,
       });
 
@@ -51,7 +45,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
         strategy: 'email_code',
       });
 
-      navigation.navigate('VerifySignUpEmail', { emailAddress, phoneNumber, countryCode });
+      navigation.navigate('VerifySignUpEmail', { emailAddress, phoneNumber });
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
     }
@@ -70,7 +64,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
             value={value}
             onChangeText={onChange}
             onBlur={onBlur}
-            required
+            errorText={error?.message}
           />
         )}
       />
@@ -83,9 +77,9 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
             label="Last name"
             returnKeyType="next"
             value={value}
-            onBlur={onBlur}
             onChangeText={onChange}
-            required
+            onBlur={onBlur}
+            errorText={error?.message && error.message}
           />
         )}
       />
@@ -100,6 +94,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
             value={value}
             onBlur={onBlur}
             onChangeText={onChange}
+            errorText={error?.message && error.message}
             autoCapitalize="none"
             autoComplete="email"
             textContentType="emailAddress"
@@ -108,54 +103,30 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
         )}
       />
 
-      {/* <Controller
+      <Controller
         control={signUpForm.control}
-        name="lastName"
+        name="phoneNumber"
         render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
-         
+          <FormInput
+            label="Phone number"
+            placeholder="+91 82345 54389"
+            placeholderTextColor="#aaa"
+            returnKeyType="done"
+            value={value}
+            onBlur={onBlur}
+            onChangeText={onChange}
+            errorText={error?.message && error.message}
+            keyboardType="phone-pad"
+            selectionColor={Themes.colors.primary}
+            underlineColor="transparent"
+            mode="outlined"
+          />
         )}
-      /> */}
-      <View style={styles.inpuContainer}>
-        <Controller
-          control={signUpForm.control}
-          name="countryCode"
-          render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
-            <FormInput
-              label="Code"
-              returnKeyType="next"
-              value={value}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              containerStyles={{ width: '20%' }}
-              style={styles.countryCodeInput}
-            />
-          )}
-        />
-
-        <Controller
-          control={signUpForm.control}
-          name="phoneNumber"
-          render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
-            <FormInput
-              label="Phone number"
-              returnKeyType="done"
-              value={value}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              containerStyles={{ flex: 1 }}
-              style={styles.phoneNumberInput}
-              keyboardType="number-pad"
-              selectionColor={Themes.colors.primary}
-              underlineColor="transparent"
-              mode="outlined"
-            />
-          )}
-        />
-      </View>
+      />
 
       <Controller
         control={signUpForm.control}
-        name="lastName"
+        name="password"
         render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
           <FormInput
             label="Password"
@@ -163,17 +134,27 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
             value={value}
             onBlur={onBlur}
             onChangeText={onChange}
+            errorText={error?.message && error.message}
             isPassword
           />
         )}
       />
 
-      <Button mode="contained" onPress={onSignUpPress} style={styles.button}>
+      <Button
+        mode="contained"
+        onPress={signUpForm.handleSubmit(onSignUpPress)}
+        style={styles.button}
+      >
         Sign Up
       </Button>
       <View style={styles.row}>
         <Text style={styles.label}>Already have an account? </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+        <TouchableOpacity
+          onPress={() => {
+            signUpForm.reset();
+            navigation.navigate('Login');
+          }}
+        >
           <Text style={styles.link}>Login</Text>
         </TouchableOpacity>
       </View>

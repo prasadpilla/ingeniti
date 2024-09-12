@@ -8,11 +8,9 @@ type RootStackNavigationParamList = {
   VerifySignUpEmail: {
     emailAddress: string;
     phoneNumber: string;
-    countryCode: string;
   };
   VerifySignUpPhone: {
     phoneNumber: string;
-    countryCode: string;
   };
   DashboardHome: undefined;
 };

@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Text, ViewStyle } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Text,
+  ViewStyle,
+  NativeTouchEvent,
+  NativeSyntheticEvent,
+  TextInputFocusEventData,
+} from 'react-native';
 import { TextInput as Input } from 'react-native-paper';
 
 import { Themes } from '../styles/themes';
@@ -14,7 +22,6 @@ interface FormInputProps extends React.ComponentProps<typeof Input> {
 const FormInput: React.FC<FormInputProps> = ({
   errorText,
   isPassword,
-  required,
   containerStyles,
   label,
   ...props
@@ -25,14 +32,11 @@ const FormInput: React.FC<FormInputProps> = ({
     setPasswordVisible(!passwordVisible);
   };
 
-  const handleBlur = (e) => {
+  const handleBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     if (props.onBlur) {
       props.onBlur(e);
     }
   };
-
-  const showError = false; // required && props.value (Need clarity on how to show validation errors)
-  const displayedErrorText = showError ? `${label} is required` : errorText;
 
   return (
     <View style={[styles.container, containerStyles]}>
@@ -42,7 +46,7 @@ const FormInput: React.FC<FormInputProps> = ({
         underlineColor="transparent"
         mode="outlined"
         label={label}
-        error={showError || !!errorText}
+        error={!!errorText}
         secureTextEntry={isPassword && !passwordVisible}
         right={
           isPassword ? (
@@ -59,7 +63,7 @@ const FormInput: React.FC<FormInputProps> = ({
         onBlur={(e) => handleBlur(e)}
         {...props}
       />
-      {displayedErrorText ? <Text style={styles.error}>{displayedErrorText}</Text> : null}
+      {errorText && <Text style={styles.error}>{errorText}</Text>}
     </View>
   );
 };
@@ -73,7 +77,7 @@ const styles = StyleSheet.create({
     backgroundColor: Themes.colors.surface,
   },
   error: {
-    fontSize: 14,
+    fontSize: 12,
     color: Themes.colors.error,
     paddingHorizontal: 4,
     paddingTop: 4,
