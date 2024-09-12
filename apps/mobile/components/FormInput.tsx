@@ -4,21 +4,21 @@ import { TextInput as Input } from 'react-native-paper';
 
 import { Themes } from '../styles/themes';
 
-type Props = React.ComponentProps<typeof Input> & {
+interface FormInputProps extends React.ComponentProps<typeof Input> {
   errorText?: string;
   isPassword?: boolean;
   required?: boolean;
   containerStyles?: ViewStyle;
-};
+}
 
-const TextInput = ({
+const FormInput: React.FC<FormInputProps> = ({
   errorText,
   isPassword,
   required,
   containerStyles,
   label,
   ...props
-}: Props) => {
+}) => {
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
 
   const togglePasswordVisibility = () => {
@@ -80,4 +80,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TextInput;
+export default FormInput;

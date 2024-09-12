@@ -4,13 +4,9 @@ import Background from '../components/Background';
 import Button from '../components/Button';
 import Header from '../components/Header';
 import Paragraph from '../components/Paragraph';
-import { Navigation } from '../types';
+import { HomeProps } from '../types';
 
-interface Props {
-  navigation: Navigation;
-}
-
-const HomeScreen = ({ navigation }: Props) => (
+const HomeScreen: React.FC<HomeProps> = ({ navigation }) => (
   <Background>
     <Header>inGeniti</Header>
     <Paragraph>Energy and water optimization platform</Paragraph>

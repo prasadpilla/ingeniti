@@ -3,11 +3,11 @@ import { StyleSheet, Text } from 'react-native';
 
 import { Themes } from '../styles/themes';
 
-type Props = React.ComponentProps<typeof Text> & {
+interface ParagraphProps extends React.ComponentProps<typeof Text> {
   children: React.ReactNode;
-};
+}
 
-const Paragraph = ({ children, ...props }: Props) => (
+const Paragraph: React.FC<ParagraphProps> = ({ children, ...props }) => (
   <Text style={styles.text} {...props}>
     {children}
   </Text>

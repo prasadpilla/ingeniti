@@ -3,11 +3,13 @@ import { StyleSheet, Text } from 'react-native';
 
 import { Themes } from '../styles/themes';
 
-interface Props {
+interface HeaderProps {
   children: React.ReactNode;
 }
 
-const Header = ({ children }: Props) => <Text style={styles.header}>{children}</Text>;
+const Header: React.FC<HeaderProps> = ({ children }) => (
+  <Text style={styles.header}>{children}</Text>
+);
 
 const styles = StyleSheet.create({
   header: {

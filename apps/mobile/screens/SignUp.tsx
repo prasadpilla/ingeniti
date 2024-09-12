@@ -4,15 +4,12 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
+import FormInput from '../components/FormInput';
 import Header from '../components/Header';
-import TextInput from '../components/TextInput';
 import { Themes } from '../styles/themes';
+import { SignupProps } from '../types';
 
-interface SignUpScreenProps {
-  navigation: any;
-}
-
-const SignUpScreen = ({ navigation }: SignUpScreenProps) => {
+const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
   const { isLoaded, signUp } = useSignUp();
 
   const [firstName, setFirstName] = useState<string>('');
@@ -38,7 +35,7 @@ const SignUpScreen = ({ navigation }: SignUpScreenProps) => {
         strategy: 'email_code',
       });
 
-      navigation.navigate('VerifyEmail', { emailAddress, phoneNumber, countryCode });
+      navigation.navigate('VerifySignUpEmail', { emailAddress, phoneNumber, countryCode });
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
     }
@@ -47,21 +44,21 @@ const SignUpScreen = ({ navigation }: SignUpScreenProps) => {
   return (
     <Background>
       <Header>Create Account</Header>
-      <TextInput
+      <FormInput
         label="First name"
         returnKeyType="next"
         value={firstName}
         onChangeText={(firstName) => setFirstName(firstName)}
         required
       />
-      <TextInput
+      <FormInput
         label="Last name"
         returnKeyType="next"
         value={lastName}
         onChangeText={(lastName) => setLastName(lastName)}
         required
       />
-      <TextInput
+      <FormInput
         label="Email"
         returnKeyType="next"
         value={emailAddress}
@@ -72,7 +69,7 @@ const SignUpScreen = ({ navigation }: SignUpScreenProps) => {
         keyboardType="email-address"
       />
       <View style={styles.inpuContainer}>
-        <TextInput
+        <FormInput
           label="Code"
           returnKeyType="next"
           value={countryCode}
@@ -80,7 +77,7 @@ const SignUpScreen = ({ navigation }: SignUpScreenProps) => {
           containerStyles={{ width: '20%' }}
           style={styles.countryCodeInput}
         />
-        <TextInput
+        <FormInput
           label="Phone number"
           returnKeyType="done"
           value={phoneNumber}
@@ -93,7 +90,7 @@ const SignUpScreen = ({ navigation }: SignUpScreenProps) => {
           mode="outlined"
         />
       </View>
-      <TextInput
+      <FormInput
         label="Password"
         returnKeyType="done"
         value={password}

@@ -5,17 +5,13 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
+import FormInput from '../components/FormInput';
 import Header from '../components/Header';
 import Paragraph from '../components/Paragraph';
-import TextInput from '../components/TextInput';
 import { Themes } from '../styles/themes';
+import { VerifySignUpPhoneProps } from '../types';
 
-interface VerifyPhoneScreenProps {
-  route: any;
-  navigation: any;
-}
-
-const VerifyPhoneScreen = ({ route, navigation }: VerifyPhoneScreenProps) => {
+const VerifySignUpPhoneScreen: React.FC<VerifySignUpPhoneProps> = ({ route }) => {
   const { isLoaded, signUp, setActive } = useSignUp();
   const { phoneNumber, countryCode } = route.params;
   const phone = `${countryCode}${phoneNumber}`;
@@ -58,7 +54,7 @@ const VerifyPhoneScreen = ({ route, navigation }: VerifyPhoneScreenProps) => {
         </View>
       </View>
 
-      <TextInput
+      <FormInput
         label="Vefication Code"
         returnKeyType="done"
         value={verificationCode}
@@ -98,4 +94,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default VerifyPhoneScreen;
+export default VerifySignUpPhoneScreen;

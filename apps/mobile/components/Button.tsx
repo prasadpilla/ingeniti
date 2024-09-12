@@ -4,9 +4,9 @@ import { Button as PaperButton } from 'react-native-paper';
 
 import { Themes } from '../styles/themes';
 
-type Props = React.ComponentProps<typeof PaperButton>;
+interface ButtonProps extends React.ComponentProps<typeof PaperButton> {}
 
-const Button = ({ mode, style, children, ...props }: Props) => (
+const Button: React.FC<ButtonProps> = ({ mode, style, children, ...props }) => (
   <PaperButton
     style={[
       styles.button,

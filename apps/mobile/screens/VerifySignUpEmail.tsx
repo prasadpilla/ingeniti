@@ -5,17 +5,13 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
+import FormInput from '../components/FormInput';
 import Header from '../components/Header';
 import Paragraph from '../components/Paragraph';
-import TextInput from '../components/TextInput';
 import { Themes } from '../styles/themes';
+import { VerifySignUpEmailProps } from '../types';
 
-interface VerifyEmailScreenProps {
-  route: any;
-  navigation: any;
-}
-
-const VerifyEmailScreen = ({ route, navigation }: VerifyEmailScreenProps) => {
+const VerifySignUpEmailScreen: React.FC<VerifySignUpEmailProps> = ({ route, navigation }) => {
   const { isLoaded, signUp } = useSignUp();
   const { emailAddress, phoneNumber, countryCode } = route.params;
 
@@ -33,7 +29,7 @@ const VerifyEmailScreen = ({ route, navigation }: VerifyEmailScreenProps) => {
 
       if (completeSignUp.status === 'complete') {
         await signUp.preparePhoneNumberVerification();
-        navigation.navigate('VerifyPhone', {
+        navigation.navigate('VerifySignUpPhone', {
           phoneNumber,
           countryCode,
         });
@@ -61,7 +57,7 @@ const VerifyEmailScreen = ({ route, navigation }: VerifyEmailScreenProps) => {
         </View>
       </View>
 
-      <TextInput
+      <FormInput
         label="Vefication Code"
         returnKeyType="done"
         value={verificationCode}
@@ -101,4 +97,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default VerifyEmailScreen;
+export default VerifySignUpEmailScreen;

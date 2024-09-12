@@ -1,11 +1,13 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
-interface Props {
+interface BackgroundProps {
   children: React.ReactNode;
 }
 
-const Background = ({ children }: Props) => <View style={styles.container}>{children}</View>;
+const Background: React.FC<BackgroundProps> = ({ children }) => (
+  <View style={styles.container}>{children}</View>
+);
 
 const styles = StyleSheet.create({
   container: {

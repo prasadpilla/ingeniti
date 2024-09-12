@@ -11,10 +11,11 @@ import LoginScreen from './screens/Login';
 import ProfileScreen from './screens/Profile';
 import SettingsScreen from './screens/Settings';
 import SignUpScreen from './screens/SignUp';
-import VerifyEmailScreen from './screens/VerifyEmail';
-import VerifyPhoneScreen from './screens/VerifyPhone';
+import VerifySignUpEmailScreen from './screens/VerifySignUpEmail';
+import VerifySignUpPhoneScreen from './screens/VerifySignUpPhone';
+import { BottomTabNavigationParamList, RootStackNavigationParamList } from './types';
 
-const Tab = createMaterialBottomTabNavigator();
+const Tab = createMaterialBottomTabNavigator<BottomTabNavigationParamList>();
 function TabNavigation() {
   return (
     <Tab.Navigator>
@@ -48,8 +49,7 @@ function TabNavigation() {
   );
 }
 
-const Stack = createStackNavigator();
-
+const Stack = createStackNavigator<RootStackNavigationParamList>();
 const Navigation = ({ theme }) => {
   const { isSignedIn } = useAuth();
 
@@ -57,14 +57,14 @@ const Navigation = ({ theme }) => {
     <NavigationContainer theme={theme}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {isSignedIn ? (
-          <Stack.Screen name="Dashboard" component={TabNavigation} />
+          <Stack.Screen name="DashboardHome" component={TabNavigation} />
         ) : (
           <>
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="SignUp" component={SignUpScreen} />
-            <Stack.Screen name="VerifyEmail" component={VerifyEmailScreen} />
-            <Stack.Screen name="VerifyPhone" component={VerifyPhoneScreen} />
+            <Stack.Screen name="VerifySignUpEmail" component={VerifySignUpEmailScreen} />
+            <Stack.Screen name="VerifySignUpPhone" component={VerifySignUpPhoneScreen} />
           </>
         )}
       </Stack.Navigator>

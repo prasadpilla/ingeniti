@@ -5,7 +5,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Background from '../components/Background';
 import Button from '../components/Button';
 import Header from '../components/Header';
-import TextInput from '../components/TextInput';
+import FormInput from '../components/FormInput';
 import { Themes } from '../styles/themes';
 import { Navigation } from '../types';
 
@@ -57,7 +57,7 @@ const LoginScreen = ({ navigation }: Props) => {
 
       {!usePhone ? (
         <>
-          <TextInput
+          <FormInput
             label="Email"
             returnKeyType="next"
             value={emailAddress}
@@ -68,7 +68,7 @@ const LoginScreen = ({ navigation }: Props) => {
             keyboardType="email-address"
           />
 
-          <TextInput
+          <FormInput
             label="Password"
             returnKeyType="done"
             value={password}
@@ -84,7 +84,7 @@ const LoginScreen = ({ navigation }: Props) => {
         </>
       ) : (
         <View style={styles.inpuContainer}>
-          <TextInput
+          <FormInput
             label="Code"
             returnKeyType="next"
             value={countryCode}
@@ -93,7 +93,7 @@ const LoginScreen = ({ navigation }: Props) => {
             style={styles.countryCodeInput}
           />
 
-          <TextInput
+          <FormInput
             label="Phone number"
             returnKeyType="done"
             value={phoneNumber}
