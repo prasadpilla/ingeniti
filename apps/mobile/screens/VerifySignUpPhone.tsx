@@ -1,10 +1,9 @@
 import { useSignUp } from '@clerk/clerk-expo';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { VerificationCodeForm, verificationCodeFormSchema } from '@ingeniti/shared';
 import React from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
@@ -16,7 +15,7 @@ import { VerifySignUpPhoneProps } from '../types';
 
 const VerifySignUpPhoneScreen: React.FC<VerifySignUpPhoneProps> = ({ route }) => {
   const { isLoaded, signUp, setActive } = useSignUp();
-  const { firstName, lastName, phoneNumber } = route.params;
+  const { phoneNumber } = route.params;
 
   const verificationCodeForm = useForm<VerificationCodeForm>({
     resolver: zodResolver(verificationCodeFormSchema),
@@ -56,9 +55,6 @@ const VerifySignUpPhoneScreen: React.FC<VerifySignUpPhoneProps> = ({ route }) =>
         </Paragraph>
         <View style={styles.credentialContainer}>
           <Paragraph style={styles.credential}>{phoneNumber}</Paragraph>
-          <TouchableOpacity onPress={() => {}}>
-            <MaterialCommunityIcons name="pencil" size={20} style={styles.editIcon} />
-          </TouchableOpacity>
         </View>
       </View>
 
@@ -67,7 +63,7 @@ const VerifySignUpPhoneScreen: React.FC<VerifySignUpPhoneProps> = ({ route }) =>
         name="code"
         render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
           <FormInput
-            label="Vefication Code"
+            label="Verification Code"
             returnKeyType="done"
             value={value}
             onChangeText={onChange}

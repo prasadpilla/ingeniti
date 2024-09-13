@@ -56,9 +56,6 @@ const VerifyLoginPhoneScreen: React.FC<VerifyLoginPhoneProps> = ({ route }) => {
         </Paragraph>
         <View style={styles.credentialContainer}>
           <Paragraph style={styles.credential}>{phoneNumber}</Paragraph>
-          <TouchableOpacity onPress={() => {}}>
-            <MaterialCommunityIcons name="pencil" size={20} style={styles.editIcon} />
-          </TouchableOpacity>
         </View>
       </View>
 
@@ -67,7 +64,7 @@ const VerifyLoginPhoneScreen: React.FC<VerifyLoginPhoneProps> = ({ route }) => {
         name="code"
         render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
           <FormInput
-            label="Vefication Code"
+            label="Verification Code"
             returnKeyType="done"
             value={value}
             onChangeText={onChange}

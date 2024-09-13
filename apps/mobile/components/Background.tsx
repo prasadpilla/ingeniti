@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, SafeAreaView } from 'react-native';
+import { SafeAreaView, StyleSheet } from 'react-native';
 
 interface BackgroundProps {
   children: React.ReactNode;

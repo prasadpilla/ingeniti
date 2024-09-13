@@ -63,9 +63,6 @@ const VerifySignUpEmailScreen: React.FC<VerifySignUpEmailProps> = ({ route, navi
         </Paragraph>
         <View style={styles.credentialContainer}>
           <Paragraph style={styles.credential}>{emailAddress}</Paragraph>
-          <TouchableOpacity onPress={() => {}}>
-            <MaterialCommunityIcons name="pencil" size={20} style={styles.editIcon} />
-          </TouchableOpacity>
         </View>
       </View>
 
