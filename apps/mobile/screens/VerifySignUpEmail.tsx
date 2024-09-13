@@ -74,7 +74,7 @@ const VerifySignUpEmailScreen: React.FC<VerifySignUpEmailProps> = ({ route, navi
         name="code"
         render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
           <FormInput
-            label="Vefication Code"
+            label="Verification Code"
             returnKeyType="done"
             value={value}
             onChangeText={onChange}

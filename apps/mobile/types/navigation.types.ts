@@ -19,6 +19,7 @@ type RootStackNavigationParamList = {
     lastName: string;
     phoneNumber: string;
   };
+  ForgotPassword: undefined;
   DashboardHome: undefined;
 };
 
@@ -46,21 +47,24 @@ type BottomTabNavigationParamList = {
   Settings: undefined;
 };
 
+type ForgotPasswordProps = NativeStackScreenProps<RootStackNavigationParamList, 'ForgotPassword'>;
+
 type DashboardProps = MaterialBottomTabScreenProps<BottomTabNavigationParamList, 'Dashboard'>;
 type ProfileProps = MaterialBottomTabScreenProps<BottomTabNavigationParamList, 'Profile'>;
 type SettingsProps = MaterialBottomTabScreenProps<BottomTabNavigationParamList, 'Settings'>;
 
 export type {
-  RootStackNavigationParamList,
   BottomTabNavigationParamList,
-  HomeProps,
-  LoginProps,
-  VerifyLoginPhoneProps,
-  SignupProps,
-  VerifySignUpEmailProps,
-  VerifySignUpPhoneProps,
   DashboardHomeProps,
   DashboardProps,
+  ForgotPasswordProps,
+  HomeProps,
+  LoginProps,
   ProfileProps,
+  RootStackNavigationParamList,
   SettingsProps,
+  SignupProps,
+  VerifyLoginPhoneProps,
+  VerifySignUpEmailProps,
+  VerifySignUpPhoneProps
 };
