@@ -1,5 +1,5 @@
 import { useSignIn } from '@clerk/clerk-expo';
-import { PhoneCodeFactor, SignInFirstFactor } from '@clerk/types';
+import { ClerkAPIError, PhoneCodeFactor, SignInFirstFactor } from '@clerk/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   LoginFormEmail,
@@ -20,8 +20,13 @@ import { LoginProps } from '../types';
 
 const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
   const { signIn, setActive, isLoaded } = useSignIn();
-
   const [usePhone, setUsePhone] = useState(false);
+  const [loginError, setLoginError] = useState<Record<string, string | undefined>>({
+    emailError: undefined,
+    phoneError: undefined,
+    passwordError: undefined,
+    defaultError: undefined,
+  });
 
   const loginEmailForm = useForm<LoginFormEmail>({
     resolver: zodResolver(loginFormEmailSchema),
@@ -37,6 +42,47 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
       phoneNumber: '',
     },
   });
+
+  const handleLoginErrors = (errors: ClerkAPIError[]) => {
+    if (errors.length > 0) {
+      const err = errors[0];
+      const paramName = err.meta?.paramName;
+
+      switch (paramName) {
+        case 'email_address':
+          setLoginError({
+            emailError: err.message,
+            phoneError: undefined,
+            passwordError: undefined,
+            defaultError: undefined,
+          });
+          break;
+        case 'phone_number':
+          setLoginError({
+            emailError: undefined,
+            phoneError: err.message,
+            passwordError: undefined,
+            defaultError: undefined,
+          });
+          break;
+        case 'password':
+          setLoginError({
+            emailError: undefined,
+            phoneError: undefined,
+            passwordError: err.message,
+            defaultError: undefined,
+          });
+          break;
+        default:
+          setLoginError({
+            emailError: undefined,
+            phoneError: undefined,
+            passwordError: undefined,
+            defaultError: err.message,
+          });
+      }
+    }
+  };
 
   const onEmailSignInPress: SubmitHandler<LoginFormEmail> = async (data) => {
     if (!isLoaded) {
@@ -57,6 +103,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
         console.error(JSON.stringify(signInAttempt, null, 2));
       }
     } catch (err: any) {
+      handleLoginErrors(err.errors);
       console.error(JSON.stringify(err, null, 2));
     }
   };
@@ -89,15 +136,16 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
 
       navigation.navigate('VerifyLoginPhone', { phoneNumber: phone });
     } catch (err: any) {
+      handleLoginErrors(err.errors);
       console.error(JSON.stringify(err, null, 2));
     }
   };
 
   return (
     <Background>
-      <Header>Welcome back.</Header>
+      <Header>Welcome back</Header>
 
-      <View style={styles.usePhone}>
+      <View style={styles.usePhoneContainer}>
         <TouchableOpacity
           onPress={() => {
             loginEmailForm.reset();
@@ -105,7 +153,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
             setUsePhone(!usePhone);
           }}
         >
-          <Text style={styles.usePhoneLabel}>{!usePhone ? 'Use Phone' : 'Use email'}</Text>
+          <Text style={styles.usePhoneText}>{!usePhone ? 'Use Phone' : 'Use email'}</Text>
         </TouchableOpacity>
       </View>
 
@@ -121,7 +169,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
                 value={value}
                 onChangeText={onChange}
                 onBlur={onBlur}
-                errorText={error?.message}
+                errorText={error?.message || loginError.emailError}
                 autoCapitalize="none"
                 autoComplete="email"
                 textContentType="emailAddress"
@@ -140,20 +188,15 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
                 value={value}
                 onChangeText={onChange}
                 onBlur={onBlur}
-                errorText={error?.message}
+                errorText={error?.message || loginError.passwordError}
                 isPassword
               />
             )}
           />
 
-          <View style={styles.forgotPassword}>
-            <TouchableOpacity
-              onPress={() => {
-                // TODO: Create Forgot password screen, Add to RootStack list
-                // navigation.navigate('ForgotPasswordScreen');
-              }}
-            >
-              <Text style={styles.label}>Forgot your password?</Text>
+          <View style={styles.forgotPasswordContainer}>
+            <TouchableOpacity onPress={() => {}}>
+              <Text style={styles.secondaryText}>Forgot your password?</Text>
             </TouchableOpacity>
           </View>
         </>
@@ -170,7 +213,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
               value={value}
               onChangeText={onChange}
               onBlur={onBlur}
-              errorText={error?.message}
+              errorText={error?.message || loginError.phoneError}
               keyboardType="phone-pad"
               selectionColor={Themes.colors.primary}
               underlineColor="transparent"
@@ -179,6 +222,8 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
           )}
         />
       )}
+
+      {loginError.defaultError && <Text style={styles.errorText}>{loginError.defaultError}</Text>}
 
       <Button
         mode="contained"
@@ -191,10 +236,10 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
         Login
       </Button>
 
-      <View style={styles.row}>
-        <Text style={styles.label}>Don’t have an account? </Text>
+      <View style={styles.signUpContainer}>
+        <Text style={styles.secondaryText}>Don't have an account? </Text>
         <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-          <Text style={styles.link}>Sign up</Text>
+          <Text style={styles.primaryText}>Sign up</Text>
         </TouchableOpacity>
       </View>
     </Background>
@@ -202,43 +247,35 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  usePhone: { width: '100%', alignItems: 'flex-end', marginBottom: -8, zIndex: 10 },
-  usePhoneLabel: {
+  usePhoneContainer: {
+    width: '100%',
+    alignItems: 'flex-end',
+    marginBottom: -8,
+    zIndex: 10,
+  },
+  usePhoneText: {
     color: Themes.colors.primary,
     fontWeight: '500',
   },
-  forgotPassword: {
+  forgotPasswordContainer: {
     width: '100%',
     alignItems: 'flex-end',
     marginBottom: 16,
   },
-  row: {
+  secondaryText: {
+    color: Themes.colors.secondary,
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 8,
+  },
+  signUpContainer: {
     flexDirection: 'row',
     marginTop: 4,
   },
-  label: {
-    color: Themes.colors.secondary,
-  },
-  link: {
+  primaryText: {
     fontWeight: 'bold',
     color: Themes.colors.primary,
-  },
-  inpuContainer: {
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    backgroundColor: Themes.colors.surface,
-    padding: 0,
-    marginBottom: 10,
-  },
-  countryCodeInput: {
-    marginVertical: 0,
-    backgroundColor: '#eee',
-  },
-  phoneNumberInput: {
-    flex: 1,
-    marginVertical: 0,
   },
 });
 
