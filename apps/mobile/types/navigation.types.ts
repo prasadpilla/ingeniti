@@ -4,6 +4,9 @@ import { NativeStackScreenProps } from 'react-native-screens/lib/typescript/nati
 type RootStackNavigationParamList = {
   Home: undefined;
   Login: undefined;
+  VerifyLoginPhone: {
+    phoneNumber: string;
+  };
   SignUp: undefined;
   VerifySignUpEmail: {
     emailAddress: string;
@@ -17,6 +20,10 @@ type RootStackNavigationParamList = {
 
 type HomeProps = NativeStackScreenProps<RootStackNavigationParamList, 'Home'>;
 type LoginProps = NativeStackScreenProps<RootStackNavigationParamList, 'Login'>;
+type VerifyLoginPhoneProps = NativeStackScreenProps<
+  RootStackNavigationParamList,
+  'VerifyLoginPhone'
+>;
 type SignupProps = NativeStackScreenProps<RootStackNavigationParamList, 'SignUp'>;
 type VerifySignUpEmailProps = NativeStackScreenProps<
   RootStackNavigationParamList,
@@ -44,6 +51,7 @@ export type {
   BottomTabNavigationParamList,
   HomeProps,
   LoginProps,
+  VerifyLoginPhoneProps,
   SignupProps,
   VerifySignUpEmailProps,
   VerifySignUpPhoneProps,

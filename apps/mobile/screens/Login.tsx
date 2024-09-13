@@ -1,4 +1,5 @@
 import { useSignIn } from '@clerk/clerk-expo';
+import { PhoneCodeFactor, SignInFirstFactor } from '@clerk/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   LoginFormEmail,
@@ -69,16 +70,24 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
     const phone = phoneNumber.startsWith('+') ? phoneNumber : `+${phoneNumber}`;
 
     try {
-      const signInAttempt = await signIn.create({
-        strategy: 'phone_code',
+      const { supportedFirstFactors } = await signIn.create({
         identifier: phone,
       });
 
-      if (signInAttempt.status === 'complete') {
-        await setActive({ session: signInAttempt.createdSessionId });
-      } else {
-        console.error(JSON.stringify(signInAttempt, null, 2));
+      const isPhoneCodeFactor = (factor: SignInFirstFactor): factor is PhoneCodeFactor => {
+        return factor.strategy === 'phone_code';
+      };
+      const phoneCodeFactor = supportedFirstFactors?.find(isPhoneCodeFactor);
+
+      if (phoneCodeFactor) {
+        const { phoneNumberId } = phoneCodeFactor;
+        await signIn.prepareFirstFactor({
+          strategy: 'phone_code',
+          phoneNumberId,
+        });
       }
+
+      navigation.navigate('VerifyLoginPhone', { phoneNumber: phone });
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
     }
@@ -112,7 +121,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
                 value={value}
                 onChangeText={onChange}
                 onBlur={onBlur}
-                errorText={error?.message && error.message}
+                errorText={error?.message}
                 autoCapitalize="none"
                 autoComplete="email"
                 textContentType="emailAddress"
@@ -131,7 +140,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
                 value={value}
                 onChangeText={onChange}
                 onBlur={onBlur}
-                errorText={error?.message && error.message}
+                errorText={error?.message}
                 isPassword
               />
             )}
@@ -141,7 +150,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
             <TouchableOpacity
               onPress={() => {
                 // TODO: Create Forgot password screen, Add to RootStack list
-                navigation.navigate('ForgotPasswordScreen');
+                // navigation.navigate('ForgotPasswordScreen');
               }}
             >
               <Text style={styles.label}>Forgot your password?</Text>
@@ -155,11 +164,13 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
           render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
             <FormInput
               label="Phone number"
+              placeholder="+91 82345 54389"
+              placeholderTextColor="#aaa"
               returnKeyType="done"
               value={value}
               onChangeText={onChange}
               onBlur={onBlur}
-              errorText={error?.message && error.message}
+              errorText={error?.message}
               keyboardType="phone-pad"
               selectionColor={Themes.colors.primary}
               underlineColor="transparent"

@@ -1,6 +1,9 @@
 import { useSignUp } from '@clerk/clerk-expo';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import React, { useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { VerificationCodeForm, verificationCodeFormSchema } from '@ingeniti/shared';
+import React from 'react';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import Background from '../components/Background';
@@ -13,25 +16,29 @@ import { VerifySignUpEmailProps } from '../types';
 
 const VerifySignUpEmailScreen: React.FC<VerifySignUpEmailProps> = ({ route, navigation }) => {
   const { isLoaded, signUp } = useSignUp();
-  const { emailAddress, phoneNumber, countryCode } = route.params;
+  const { emailAddress, phoneNumber } = route.params;
 
-  const [verificationCode, setVerificationCode] = useState<string>('');
+  const verificationCodeForm = useForm<VerificationCodeForm>({
+    resolver: zodResolver(verificationCodeFormSchema),
+    defaultValues: {
+      code: '',
+    },
+  });
 
-  const onPressVerify = async () => {
+  const onPressVerify: SubmitHandler<VerificationCodeForm> = async (data) => {
     if (!isLoaded) {
       return;
     }
 
     try {
       const completeSignUp = await signUp.attemptEmailAddressVerification({
-        code: verificationCode,
+        code: data.code,
       });
 
       if (completeSignUp.status === 'complete') {
         await signUp.preparePhoneNumberVerification();
         navigation.navigate('VerifySignUpPhone', {
           phoneNumber,
-          countryCode,
         });
       } else {
         console.error(JSON.stringify(completeSignUp, null, 2));
@@ -57,14 +64,26 @@ const VerifySignUpEmailScreen: React.FC<VerifySignUpEmailProps> = ({ route, navi
         </View>
       </View>
 
-      <FormInput
-        label="Vefication Code"
-        returnKeyType="done"
-        value={verificationCode}
-        onChangeText={(verificationCode) => setVerificationCode(verificationCode)}
+      <Controller
+        control={verificationCodeForm.control}
+        name="code"
+        render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+          <FormInput
+            label="Vefication Code"
+            returnKeyType="done"
+            value={value}
+            onChangeText={onChange}
+            onBlur={onBlur}
+            errorText={error?.message}
+          />
+        )}
       />
 
-      <Button mode="contained" onPress={onPressVerify} style={styles.button}>
+      <Button
+        mode="contained"
+        onPress={verificationCodeForm.handleSubmit(onPressVerify)}
+        style={styles.button}
+      >
         Verify
       </Button>
     </Background>

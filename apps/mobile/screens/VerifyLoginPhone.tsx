@@ -1,4 +1,4 @@
-import { useSignUp } from '@clerk/clerk-expo';
+import { useSignIn } from '@clerk/clerk-expo';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { VerificationCodeForm, verificationCodeFormSchema } from '@ingeniti/shared';
@@ -12,10 +12,10 @@ import FormInput from '../components/FormInput';
 import Header from '../components/Header';
 import Paragraph from '../components/Paragraph';
 import { Themes } from '../styles/themes';
-import { VerifySignUpPhoneProps } from '../types';
+import { VerifyLoginPhoneProps } from '../types';
 
-const VerifySignUpPhoneScreen: React.FC<VerifySignUpPhoneProps> = ({ route }) => {
-  const { isLoaded, signUp, setActive } = useSignUp();
+const VerifyLoginPhoneScreen: React.FC<VerifyLoginPhoneProps> = ({ route }) => {
+  const { isLoaded, signIn, setActive } = useSignIn();
   const { phoneNumber } = route.params;
 
   const verificationCodeForm = useForm<VerificationCodeForm>({
@@ -26,22 +26,23 @@ const VerifySignUpPhoneScreen: React.FC<VerifySignUpPhoneProps> = ({ route }) =>
   });
 
   const onPressVerify: SubmitHandler<VerificationCodeForm> = async (data) => {
-    if (!isLoaded) {
+    if (!isLoaded && !signIn) {
       return;
     }
 
     try {
-      const completeSignUp = await signUp.attemptPhoneNumberVerification({
+      const signInAttempt = await signIn.attemptFirstFactor({
+        strategy: 'phone_code',
         code: data.code,
       });
 
-      if (completeSignUp.status === 'complete') {
-        await setActive({ session: completeSignUp.createdSessionId });
+      if (signInAttempt.status === 'complete') {
+        await setActive({ session: signInAttempt.createdSessionId });
       } else {
-        console.error(JSON.stringify(completeSignUp, null, 2));
+        console.error(signInAttempt);
       }
-    } catch (err: any) {
-      console.error(JSON.stringify(err, null, 2));
+    } catch (err) {
+      console.error('Error:', JSON.stringify(err, null, 2));
     }
   };
 
@@ -113,4 +114,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default VerifySignUpPhoneScreen;
+export default VerifyLoginPhoneScreen;

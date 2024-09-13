@@ -31,8 +31,13 @@ const loginFormPhoneSchema = z.object({
     .regex(PHONE_NUMBER_REGEX, 'Invalid phone number format!'),
 });
 
-export { signUpFormSchema, loginFormEmailSchema, loginFormPhoneSchema };
+const verificationCodeFormSchema = z.object({
+  code: z.string().length(6, 'OTP must be a 6-digit number!'),
+});
+
+export { signUpFormSchema, loginFormEmailSchema, loginFormPhoneSchema, verificationCodeFormSchema };
 
 export type SignUpForm = z.infer<typeof signUpFormSchema>;
 export type LoginFormEmail = z.infer<typeof loginFormEmailSchema>;
 export type LoginFormPhone = z.infer<typeof loginFormPhoneSchema>;
+export type VerificationCodeForm = z.infer<typeof verificationCodeFormSchema>;

@@ -46,7 +46,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
         strategy: 'email_code',
       });
 
-      navigation.navigate('VerifySignUpEmail', { emailAddress, phoneNumber });
+      navigation.navigate('VerifySignUpEmail', { emailAddress, phoneNumber: phone });
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
     }
@@ -80,7 +80,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
             value={value}
             onChangeText={onChange}
             onBlur={onBlur}
-            errorText={error?.message && error.message}
+            errorText={error?.message}
           />
         )}
       />
@@ -95,7 +95,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
             value={value}
             onBlur={onBlur}
             onChangeText={onChange}
-            errorText={error?.message && error.message}
+            errorText={error?.message}
             autoCapitalize="none"
             autoComplete="email"
             textContentType="emailAddress"
@@ -116,7 +116,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
             value={value}
             onBlur={onBlur}
             onChangeText={onChange}
-            errorText={error?.message && error.message}
+            errorText={error?.message}
             keyboardType="phone-pad"
             selectionColor={Themes.colors.primary}
             underlineColor="transparent"
@@ -135,7 +135,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
             value={value}
             onBlur={onBlur}
             onChangeText={onChange}
-            errorText={error?.message && error.message}
+            errorText={error?.message}
             isPassword
           />
         )}
