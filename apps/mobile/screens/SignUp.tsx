@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: Themes.colors.primary,
   },
-  inpuContainer: {
+  inputContainer: {
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'flex-start',
@@ -239,6 +239,8 @@ const styles = StyleSheet.create({
   },
   goBackText: {
     color: Themes.colors.primary,
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

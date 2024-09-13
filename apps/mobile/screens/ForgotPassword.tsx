@@ -3,12 +3,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { z } from 'zod';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
 import FormInput from '../components/FormInput';
 import Header from '../components/Header';
+import { Themes } from '../styles/themes';
 import { ForgotPasswordProps } from '../types';
 
 const forgotPasswordSchema = z.object({
@@ -126,105 +128,109 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
   };
 
   return (
-    <Background>
-      <Header>Reset Password</Header>
-      {!resetSent ? (
-        <>
-          <Controller
-            control={forgotPasswordForm.control}
-            name="emailAddress"
-            render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
-              <FormInput
-                label="Email"
-                returnKeyType="done"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                errorText={error?.message || resetError}
-                autoCapitalize="none"
-                autoComplete="email"
-                textContentType="emailAddress"
-                keyboardType="email-address"
-              />
-            )}
-          />
-          <Button mode="contained" onPress={forgotPasswordForm.handleSubmit(onResetPress)}>
-            Send Reset Instructions
-          </Button>
-        </>
-      ) : !otpVerified ? (
-        <>
+    <SafeAreaView>
+      <Background>
+        <Header>Reset Password</Header>
+        {!resetSent ? (
+          <>
+            <Controller
+              control={forgotPasswordForm.control}
+              name="emailAddress"
+              render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+                <FormInput
+                  label="Email"
+                  returnKeyType="done"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  errorText={error?.message || resetError}
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  textContentType="emailAddress"
+                  keyboardType="email-address"
+                />
+              )}
+            />
+            <Button mode="contained" onPress={forgotPasswordForm.handleSubmit(onResetPress)}>
+              Send OTP
+            </Button>
+          </>
+        ) : !otpVerified ? (
+          <>
+            <Text style={styles.centeredText}>
+              OTP sent to your email. Please enter the OTP below.
+            </Text>
+            <Controller
+              control={verifyOTPForm.control}
+              name="otp"
+              render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+                <FormInput
+                  label="OTP"
+                  returnKeyType="done"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  errorText={error?.message || resetError}
+                  keyboardType="number-pad"
+                />
+              )}
+            />
+            <Button mode="contained" onPress={verifyOTPForm.handleSubmit(onVerifyOTP)}>
+              Verify OTP
+            </Button>
+          </>
+        ) : !verificationComplete ? (
+          <View style={styles.fullWidth}>
+            <Text style={[styles.centeredText, styles.marginBottom]}>
+              OTP verified. Please enter your new password.
+            </Text>
+            <Controller
+              control={newPasswordForm.control}
+              name="password"
+              render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+                <FormInput
+                  label="New Password"
+                  returnKeyType="next"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  errorText={error?.message}
+                  secureTextEntry
+                />
+              )}
+            />
+            <Controller
+              control={newPasswordForm.control}
+              name="confirmPassword"
+              render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+                <FormInput
+                  label="Confirm New Password"
+                  returnKeyType="done"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  errorText={error?.message}
+                  secureTextEntry
+                />
+              )}
+            />
+            <Button mode="contained" onPress={newPasswordForm.handleSubmit(onNewPasswordSubmit)}>
+              Reset Password
+            </Button>
+          </View>
+        ) : (
           <Text style={styles.centeredText}>
-            Reset instructions sent. Please check your email and enter the OTP below.
+            Password reset successful. You can now log in with your new password.
           </Text>
-          <Controller
-            control={verifyOTPForm.control}
-            name="otp"
-            render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
-              <FormInput
-                label="OTP"
-                returnKeyType="done"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                errorText={error?.message || resetError}
-                keyboardType="number-pad"
-              />
-            )}
-          />
-          <Button mode="contained" onPress={verifyOTPForm.handleSubmit(onVerifyOTP)}>
-            Verify OTP
-          </Button>
-        </>
-      ) : !verificationComplete ? (
-        <View style={styles.fullWidth}>
-          <Text style={[styles.centeredText, styles.marginBottom]}>
-            OTP verified. Please enter your new password.
-          </Text>
-          <Controller
-            control={newPasswordForm.control}
-            name="password"
-            render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
-              <FormInput
-                label="New Password"
-                returnKeyType="next"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                errorText={error?.message}
-                secureTextEntry
-              />
-            )}
-          />
-          <Controller
-            control={newPasswordForm.control}
-            name="confirmPassword"
-            render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
-              <FormInput
-                label="Confirm New Password"
-                returnKeyType="done"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                errorText={error?.message}
-                secureTextEntry
-              />
-            )}
-          />
-          <Button mode="contained" onPress={newPasswordForm.handleSubmit(onNewPasswordSubmit)}>
-            Reset Password
-          </Button>
+        )}
+        {resetError && <Text style={styles.errorText}>{resetError}</Text>}
+        <View style={styles.backToLoginContainer}>
+          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.backToLoginText}>Back to Login</Text>
+          </TouchableOpacity>
         </View>
-      ) : (
-        <Text style={styles.centeredText}>Password reset successful. You can now log in with your new password.</Text>
-      )}
-      {resetError && <Text style={styles.errorText}>{resetError}</Text>}
-      <View style={styles.backToLoginContainer}>
-        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-          <Text style={styles.backToLoginText}>Back to Login</Text>
-        </TouchableOpacity>
-      </View>
-    </Background>
+      </Background>
+    </SafeAreaView>
   );
 };
 
@@ -243,8 +249,9 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   backToLoginText: {
-    color: 'blue',
-    fontWeight: 'bold',
+    color: Themes.colors.primary,
+    fontSize: 16,
+    fontWeight: '600',
   },
   fullWidth: {
     width: '100%',

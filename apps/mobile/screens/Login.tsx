@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
   goBackText: {
     color: Themes.colors.primary,
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: '600',
   },
 });
 
