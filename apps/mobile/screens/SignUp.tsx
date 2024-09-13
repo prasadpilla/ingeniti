@@ -1,7 +1,8 @@
 import { useSignUp } from '@clerk/clerk-expo';
+import { ClerkAPIErrorJSON, ClerkAPIError } from '@clerk/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signUpFormSchema, SignUpForm } from '@ingeniti/shared';
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -14,6 +15,11 @@ import { SignupProps } from '../types';
 
 const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
   const { isLoaded, signUp } = useSignUp();
+  const [signUpError, setSignUpError] = useState<Record<string, string | undefined>>({
+    emailError: undefined,
+    phoneError: undefined,
+    defaultError: undefined,
+  });
 
   const signUpForm = useForm<SignUpForm>({
     resolver: zodResolver(signUpFormSchema),
@@ -26,6 +32,36 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
     },
     mode: 'onBlur',
   });
+
+  const handleSignUpErrors = (errors: ClerkAPIError[]) => {
+    if (errors.length > 0) {
+      const err = errors[0];
+      const paramName = err.meta?.paramName;
+
+      switch (paramName) {
+        case 'email_address':
+          setSignUpError({
+            emailError: err.message,
+            phoneError: undefined,
+            default: undefined,
+          });
+          break;
+        case 'phone_number':
+          setSignUpError({
+            emailError: undefined,
+            phoneError: err.message,
+            default: undefined,
+          });
+          break;
+        default:
+          setSignUpError({
+            emailError: undefined,
+            phoneError: undefined,
+            default: err.message,
+          });
+      }
+    }
+  };
 
   const onSignUpPress: SubmitHandler<SignUpForm> = async (data) => {
     if (!isLoaded) return;
@@ -51,6 +87,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
         lastName,
       });
     } catch (err: any) {
+      handleSignUpErrors(err.errors);
       console.error(JSON.stringify(err, null, 2));
     }
   };
@@ -98,7 +135,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
             value={value}
             onBlur={onBlur}
             onChangeText={onChange}
-            errorText={error?.message}
+            errorText={error?.message || signUpError.emailError}
             autoCapitalize="none"
             autoComplete="email"
             textContentType="emailAddress"
@@ -119,7 +156,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
             value={value}
             onBlur={onBlur}
             onChangeText={onChange}
-            errorText={error?.message}
+            errorText={error?.message || signUpError.phoneError}
             keyboardType="phone-pad"
             selectionColor={Themes.colors.primary}
             underlineColor="transparent"

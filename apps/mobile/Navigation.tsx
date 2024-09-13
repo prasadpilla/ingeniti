@@ -11,10 +11,10 @@ import LoginScreen from './screens/Login';
 import ProfileScreen from './screens/Profile';
 import SettingsScreen from './screens/Settings';
 import SignUpScreen from './screens/SignUp';
+import VerifyLoginPhoneScreen from './screens/VerifyLoginPhone';
 import VerifySignUpEmailScreen from './screens/VerifySignUpEmail';
 import VerifySignUpPhoneScreen from './screens/VerifySignUpPhone';
 import { BottomTabNavigationParamList, RootStackNavigationParamList } from './types';
-import VerifyLoginPhoneScreen from './screens/VerifyLoginPhone';
 
 const Tab = createMaterialBottomTabNavigator<BottomTabNavigationParamList>();
 function TabNavigation() {
