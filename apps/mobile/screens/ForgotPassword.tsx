@@ -216,9 +216,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
           </Button>
         </View>
       ) : (
-        <Text style={styles.centeredText}>
-          Password reset successful. You can now log in with your new password.
-        </Text>
+        <Text style={styles.centeredText}>Password reset successful. You can now log in with your new password.</Text>
       )}
       {resetError && <Text style={styles.errorText}>{resetError}</Text>}
       <View style={styles.backToLoginContainer}>

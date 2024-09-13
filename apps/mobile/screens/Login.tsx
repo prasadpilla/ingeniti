@@ -242,6 +242,10 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
           <Text style={styles.primaryText}>Sign up</Text>
         </TouchableOpacity>
       </View>
+
+      <TouchableOpacity style={styles.goBackButton} onPress={() => navigation.goBack()}>
+        <Text style={styles.goBackText}>Go Back</Text>
+      </TouchableOpacity>
     </Background>
   );
 };
@@ -276,6 +280,15 @@ const styles = StyleSheet.create({
   primaryText: {
     fontWeight: 'bold',
     color: Themes.colors.primary,
+  },
+  goBackButton: {
+    marginTop: 20,
+    alignSelf: 'center',
+  },
+  goBackText: {
+    color: Themes.colors.primary,
+    fontSize: 16,
+    fontWeight: '500',
   },
 });
 

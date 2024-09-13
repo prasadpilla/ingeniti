@@ -14,7 +14,7 @@ const Header: React.FC<HeaderProps> = ({ children }) => (
 const styles = StyleSheet.create({
   header: {
     fontSize: 26,
-    color: Themes.colors.primary,
+    color: Themes.colors.secondary,
     fontWeight: 'bold',
     paddingVertical: 14,
   },

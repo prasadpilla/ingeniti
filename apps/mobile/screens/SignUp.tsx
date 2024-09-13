@@ -1,9 +1,9 @@
 import { useSignUp } from '@clerk/clerk-expo';
-import { ClerkAPIErrorJSON, ClerkAPIError } from '@clerk/types';
+import { ClerkAPIError } from '@clerk/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { signUpFormSchema, SignUpForm } from '@ingeniti/shared';
+import { SignUpForm, signUpFormSchema } from '@ingeniti/shared';
 import React, { useState } from 'react';
-import { useForm, Controller, SubmitHandler } from 'react-hook-form';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import Background from '../components/Background';
@@ -199,6 +199,9 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
           <Text style={styles.link}>Login</Text>
         </TouchableOpacity>
       </View>
+      <TouchableOpacity style={styles.goBackButton} onPress={() => navigation.goBack()}>
+        <Text style={styles.goBackText}>Go Back</Text>
+      </TouchableOpacity>
     </Background>
   );
 };
@@ -230,6 +233,12 @@ const styles = StyleSheet.create({
   },
   phoneNumberInput: {
     flex: 1,
+  },
+  goBackButton: {
+    marginTop: 24,
+  },
+  goBackText: {
+    color: Themes.colors.primary,
   },
 });
 
