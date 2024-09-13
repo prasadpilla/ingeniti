@@ -9,10 +9,14 @@ type RootStackNavigationParamList = {
   };
   SignUp: undefined;
   VerifySignUpEmail: {
+    firstName: string;
+    lastName: string;
     emailAddress: string;
     phoneNumber: string;
   };
   VerifySignUpPhone: {
+    firstName: string;
+    lastName: string;
     phoneNumber: string;
   };
   DashboardHome: undefined;

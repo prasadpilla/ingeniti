@@ -16,7 +16,8 @@ import { VerifySignUpEmailProps } from '../types';
 
 const VerifySignUpEmailScreen: React.FC<VerifySignUpEmailProps> = ({ route, navigation }) => {
   const { isLoaded, signUp } = useSignUp();
-  const { emailAddress, phoneNumber } = route.params;
+
+  const { firstName, lastName, emailAddress, phoneNumber } = route.params;
 
   const verificationCodeForm = useForm<VerificationCodeForm>({
     resolver: zodResolver(verificationCodeFormSchema),
@@ -35,9 +36,13 @@ const VerifySignUpEmailScreen: React.FC<VerifySignUpEmailProps> = ({ route, navi
         code: data.code,
       });
 
-      if (completeSignUp.status === 'complete') {
-        await signUp.preparePhoneNumberVerification();
+      if (completeSignUp.status === 'missing_requirements') {
+        await signUp.preparePhoneNumberVerification({
+          strategy: 'phone_code',
+        });
         navigation.navigate('VerifySignUpPhone', {
+          firstName,
+          lastName,
           phoneNumber,
         });
       } else {

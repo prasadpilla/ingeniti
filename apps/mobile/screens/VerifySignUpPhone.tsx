@@ -16,7 +16,7 @@ import { VerifySignUpPhoneProps } from '../types';
 
 const VerifySignUpPhoneScreen: React.FC<VerifySignUpPhoneProps> = ({ route }) => {
   const { isLoaded, signUp, setActive } = useSignUp();
-  const { phoneNumber } = route.params;
+  const { firstName, lastName, phoneNumber } = route.params;
 
   const verificationCodeForm = useForm<VerificationCodeForm>({
     resolver: zodResolver(verificationCodeFormSchema),
@@ -35,13 +35,14 @@ const VerifySignUpPhoneScreen: React.FC<VerifySignUpPhoneProps> = ({ route }) =>
         code: data.code,
       });
 
-      if (completeSignUp.status === 'complete') {
-        await setActive({ session: completeSignUp.createdSessionId });
-      } else {
+      if (completeSignUp.status !== 'complete') {
         console.error(JSON.stringify(completeSignUp, null, 2));
+        return;
       }
+
+      await setActive({ session: completeSignUp.createdSessionId });
     } catch (err: any) {
-      console.error(JSON.stringify(err, null, 2));
+      console.error('Error during verification:', err.message || err);
     }
   };
 

@@ -35,8 +35,6 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
 
     try {
       await signUp.create({
-        firstName,
-        lastName,
         emailAddress,
         phoneNumber: phone,
         password,
@@ -46,7 +44,12 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
         strategy: 'email_code',
       });
 
-      navigation.navigate('VerifySignUpEmail', { emailAddress, phoneNumber: phone });
+      navigation.navigate('VerifySignUpEmail', {
+        emailAddress,
+        phoneNumber: phone,
+        firstName,
+        lastName,
+      });
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
     }

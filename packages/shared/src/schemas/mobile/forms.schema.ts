@@ -9,6 +9,7 @@ const signUpFormSchema = z.object({
   phoneNumber: z
     .string()
     .min(1, 'Phone number is required!')
+    .max(16, 'Invalid phone number!')
     .regex(PHONE_NUMBER_REGEX, 'Invalid phone number format!'),
   password: z
     .string()
@@ -28,6 +29,7 @@ const loginFormPhoneSchema = z.object({
   phoneNumber: z
     .string()
     .min(1, 'Phone number is required!')
+    .max(16, 'Invalid phone number!')
     .regex(PHONE_NUMBER_REGEX, 'Invalid phone number format!'),
 });
 
