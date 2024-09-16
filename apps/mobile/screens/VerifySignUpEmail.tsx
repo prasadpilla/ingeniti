@@ -1,10 +1,10 @@
 import { useSignUp } from '@clerk/clerk-expo';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { ClerkAPIError } from '@clerk/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { VerificationCodeForm, verificationCodeFormSchema } from '@ingeniti/shared';
-import React from 'react';
+import React, { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
@@ -25,6 +25,8 @@ const VerifySignUpEmailScreen: React.FC<VerifySignUpEmailProps> = ({ route, navi
       code: '',
     },
   });
+
+  const [verificationError, setVerificationError] = useState<string | undefined>(undefined);
 
   const onPressVerify: SubmitHandler<VerificationCodeForm> = async (data) => {
     if (!isLoaded) {
@@ -49,7 +51,22 @@ const VerifySignUpEmailScreen: React.FC<VerifySignUpEmailProps> = ({ route, navi
         console.error(JSON.stringify(completeSignUp, null, 2));
       }
     } catch (err: any) {
+      handleVerificationErrors(err.errors);
       console.error(JSON.stringify(err, null, 2));
+    }
+  };
+
+  const handleVerificationErrors = (errors: ClerkAPIError[]) => {
+    if (errors.length > 0) {
+      const err = errors[0];
+      const errCode = err.code;
+      const paramName = err.meta?.paramName;
+
+      if (`${errCode}-${paramName}` === 'form_code_incorrect-code') {
+        setVerificationError('The code is incorrect. Please try again.');
+      } else {
+        setVerificationError('Something went wrong. Try again');
+      }
     }
   };
 
@@ -74,12 +91,17 @@ const VerifySignUpEmailScreen: React.FC<VerifySignUpEmailProps> = ({ route, navi
             label="Verification Code"
             returnKeyType="done"
             value={value}
-            onChangeText={onChange}
+            onChangeText={(text) => {
+              onChange(text);
+              if (verificationError) setVerificationError(undefined);
+            }}
             onBlur={onBlur}
             errorText={error?.message}
           />
         )}
       />
+
+      {verificationError && <Paragraph style={styles.errorText}>{verificationError}</Paragraph>}
 
       <Button
         mode="contained"
@@ -93,10 +115,7 @@ const VerifySignUpEmailScreen: React.FC<VerifySignUpEmailProps> = ({ route, navi
 };
 
 const styles = StyleSheet.create({
-  paragraph: {
-    fontSize: 14,
-    color: Themes.colors.secondary,
-  },
+  paragraph: { fontSize: 14 },
   credentialContainer: {
     marginTop: -4,
     paddingVertical: 10,
@@ -107,14 +126,18 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
   credential: {
-    alignItems: 'center',
-    color: Themes.colors.secondary,
+    fontSize: 14,
   },
   editIcon: {
     color: Themes.colors.secondary,
   },
   button: {
     marginTop: 24,
+  },
+  errorText: {
+    color: 'red',
+    marginTop: 8,
+    textAlign: 'center',
   },
 });
 

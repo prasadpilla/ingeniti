@@ -4,12 +4,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { SignUpForm, signUpFormSchema } from '@ingeniti/shared';
 import React, { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
 import FormInput from '../components/FormInput';
 import Header from '../components/Header';
+import Paragraph from '../components/Paragraph';
 import { Themes } from '../styles/themes';
 import { SignupProps } from '../types';
 
@@ -182,7 +183,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
         )}
       />
 
-      {signUpError && <Text style={styles.errorText}>{signUpError}</Text>}
+      {signUpError && <Paragraph style={styles.errorText}>{signUpError}</Paragraph>}
 
       <Button
         mode="contained"
@@ -192,27 +193,26 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
         Sign Up
       </Button>
       <View style={styles.row}>
-        <Text style={styles.label}>Already have an account? </Text>
+        <Paragraph style={styles.label}>Already have an account? </Paragraph>
         <TouchableOpacity
           onPress={() => {
             signUpForm.reset();
             navigation.navigate('Login');
           }}
         >
-          <Text style={styles.link}>Login</Text>
+          <Paragraph style={styles.link}>Login</Paragraph>
         </TouchableOpacity>
       </View>
       <TouchableOpacity style={styles.goBackButton} onPress={() => navigation.goBack()}>
-        <Text style={styles.goBackText}>Go Back</Text>
+        <Paragraph style={styles.goBackText}>Go Back</Paragraph>
       </TouchableOpacity>
     </Background>
   );
 };
 
-// Add a style for the error text
 const styles = StyleSheet.create({
   label: {
-    color: Themes.colors.secondary,
+    fontSize: 14,
   },
   button: {
     marginTop: 24,
@@ -223,6 +223,7 @@ const styles = StyleSheet.create({
   },
   link: {
     fontWeight: 'bold',
+    fontSize: 14,
     color: Themes.colors.primary,
   },
   inputContainer: {
@@ -242,13 +243,13 @@ const styles = StyleSheet.create({
     color: 'red',
     marginTop: 8,
     textAlign: 'center',
+    fontSize: 14,
   },
   goBackButton: {
     marginTop: 24,
   },
   goBackText: {
     color: Themes.colors.primary,
-    fontSize: 16,
     fontWeight: '600',
   },
 });

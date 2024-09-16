@@ -1,4 +1,5 @@
-import { useSignIn } from '@clerk/clerk-expo';
+import { useSignIn, useAuth } from '@clerk/clerk-expo';
+import MaterialIcons from '@expo/vector-icons/build/MaterialIcons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -9,15 +10,16 @@ import Background from '../components/Background';
 import Button from '../components/Button';
 import FormInput from '../components/FormInput';
 import Header from '../components/Header';
+import Paragraph from '../components/Paragraph';
 import { Themes } from '../styles/themes';
 import { ForgotPasswordProps } from '../types';
 
 const forgotPasswordSchema = z.object({
-  emailAddress: z.string().email('Invalid email address'),
+  emailAddress: z.string().min(1, 'Email is required').email('Invalid email address'),
 });
 
 const verifyOTPSchema = z.object({
-  otp: z.string().min(6, 'OTP must be 6 digits'),
+  otp: z.string().min(6, 'OTP must be 6 digits').max(6, 'OTP must be 6 digits'),
 });
 
 const newPasswordSchema = z
@@ -36,6 +38,7 @@ type NewPasswordForm = z.infer<typeof newPasswordSchema>;
 
 const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => {
   const { signIn, isLoaded } = useSignIn();
+  const { signOut } = useAuth();
   const [resetError, setResetError] = useState<string | undefined>();
   const [resetSent, setResetSent] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
@@ -46,6 +49,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
     defaultValues: {
       emailAddress: '',
     },
+    mode: 'onBlur',
   });
 
   const verifyOTPForm = useForm<VerifyOTPForm>({
@@ -53,6 +57,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
     defaultValues: {
       otp: '',
     },
+    mode: 'onBlur',
   });
 
   const newPasswordForm = useForm<NewPasswordForm>({
@@ -61,6 +66,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
       password: '',
       confirmPassword: '',
     },
+    mode: 'onBlur',
   });
 
   useEffect(() => {
@@ -80,7 +86,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
       setResetSent(true);
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
-      setResetError(err.errors[0]?.message || 'An error occurred');
+      setResetError(err.errors[0]?.longMessage || 'An error occurred');
     }
   };
 
@@ -93,6 +99,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
         code: data.otp,
       });
 
+      console.log('After first factor', result);
       if (result.status === 'needs_new_password') {
         setOtpVerified(true);
       } else {
@@ -101,7 +108,14 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
       }
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
-      setResetError(err.errors[0]?.message || 'An error occurred');
+      if (
+        err.errors[0]?.code === 'form_code_incorrect' &&
+        err.errors[0]?.meta.paramName === 'code'
+      ) {
+        setResetError('Invalid OTP. Please try again.');
+      } else {
+        setResetError('Something went wrong. Please try again.');
+      }
     }
   };
 
@@ -113,9 +127,10 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
         password: data.password,
       });
 
+      console.log('After reset password', result);
       if (result.status === 'complete') {
         setVerificationComplete(true);
-        navigation.navigate('Home');
+        await signOut();
       } else {
         console.error('Unexpected result:', result);
         setResetError('Password reset failed. Please try again.');
@@ -139,9 +154,12 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
                 label="Email"
                 returnKeyType="done"
                 value={value}
-                onChangeText={onChange}
+                onChangeText={(text) => {
+                  onChange(text);
+                  if (resetError) setResetError(undefined);
+                }}
                 onBlur={onBlur}
-                errorText={error?.message || resetError}
+                errorText={error?.message}
                 autoCapitalize="none"
                 autoComplete="email"
                 textContentType="emailAddress"
@@ -149,6 +167,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
               />
             )}
           />
+          {resetError && <Text style={styles.errorText}>{resetError}</Text>}
           <Button mode="contained" onPress={forgotPasswordForm.handleSubmit(onResetPress)}>
             Send OTP
           </Button>
@@ -166,13 +185,17 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
                 label="OTP"
                 returnKeyType="done"
                 value={value}
-                onChangeText={onChange}
+                onChangeText={(text) => {
+                  onChange(text);
+                  if (resetError) setResetError(undefined);
+                }}
                 onBlur={onBlur}
-                errorText={error?.message || resetError}
+                errorText={error?.message}
                 keyboardType="number-pad"
               />
             )}
           />
+          {resetError && <Text style={styles.errorText}>{resetError}</Text>}
           <Button mode="contained" onPress={verifyOTPForm.handleSubmit(onVerifyOTP)}>
             Verify OTP
           </Button>
@@ -190,10 +213,13 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
                 label="New Password"
                 returnKeyType="next"
                 value={value}
-                onChangeText={onChange}
+                onChangeText={(text) => {
+                  onChange(text);
+                  if (resetError) setResetError(undefined);
+                }}
                 onBlur={onBlur}
                 errorText={error?.message}
-                secureTextEntry
+                isPassword
               />
             )}
           />
@@ -205,23 +231,29 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
                 label="Confirm New Password"
                 returnKeyType="done"
                 value={value}
-                onChangeText={onChange}
+                onChangeText={(text) => {
+                  onChange(text);
+                  if (resetError) setResetError(undefined);
+                }}
                 onBlur={onBlur}
                 errorText={error?.message}
-                secureTextEntry
+                isPassword
               />
             )}
           />
+          {resetError && <Text style={styles.errorText}>{resetError}</Text>}
           <Button mode="contained" onPress={newPasswordForm.handleSubmit(onNewPasswordSubmit)}>
             Reset Password
           </Button>
         </View>
       ) : (
-        <Text style={styles.centeredText}>
-          Password reset successful. You can now log in with your new password.
-        </Text>
+        <View style={styles.successContainer}>
+          <MaterialIcons name="check-circle" size={24} color="green" />
+          <Paragraph>
+            Password reset successful. You can now log in with your new password.
+          </Paragraph>
+        </View>
       )}
-      {resetError && <Text style={styles.errorText}>{resetError}</Text>}
       <View style={styles.backToLoginContainer}>
         <TouchableOpacity onPress={() => navigation.navigate('Login')}>
           <Text style={styles.backToLoginText}>Back to Login</Text>
@@ -238,7 +270,8 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: 'red',
-    marginBottom: 16,
+    textAlign: 'center',
+    marginVertical: 8,
   },
   backToLoginContainer: {
     flexDirection: 'row',
@@ -254,6 +287,11 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   marginBottom: {
+    marginBottom: 16,
+  },
+  successContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 16,
   },
 });

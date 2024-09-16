@@ -1,10 +1,10 @@
 import { useSignIn } from '@clerk/clerk-expo';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { ClerkAPIError } from '@clerk/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { VerificationCodeForm, verificationCodeFormSchema } from '@ingeniti/shared';
-import React from 'react';
+import React, { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
@@ -25,6 +25,8 @@ const VerifyLoginPhoneScreen: React.FC<VerifyLoginPhoneProps> = ({ route }) => {
     },
   });
 
+  const [verificationError, setVerificationError] = useState<string | undefined>(undefined); // Add state for error
+
   const onPressVerify: SubmitHandler<VerificationCodeForm> = async (data) => {
     if (!isLoaded && !signIn) {
       return;
@@ -39,26 +41,37 @@ const VerifyLoginPhoneScreen: React.FC<VerifyLoginPhoneProps> = ({ route }) => {
       if (signInAttempt.status === 'complete') {
         await setActive({ session: signInAttempt.createdSessionId });
       } else {
-        console.error(signInAttempt);
+        setVerificationError('Something went wrong. Please try again.');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error:', JSON.stringify(err, null, 2));
+      handleVerificationErrors(err.errors);
+    }
+  };
+
+  const handleVerificationErrors = (errors: ClerkAPIError[]) => {
+    if (errors.length > 0) {
+      const err = errors[0];
+      const errCode = err.code;
+      const paramName = err.meta?.paramName;
+
+      if (`${errCode}-${paramName}` === 'form_code_incorrect-code') {
+        setVerificationError('The code is incorrect. Please try again.');
+      } else {
+        setVerificationError('Something went wrong. Try again');
+      }
     }
   };
 
   return (
     <Background>
       <Header>Verify Your Phone</Header>
-
       <View>
-        <Paragraph style={styles.paragraph}>
-          Enter the verification code sent to your phone number
-        </Paragraph>
+        <Paragraph style={styles.paragraph}>Enter the code sent to your phone number</Paragraph>
         <View style={styles.credentialContainer}>
           <Paragraph style={styles.credential}>{phoneNumber}</Paragraph>
         </View>
       </View>
-
       <Controller
         control={verificationCodeForm.control}
         name="code"
@@ -73,7 +86,7 @@ const VerifyLoginPhoneScreen: React.FC<VerifyLoginPhoneProps> = ({ route }) => {
           />
         )}
       />
-
+      {verificationError && <Paragraph style={styles.errorText}>{verificationError}</Paragraph>}
       <Button
         mode="contained"
         onPress={verificationCodeForm.handleSubmit(onPressVerify)}
@@ -86,10 +99,7 @@ const VerifyLoginPhoneScreen: React.FC<VerifyLoginPhoneProps> = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
-  paragraph: {
-    fontSize: 14,
-    color: Themes.colors.secondary,
-  },
+  paragraph: { fontSize: 14 },
   credentialContainer: {
     marginTop: -4,
     paddingVertical: 10,
@@ -100,14 +110,18 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
   credential: {
-    alignItems: 'center',
-    color: Themes.colors.secondary,
+    fontSize: 14,
   },
   editIcon: {
     color: Themes.colors.secondary,
   },
   button: {
     marginTop: 24,
+  },
+  errorText: {
+    color: 'red',
+    marginTop: 8,
+    textAlign: 'center',
   },
 });
 

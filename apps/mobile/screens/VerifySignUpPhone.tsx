@@ -1,7 +1,8 @@
 import { useSignUp } from '@clerk/clerk-expo';
+import { ClerkAPIError } from '@clerk/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { VerificationCodeForm, verificationCodeFormSchema } from '@ingeniti/shared';
-import React from 'react';
+import React, { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { StyleSheet, View } from 'react-native';
 
@@ -16,6 +17,8 @@ import { VerifySignUpPhoneProps } from '../types';
 const VerifySignUpPhoneScreen: React.FC<VerifySignUpPhoneProps> = ({ route }) => {
   const { isLoaded, signUp, setActive } = useSignUp();
   const { phoneNumber } = route.params;
+
+  const [verificationError, setVerificationError] = useState<string | undefined>(undefined);
 
   const verificationCodeForm = useForm<VerificationCodeForm>({
     resolver: zodResolver(verificationCodeFormSchema),
@@ -41,7 +44,22 @@ const VerifySignUpPhoneScreen: React.FC<VerifySignUpPhoneProps> = ({ route }) =>
 
       await setActive({ session: completeSignUp.createdSessionId });
     } catch (err: any) {
+      handleVerificationErrors(err.errors);
       console.error('Error during verification:', err.message || err);
+    }
+  };
+
+  const handleVerificationErrors = (errors: ClerkAPIError[]) => {
+    if (errors.length > 0) {
+      const err = errors[0];
+      const errCode = err.code;
+      const paramName = err.meta?.paramName;
+
+      if (`${errCode}-${paramName}` === 'form_code_incorrect-code') {
+        setVerificationError('The code is incorrect. Please try again.');
+      } else {
+        setVerificationError('Something went wrong. Try again');
+      }
     }
   };
 
@@ -50,9 +68,7 @@ const VerifySignUpPhoneScreen: React.FC<VerifySignUpPhoneProps> = ({ route }) =>
       <Header>Verify Your Phone</Header>
 
       <View>
-        <Paragraph style={styles.paragraph}>
-          Enter the verification code sent to your phone number
-        </Paragraph>
+        <Paragraph style={styles.paragraph}>Enter the code sent to your phone number</Paragraph>
         <View style={styles.credentialContainer}>
           <Paragraph style={styles.credential}>{phoneNumber}</Paragraph>
         </View>
@@ -66,12 +82,17 @@ const VerifySignUpPhoneScreen: React.FC<VerifySignUpPhoneProps> = ({ route }) =>
             label="Verification Code"
             returnKeyType="done"
             value={value}
-            onChangeText={onChange}
+            onChangeText={(text) => {
+              onChange(text);
+              if (verificationError) setVerificationError(undefined);
+            }}
             onBlur={onBlur}
             errorText={error?.message}
           />
         )}
       />
+
+      {verificationError && <Paragraph style={styles.errorText}>{verificationError}</Paragraph>}
 
       <Button
         mode="contained"
@@ -87,7 +108,6 @@ const VerifySignUpPhoneScreen: React.FC<VerifySignUpPhoneProps> = ({ route }) =>
 const styles = StyleSheet.create({
   paragraph: {
     fontSize: 14,
-    color: Themes.colors.secondary,
   },
   credentialContainer: {
     marginTop: -4,
@@ -99,14 +119,18 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
   credential: {
-    alignItems: 'center',
-    color: Themes.colors.secondary,
+    fontSize: 14,
   },
   editIcon: {
     color: Themes.colors.secondary,
   },
   button: {
     marginTop: 24,
+  },
+  errorText: {
+    color: 'red',
+    marginTop: 8,
+    textAlign: 'center',
   },
 });
 

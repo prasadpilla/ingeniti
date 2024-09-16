@@ -7,8 +7,8 @@ interface ParagraphProps extends React.ComponentProps<typeof Text> {
   children: React.ReactNode;
 }
 
-const Paragraph: React.FC<ParagraphProps> = ({ children, ...props }) => (
-  <Text style={styles.text} {...props}>
+const Paragraph: React.FC<ParagraphProps> = ({ children, style, ...props }) => (
+  <Text style={StyleSheet.compose(styles.text, style)} {...props}>
     {children}
   </Text>
 );
@@ -16,10 +16,9 @@ const Paragraph: React.FC<ParagraphProps> = ({ children, ...props }) => (
 const styles = StyleSheet.create({
   text: {
     fontSize: 16,
-    lineHeight: 26,
+    lineHeight: 20,
     color: Themes.colors.secondary,
     textAlign: 'center',
-    marginBottom: 14,
   },
 });
 

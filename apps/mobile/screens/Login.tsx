@@ -9,24 +9,20 @@ import {
 } from '@ingeniti/shared';
 import React, { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
 import FormInput from '../components/FormInput';
 import Header from '../components/Header';
+import Paragraph from '../components/Paragraph';
 import { Themes } from '../styles/themes';
 import { LoginProps } from '../types';
 
 const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
   const { signIn, setActive, isLoaded } = useSignIn();
   const [usePhone, setUsePhone] = useState(false);
-  const [loginError, setLoginError] = useState<Record<string, string | undefined>>({
-    emailError: undefined,
-    phoneError: undefined,
-    passwordError: undefined,
-    defaultError: undefined,
-  });
+  const [loginError, setLoginError] = useState<string | undefined>(undefined);
 
   const loginEmailForm = useForm<LoginFormEmail>({
     resolver: zodResolver(loginFormEmailSchema),
@@ -47,39 +43,20 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
     if (errors.length > 0) {
       const err = errors[0];
       const paramName = err.meta?.paramName;
+      const errCode = err.code;
 
-      switch (paramName) {
-        case 'email_address':
-          setLoginError({
-            emailError: err.message,
-            phoneError: undefined,
-            passwordError: undefined,
-            defaultError: undefined,
-          });
+      switch (`${errCode}-${paramName}`) {
+        case 'form_identifier_not_found-identifier':
+          setLoginError(err.longMessage);
           break;
-        case 'phone_number':
-          setLoginError({
-            emailError: undefined,
-            phoneError: err.message,
-            passwordError: undefined,
-            defaultError: undefined,
-          });
+        case 'form_password_incorrect-password':
+          setLoginError(`Password is incorrect. Please try again.`);
           break;
-        case 'password':
-          setLoginError({
-            emailError: undefined,
-            phoneError: undefined,
-            passwordError: err.message,
-            defaultError: undefined,
-          });
+        case 'form_param_format_invalid-identifier':
+          setLoginError('Invalid phone number!');
           break;
         default:
-          setLoginError({
-            emailError: undefined,
-            phoneError: undefined,
-            passwordError: undefined,
-            defaultError: err.message,
-          });
+          setLoginError('Something went wrong. Please try again.');
       }
     }
   };
@@ -150,10 +127,11 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
           onPress={() => {
             loginEmailForm.reset();
             loginPhoneForm.reset();
+            setLoginError(undefined);
             setUsePhone(!usePhone);
           }}
         >
-          <Text style={styles.usePhoneText}>{!usePhone ? 'Use Phone' : 'Use email'}</Text>
+          <Paragraph style={styles.usePhoneText}>{!usePhone ? 'Use Phone' : 'Use email'}</Paragraph>
         </TouchableOpacity>
       </View>
 
@@ -167,9 +145,12 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
                 label="Email"
                 returnKeyType="next"
                 value={value}
-                onChangeText={onChange}
+                onChangeText={(text) => {
+                  onChange(text);
+                  if (loginError) setLoginError(undefined);
+                }}
                 onBlur={onBlur}
-                errorText={error?.message || loginError.emailError}
+                errorText={error?.message}
                 autoCapitalize="none"
                 autoComplete="email"
                 textContentType="emailAddress"
@@ -186,9 +167,12 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
                 label="Password"
                 returnKeyType="done"
                 value={value}
-                onChangeText={onChange}
+                onChangeText={(text) => {
+                  onChange(text);
+                  if (loginError) setLoginError(undefined);
+                }}
                 onBlur={onBlur}
-                errorText={error?.message || loginError.passwordError}
+                errorText={error?.message}
                 isPassword
               />
             )}
@@ -196,7 +180,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
 
           <View style={styles.forgotPasswordContainer}>
             <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
-              <Text style={styles.secondaryText}>Forgot your password?</Text>
+              <Paragraph style={styles.secondaryText}>Forgot your password?</Paragraph>
             </TouchableOpacity>
           </View>
         </>
@@ -211,9 +195,12 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
               placeholderTextColor="#aaa"
               returnKeyType="done"
               value={value}
-              onChangeText={onChange}
+              onChangeText={(text) => {
+                onChange(text);
+                if (loginError) setLoginError(undefined);
+              }}
               onBlur={onBlur}
-              errorText={error?.message || loginError.phoneError}
+              errorText={error?.message}
               keyboardType="phone-pad"
               selectionColor={Themes.colors.primary}
               underlineColor="transparent"
@@ -223,7 +210,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
         />
       )}
 
-      {loginError.defaultError && <Text style={styles.errorText}>{loginError.defaultError}</Text>}
+      {loginError && <Paragraph style={styles.errorText}>{loginError}</Paragraph>}
 
       <Button
         mode="contained"
@@ -237,14 +224,14 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
       </Button>
 
       <View style={styles.signUpContainer}>
-        <Text style={styles.secondaryText}>Don't have an account? </Text>
+        <Paragraph style={styles.secondaryText}>Don't have an account? </Paragraph>
         <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-          <Text style={styles.primaryText}>Sign up</Text>
+          <Paragraph style={styles.primaryText}>Sign up</Paragraph>
         </TouchableOpacity>
       </View>
 
       <TouchableOpacity style={styles.goBackButton} onPress={() => navigation.goBack()}>
-        <Text style={styles.goBackText}>Go Back</Text>
+        <Paragraph style={styles.goBackText}>Go Back</Paragraph>
       </TouchableOpacity>
     </Background>
   );
@@ -259,6 +246,7 @@ const styles = StyleSheet.create({
   },
   usePhoneText: {
     color: Themes.colors.primary,
+    fontSize: 14,
     fontWeight: '500',
   },
   forgotPasswordContainer: {
@@ -267,11 +255,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   secondaryText: {
-    color: Themes.colors.secondary,
+    fontSize: 14,
   },
   errorText: {
     color: 'red',
     marginBottom: 8,
+    textAlign: 'center',
+    fontSize: 14,
   },
   signUpContainer: {
     flexDirection: 'row',
@@ -279,10 +269,11 @@ const styles = StyleSheet.create({
   },
   primaryText: {
     fontWeight: 'bold',
+    fontSize: 14,
     color: Themes.colors.primary,
   },
   goBackButton: {
-    marginTop: 20,
+    marginTop: 24,
     alignSelf: 'center',
   },
   goBackText: {
