@@ -5,6 +5,7 @@ import { SignUpForm, signUpFormSchema } from '@ingeniti/shared';
 import React, { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Checkbox } from 'react-native-paper';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
@@ -29,6 +30,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
       emailAddress: '',
       phoneNumber: '',
       password: '',
+      termsAndConditions: false,
     },
     mode: 'onBlur',
   });
@@ -200,12 +202,30 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
         )}
       />
 
+      <Controller
+        control={signUpForm.control}
+        name="termsAndConditions"
+        render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+          <View style={styles.checkboxContainer}>
+            <TouchableOpacity onPress={() => onChange(!value)} style={styles.checkboxTouchable}>
+              <Checkbox
+                status={value ? 'checked' : 'unchecked'}
+                color={Themes.colors.primary}
+                onPress={() => onChange(!value)}
+              />
+            </TouchableOpacity>
+            <Paragraph style={styles.checkboxText}>I agree to the Terms and Conditions</Paragraph>
+          </View>
+        )}
+      />
+
       {signUpError && <Paragraph style={styles.errorText}>{signUpError}</Paragraph>}
 
       <Button
         mode="contained"
         onPress={signUpForm.handleSubmit(onSignUpPress)}
         style={styles.button}
+        disabled={signUpForm.formState.isSubmitting || !signUpForm.formState.isValid}
       >
         Sign Up
       </Button>
@@ -220,7 +240,13 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
           <Paragraph style={styles.link}>Login</Paragraph>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.goBackButton} onPress={() => navigation.goBack()}>
+      <TouchableOpacity
+        style={styles.goBackButton}
+        onPress={() => {
+          signUpForm.reset();
+          navigation.goBack();
+        }}
+      >
         <Paragraph style={styles.goBackText}>Go Back</Paragraph>
       </TouchableOpacity>
     </Background>
@@ -284,6 +310,21 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: -8,
     marginLeft: 4,
+  },
+  checkboxContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  checkboxTouchable: {
+    padding: 8,
+    zIndex: 100,
+  },
+  checkboxText: {
+    flex: 1,
+    fontSize: 14,
+    marginLeft: -48,
+    zIndex: 1,
   },
 });
 

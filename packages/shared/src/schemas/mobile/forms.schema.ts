@@ -13,8 +13,11 @@ const signUpFormSchema = z.object({
     .regex(PHONE_NUMBER_REGEX, 'Invalid phone number format!'),
   password: z
     .string()
-    .min(6, 'Password must contain minimum 6 characters!')
+    .min(8, 'Password must contain minimum 8 characters!')
     .max(30, 'Password cannot exceed 30 characters!'),
+  termsAndConditions: z.boolean().refine((data) => data === true, {
+    message: 'You must accept the terms and conditions!',
+  }),
 });
 
 const loginFormEmailSchema = z.object({
