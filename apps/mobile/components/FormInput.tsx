@@ -4,7 +4,6 @@ import {
   StyleSheet,
   Text,
   ViewStyle,
-  NativeTouchEvent,
   NativeSyntheticEvent,
   TextInputFocusEventData,
 } from 'react-native';

@@ -13,16 +13,19 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
+import CountryCodePicker from '../components/CountryCodePicker';
 import FormInput from '../components/FormInput';
 import Header from '../components/Header';
 import Paragraph from '../components/Paragraph';
 import { Themes } from '../styles/themes';
 import { LoginProps } from '../types';
+import { countries, CountryData } from '../utils/country-data';
 
 const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
   const { signIn, setActive, isLoaded } = useSignIn();
   const [usePhone, setUsePhone] = useState(false);
   const [loginError, setLoginError] = useState<string | undefined>(undefined);
+  const [selectedCountry, setSelectedCountry] = useState<CountryData>(countries[0]);
 
   const loginEmailForm = useForm<LoginFormEmail>({
     resolver: zodResolver(loginFormEmailSchema),
@@ -91,7 +94,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
     }
 
     const { phoneNumber } = data;
-    const phone = phoneNumber.startsWith('+') ? phoneNumber : `+${phoneNumber}`;
+    const phone = `${selectedCountry.code}${phoneNumber}`;
 
     try {
       const { supportedFirstFactors } = await signIn.create({
@@ -185,29 +188,36 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
           </View>
         </>
       ) : (
-        <Controller
-          control={loginPhoneForm.control}
-          name="phoneNumber"
-          render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
-            <FormInput
-              label="Phone number"
-              placeholder="+91 82345 54389"
-              placeholderTextColor="#aaa"
-              returnKeyType="done"
-              value={value}
-              onChangeText={(text) => {
-                onChange(text);
-                if (loginError) setLoginError(undefined);
-              }}
-              onBlur={onBlur}
-              errorText={error?.message}
-              keyboardType="phone-pad"
-              selectionColor={Themes.colors.primary}
-              underlineColor="transparent"
-              mode="outlined"
-            />
-          )}
-        />
+        <View style={styles.phoneInputContainer}>
+          <CountryCodePicker
+            selectedCountry={selectedCountry}
+            onSelectCountry={setSelectedCountry}
+          />
+          <Controller
+            control={loginPhoneForm.control}
+            name="phoneNumber"
+            render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+              <FormInput
+                label="Phone number"
+                placeholder="82345 54389"
+                placeholderTextColor="#aaa"
+                returnKeyType="done"
+                value={value}
+                onChangeText={(text) => {
+                  onChange(text);
+                  if (loginError) setLoginError(undefined);
+                }}
+                onBlur={onBlur}
+                errorText={error?.message}
+                keyboardType="phone-pad"
+                selectionColor={Themes.colors.primary}
+                underlineColor="transparent"
+                mode="outlined"
+                containerStyles={styles.phoneInput}
+              />
+            )}
+          />
+        </View>
       )}
 
       {loginError && <Paragraph style={styles.errorText}>{loginError}</Paragraph>}
@@ -280,6 +290,16 @@ const styles = StyleSheet.create({
     color: Themes.colors.primary,
     fontSize: 16,
     fontWeight: '600',
+  },
+  phoneInputContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    // backgroundColor: 'red',
+  },
+  phoneInput: {
+    flex: 1,
   },
 });
 
