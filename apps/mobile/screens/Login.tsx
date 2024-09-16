@@ -189,34 +189,41 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
         </>
       ) : (
         <View style={styles.phoneInputContainer}>
-          <CountryCodePicker
-            selectedCountry={selectedCountry}
-            onSelectCountry={setSelectedCountry}
-          />
-          <Controller
-            control={loginPhoneForm.control}
-            name="phoneNumber"
-            render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
-              <FormInput
-                label="Phone number"
-                placeholder="82345 54389"
-                placeholderTextColor="#aaa"
-                returnKeyType="done"
-                value={value}
-                onChangeText={(text) => {
-                  onChange(text);
-                  if (loginError) setLoginError(undefined);
-                }}
-                onBlur={onBlur}
-                errorText={error?.message}
-                keyboardType="phone-pad"
-                selectionColor={Themes.colors.primary}
-                underlineColor="transparent"
-                mode="outlined"
-                containerStyles={styles.phoneInput}
-              />
-            )}
-          />
+          <View style={styles.phoneInput}>
+            <CountryCodePicker
+              selectedCountry={selectedCountry}
+              onSelectCountry={setSelectedCountry}
+            />
+            <Controller
+              control={loginPhoneForm.control}
+              name="phoneNumber"
+              render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+                <FormInput
+                  label="Phone number"
+                  placeholder="82345 54389"
+                  placeholderTextColor="#aaa"
+                  returnKeyType="done"
+                  value={value}
+                  onChangeText={(text) => {
+                    onChange(text);
+                    if (loginError) setLoginError(undefined);
+                  }}
+                  onBlur={onBlur}
+                  hasError={!!error?.message}
+                  keyboardType="phone-pad"
+                  selectionColor={Themes.colors.primary}
+                  underlineColor="transparent"
+                  mode="outlined"
+                  containerStyles={styles.phoneInputField}
+                />
+              )}
+            />
+          </View>
+          {loginPhoneForm.formState.errors.phoneNumber && (
+            <Paragraph style={styles.phoneInputFieldError}>
+              {loginPhoneForm.formState.errors.phoneNumber.message}
+            </Paragraph>
+          )}
         </View>
       )}
 
@@ -224,6 +231,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
 
       <Button
         mode="contained"
+        style={{ marginTop: 28 }}
         onPress={
           !usePhone
             ? loginEmailForm.handleSubmit(onEmailSignInPress)
@@ -269,7 +277,6 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: 'red',
-    marginBottom: 8,
     textAlign: 'center',
     fontSize: 14,
   },
@@ -293,13 +300,22 @@ const styles = StyleSheet.create({
   },
   phoneInputContainer: {
     width: '100%',
+  },
+  phoneInput: {
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    // backgroundColor: 'red',
   },
-  phoneInput: {
+  phoneInputField: {
     flex: 1,
+  },
+  phoneInputFieldError: {
+    color: 'red',
+    textAlign: 'left',
+    fontSize: 12,
+    marginTop: -8,
+    marginLeft: 4,
   },
 });
 

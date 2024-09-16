@@ -12,6 +12,7 @@ import { TextInput as Input } from 'react-native-paper';
 import { Themes } from '../styles/themes';
 
 interface FormInputProps extends React.ComponentProps<typeof Input> {
+  hasError?: boolean;
   errorText?: string;
   isPassword?: boolean;
   required?: boolean;
@@ -20,6 +21,7 @@ interface FormInputProps extends React.ComponentProps<typeof Input> {
 
 const FormInput: React.FC<FormInputProps> = ({
   errorText,
+  hasError,
   isPassword,
   containerStyles,
   label,
@@ -45,7 +47,7 @@ const FormInput: React.FC<FormInputProps> = ({
         underlineColor="transparent"
         mode="outlined"
         label={label}
-        error={!!errorText}
+        error={!!errorText || hasError}
         secureTextEntry={isPassword && !passwordVisible}
         right={
           isPassword ? (

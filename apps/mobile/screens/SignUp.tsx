@@ -8,15 +8,18 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
+import CountryCodePicker from '../components/CountryCodePicker';
 import FormInput from '../components/FormInput';
 import Header from '../components/Header';
 import Paragraph from '../components/Paragraph';
 import { Themes } from '../styles/themes';
 import { SignupProps } from '../types';
+import { countries, CountryData } from '../utils/country-data';
 
 const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
   const { isLoaded, signUp } = useSignUp();
   const [signUpError, setSignUpError] = useState<string | undefined>(undefined);
+  const [selectedCountry, setSelectedCountry] = useState<CountryData>(countries[0]);
 
   const signUpForm = useForm<SignUpForm>({
     resolver: zodResolver(signUpFormSchema),
@@ -59,9 +62,8 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
   const onSignUpPress: SubmitHandler<SignUpForm> = async (data) => {
     if (!isLoaded) return;
 
-    const { firstName, lastName, emailAddress, phoneNumber, password } = data;
-    const phone = phoneNumber.startsWith('+') ? phoneNumber : `+${phoneNumber}`;
-
+    const { firstName, lastName, emailAddress, password } = data;
+    const phone = `${selectedCountry.code}${data.phoneNumber}`;
     try {
       await signUp.create({
         emailAddress,
@@ -140,29 +142,44 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
         )}
       />
 
-      <Controller
-        control={signUpForm.control}
-        name="phoneNumber"
-        render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
-          <FormInput
-            label="Phone number"
-            placeholder="+91 82345 54389"
-            placeholderTextColor="#aaa"
-            returnKeyType="done"
-            value={value}
-            onBlur={onBlur}
-            onChangeText={(text) => {
-              onChange(text);
-              if (signUpError) setSignUpError(undefined);
-            }}
-            errorText={error?.message}
-            keyboardType="phone-pad"
-            selectionColor={Themes.colors.primary}
-            underlineColor="transparent"
-            mode="outlined"
+      <View style={styles.phoneInputContainer}>
+        <View style={styles.phoneInput}>
+          <CountryCodePicker
+            selectedCountry={selectedCountry}
+            onSelectCountry={setSelectedCountry}
           />
+          <Controller
+            control={signUpForm.control}
+            name="phoneNumber"
+            render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+              <FormInput
+                label="Phone number"
+                placeholder="82345 54389"
+                placeholderTextColor="#aaa"
+                returnKeyType="done"
+                value={value}
+                onChangeText={(text) => {
+                  onChange(text);
+                  if (signUpError) setSignUpError(undefined);
+                }}
+                onBlur={onBlur}
+                hasError={!!error?.message}
+                keyboardType="phone-pad"
+                selectionColor={Themes.colors.primary}
+                underlineColor="transparent"
+                mode="outlined"
+                containerStyles={styles.phoneInputField}
+              />
+            )}
+          />
+        </View>
+
+        {signUpForm.formState.errors.phoneNumber && (
+          <Paragraph style={styles.phoneInputFieldError}>
+            {signUpForm.formState.errors.phoneNumber.message}
+          </Paragraph>
         )}
-      />
+      </View>
 
       <Controller
         control={signUpForm.control}
@@ -236,9 +253,6 @@ const styles = StyleSheet.create({
   countryCodeInput: {
     backgroundColor: '#eee',
   },
-  phoneNumberInput: {
-    flex: 1,
-  },
   errorText: {
     color: 'red',
     marginTop: 8,
@@ -251,6 +265,25 @@ const styles = StyleSheet.create({
   goBackText: {
     color: Themes.colors.primary,
     fontWeight: '600',
+  },
+  phoneInputContainer: {
+    width: '100%',
+  },
+  phoneInput: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  phoneInputField: {
+    flex: 1,
+  },
+  phoneInputFieldError: {
+    color: 'red',
+    textAlign: 'left',
+    fontSize: 12,
+    marginTop: -8,
+    marginLeft: 4,
   },
 });
 
