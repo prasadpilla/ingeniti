@@ -107,6 +107,9 @@ const VerifySignUpEmailScreen: React.FC<VerifySignUpEmailProps> = ({ route, navi
         mode="contained"
         onPress={verificationCodeForm.handleSubmit(onPressVerify)}
         style={styles.button}
+        disabled={
+          verificationCodeForm.formState.isSubmitting || !verificationCodeForm.formState.isValid
+        }
       >
         Verify
       </Button>

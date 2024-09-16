@@ -25,7 +25,7 @@ const VerifyLoginPhoneScreen: React.FC<VerifyLoginPhoneProps> = ({ route }) => {
     },
   });
 
-  const [verificationError, setVerificationError] = useState<string | undefined>(undefined); // Add state for error
+  const [verificationError, setVerificationError] = useState<string | undefined>(undefined);
 
   const onPressVerify: SubmitHandler<VerificationCodeForm> = async (data) => {
     if (!isLoaded && !signIn) {
@@ -91,6 +91,9 @@ const VerifyLoginPhoneScreen: React.FC<VerifyLoginPhoneProps> = ({ route }) => {
         mode="contained"
         onPress={verificationCodeForm.handleSubmit(onPressVerify)}
         style={styles.button}
+        disabled={
+          verificationCodeForm.formState.isSubmitting || !verificationCodeForm.formState.isValid
+        }
       >
         Verify
       </Button>

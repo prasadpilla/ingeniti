@@ -98,6 +98,9 @@ const VerifySignUpPhoneScreen: React.FC<VerifySignUpPhoneProps> = ({ route }) =>
         mode="contained"
         onPress={verificationCodeForm.handleSubmit(onPressVerify)}
         style={styles.button}
+        disabled={
+          verificationCodeForm.formState.isSubmitting || !verificationCodeForm.formState.isValid
+        }
       >
         Verify
       </Button>

@@ -233,6 +233,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
         <Paragraph style={styles.label}>Already have an account? </Paragraph>
         <TouchableOpacity
           onPress={() => {
+            setSignUpError(undefined);
             signUpForm.reset();
             navigation.navigate('Login');
           }}
@@ -243,6 +244,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
       <TouchableOpacity
         style={styles.goBackButton}
         onPress={() => {
+          setSignUpError(undefined);
           signUpForm.reset();
           navigation.goBack();
         }}

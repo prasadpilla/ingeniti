@@ -168,7 +168,13 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
             )}
           />
           {resetError && <Text style={styles.errorText}>{resetError}</Text>}
-          <Button mode="contained" onPress={forgotPasswordForm.handleSubmit(onResetPress)}>
+          <Button
+            mode="contained"
+            onPress={forgotPasswordForm.handleSubmit(onResetPress)}
+            disabled={
+              forgotPasswordForm.formState.isSubmitting || !forgotPasswordForm.formState.isValid
+            }
+          >
             Send OTP
           </Button>
         </>
@@ -196,7 +202,11 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
             )}
           />
           {resetError && <Text style={styles.errorText}>{resetError}</Text>}
-          <Button mode="contained" onPress={verifyOTPForm.handleSubmit(onVerifyOTP)}>
+          <Button
+            mode="contained"
+            onPress={verifyOTPForm.handleSubmit(onVerifyOTP)}
+            disabled={verifyOTPForm.formState.isSubmitting || !verifyOTPForm.formState.isValid}
+          >
             Verify OTP
           </Button>
         </>
@@ -242,7 +252,11 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
             )}
           />
           {resetError && <Text style={styles.errorText}>{resetError}</Text>}
-          <Button mode="contained" onPress={newPasswordForm.handleSubmit(onNewPasswordSubmit)}>
+          <Button
+            mode="contained"
+            onPress={newPasswordForm.handleSubmit(onNewPasswordSubmit)}
+            disabled={newPasswordForm.formState.isSubmitting || !newPasswordForm.formState.isValid}
+          >
             Reset Password
           </Button>
         </View>
@@ -255,7 +269,14 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
         </View>
       )}
       <View style={styles.backToLoginContainer}>
-        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+        <TouchableOpacity
+          onPress={() => {
+            forgotPasswordForm.reset();
+            verifyOTPForm.reset();
+            newPasswordForm.reset();
+            navigation.navigate('Login');
+          }}
+        >
           <Text style={styles.backToLoginText}>Back to Login</Text>
         </TouchableOpacity>
       </View>

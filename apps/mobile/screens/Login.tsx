@@ -33,6 +33,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
       emailAddress: '',
       password: '',
     },
+    mode: 'onBlur',
   });
 
   const loginPhoneForm = useForm<LoginFormPhone>({
@@ -40,6 +41,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
     defaultValues: {
       phoneNumber: '',
     },
+    mode: 'onChange',
   });
 
   const handleLoginErrors = (errors: ClerkAPIError[]) => {
@@ -229,26 +231,49 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
 
       {loginError && <Paragraph style={styles.errorText}>{loginError}</Paragraph>}
 
-      <Button
-        mode="contained"
-        style={{ marginTop: 28 }}
-        onPress={
-          !usePhone
-            ? loginEmailForm.handleSubmit(onEmailSignInPress)
-            : loginPhoneForm.handleSubmit(onPhoneSignInPress)
-        }
-      >
-        Login
-      </Button>
+      {!usePhone ? (
+        <Button
+          mode="contained"
+          style={{ marginTop: 28 }}
+          onPress={loginEmailForm.handleSubmit(onEmailSignInPress)}
+          disabled={loginEmailForm.formState.isSubmitting || !loginEmailForm.formState.isValid}
+        >
+          Login
+        </Button>
+      ) : (
+        <Button
+          mode="contained"
+          style={{ marginTop: 28 }}
+          onPress={loginPhoneForm.handleSubmit(onPhoneSignInPress)}
+          disabled={loginPhoneForm.formState.isSubmitting || !loginPhoneForm.formState.isValid}
+        >
+          Login
+        </Button>
+      )}
 
       <View style={styles.signUpContainer}>
         <Paragraph style={styles.secondaryText}>Don't have an account? </Paragraph>
-        <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+        <TouchableOpacity
+          onPress={() => {
+            setLoginError(undefined);
+            loginEmailForm.reset();
+            loginPhoneForm.reset();
+            navigation.navigate('SignUp');
+          }}
+        >
           <Paragraph style={styles.primaryText}>Sign up</Paragraph>
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.goBackButton} onPress={() => navigation.goBack()}>
+      <TouchableOpacity
+        style={styles.goBackButton}
+        onPress={() => {
+          setLoginError(undefined);
+          loginEmailForm.reset();
+          loginPhoneForm.reset();
+          navigation.goBack();
+        }}
+      >
         <Paragraph style={styles.goBackText}>Go Back</Paragraph>
       </TouchableOpacity>
     </Background>
