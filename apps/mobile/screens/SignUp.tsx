@@ -15,11 +15,7 @@ import { SignupProps } from '../types';
 
 const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
   const { isLoaded, signUp } = useSignUp();
-  const [signUpError, setSignUpError] = useState<Record<string, string | undefined>>({
-    emailError: undefined,
-    phoneError: undefined,
-    defaultError: undefined,
-  });
+  const [signUpError, setSignUpError] = useState<string | undefined>(undefined);
 
   const signUpForm = useForm<SignUpForm>({
     resolver: zodResolver(signUpFormSchema),
@@ -36,29 +32,25 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
   const handleSignUpErrors = (errors: ClerkAPIError[]) => {
     if (errors.length > 0) {
       const err = errors[0];
+      const errCode = err.code;
       const paramName = err.meta?.paramName;
 
-      switch (paramName) {
-        case 'email_address':
-          setSignUpError({
-            emailError: err.message,
-            phoneError: undefined,
-            default: undefined,
-          });
+      switch (`${errCode}-${paramName}`) {
+        case 'form_identifier_exists-email_address':
+          setSignUpError(err.longMessage);
           break;
-        case 'phone_number':
-          setSignUpError({
-            emailError: undefined,
-            phoneError: err.message,
-            default: undefined,
-          });
+        case 'form_identifier_exists-phone_number':
+          setSignUpError(err.longMessage);
+          break;
+        case 'form_param_format_invalid-phone_number':
+          setSignUpError('Invalid phone number!');
+          break;
+        case 'form_password_pwned-password':
+          setSignUpError('Password is too common. Please choose a stronger password.');
           break;
         default:
-          setSignUpError({
-            emailError: undefined,
-            phoneError: undefined,
-            default: err.message,
-          });
+          setSignUpError('Something went wrong. Try again');
+          break;
       }
     }
   };
@@ -134,8 +126,11 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
             returnKeyType="next"
             value={value}
             onBlur={onBlur}
-            onChangeText={onChange}
-            errorText={error?.message || signUpError.emailError}
+            onChangeText={(text) => {
+              onChange(text);
+              if (signUpError) setSignUpError(undefined);
+            }}
+            errorText={error?.message}
             autoCapitalize="none"
             autoComplete="email"
             textContentType="emailAddress"
@@ -155,8 +150,11 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
             returnKeyType="done"
             value={value}
             onBlur={onBlur}
-            onChangeText={onChange}
-            errorText={error?.message || signUpError.phoneError}
+            onChangeText={(text) => {
+              onChange(text);
+              if (signUpError) setSignUpError(undefined);
+            }}
+            errorText={error?.message}
             keyboardType="phone-pad"
             selectionColor={Themes.colors.primary}
             underlineColor="transparent"
@@ -174,12 +172,17 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
             returnKeyType="done"
             value={value}
             onBlur={onBlur}
-            onChangeText={onChange}
+            onChangeText={(text) => {
+              onChange(text);
+              if (signUpError) setSignUpError(undefined);
+            }}
             errorText={error?.message}
             isPassword
           />
         )}
       />
+
+      {signUpError && <Text style={styles.errorText}>{signUpError}</Text>}
 
       <Button
         mode="contained"
@@ -206,6 +209,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
   );
 };
 
+// Add a style for the error text
 const styles = StyleSheet.create({
   label: {
     color: Themes.colors.secondary,
@@ -233,6 +237,11 @@ const styles = StyleSheet.create({
   },
   phoneNumberInput: {
     flex: 1,
+  },
+  errorText: {
+    color: 'red',
+    marginTop: 8,
+    textAlign: 'center',
   },
   goBackButton: {
     marginTop: 24,
