@@ -1,25 +1,31 @@
 {
   "en": {
+    "key": "en",
     "label": "English",
     "nativeLabel": "English"
   },
   "es": {
+    "key": "es",
     "label": "Spanish",
     "nativeLabel": "Español"
   },
   "hi": {
+    "key": "hi",
     "label": "Hindi",
     "nativeLabel": "हिन्दी"
   },
   "pt": {
+    "key": "pt",
     "label": "Portuguese",
     "nativeLabel": "Português"
   },
   "fr": {
+    "key": "fr",
     "label": "French",
     "nativeLabel": "Français"
   },
   "de": {
+    "key": "de",
     "label": "German",
     "nativeLabel": "Deutsch"
   }

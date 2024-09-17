@@ -44,7 +44,6 @@ export default function App() {
     <ClerkProvider tokenCache={tokenCache} publishableKey={PUBLISHABLE_KEY}>
       <ClerkLoaded>
         <PaperProvider theme={Themes}>
-          {/* If user is authenticated, then render Navigation otherwise render SignInScreen */}
           <Navigation theme={Themes} />
         </PaperProvider>
       </ClerkLoaded>
