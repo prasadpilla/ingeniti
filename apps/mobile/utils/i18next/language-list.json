@@ -1,0 +1,26 @@
+{
+  "en": {
+    "label": "English",
+    "nativeLabel": "English"
+  },
+  "es": {
+    "label": "Spanish",
+    "nativeLabel": "Español"
+  },
+  "hi": {
+    "label": "Hindi",
+    "nativeLabel": "हिन्दी"
+  },
+  "pt": {
+    "label": "Portuguese",
+    "nativeLabel": "Português"
+  },
+  "fr": {
+    "label": "French",
+    "nativeLabel": "Français"
+  },
+  "de": {
+    "label": "German",
+    "nativeLabel": "Deutsch"
+  }
+}
