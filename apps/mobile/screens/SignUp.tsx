@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { SignUpForm, signUpFormSchema } from '@ingeniti/shared';
 import React, { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Checkbox } from 'react-native-paper';
 
@@ -18,6 +19,7 @@ import { SignupProps } from '../types';
 import { countries, CountryData } from '../utils/country-data';
 
 const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
+  const { t } = useTranslation();
   const { isLoaded, signUp } = useSignUp();
   const [signUpError, setSignUpError] = useState<string | undefined>(undefined);
   const [selectedCountry, setSelectedCountry] = useState<CountryData>(countries[0]);
@@ -43,19 +45,19 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
 
       switch (`${errCode}-${paramName}`) {
         case 'form_identifier_exists-email_address':
-          setSignUpError(err.longMessage);
+          setSignUpError(t('email_exists'));
           break;
         case 'form_identifier_exists-phone_number':
-          setSignUpError(err.longMessage);
+          setSignUpError(t('phone_exists'));
           break;
         case 'form_param_format_invalid-phone_number':
-          setSignUpError('Invalid phone number!');
+          setSignUpError(t('invalid_phone'));
           break;
         case 'form_password_pwned-password':
-          setSignUpError('Password is too common. Please choose a stronger password.');
+          setSignUpError(t('common_password'));
           break;
         default:
-          setSignUpError('Something went wrong. Try again');
+          setSignUpError(t('something_went_wrong'));
           break;
       }
     }
@@ -67,6 +69,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
     const { firstName, lastName, emailAddress, password } = data;
     const phone = `${selectedCountry.code}${data.phoneNumber}`;
     try {
+      console.log('signUp', emailAddress, phone, password);
       await signUp.create({
         emailAddress,
         phoneNumber: phone,
@@ -83,7 +86,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
         firstName,
         lastName,
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       handleSignUpErrors(err.errors);
       console.error(JSON.stringify(err, null, 2));
     }
@@ -91,13 +94,13 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
 
   return (
     <Background>
-      <Header>Create Account</Header>
+      <Header>{t('create_account')}</Header>
       <Controller
         control={signUpForm.control}
         name="firstName"
         render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
           <FormInput
-            label="First name"
+            label={t('first_name')}
             returnKeyType="next"
             value={value}
             onChangeText={onChange}
@@ -112,7 +115,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
         name="lastName"
         render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
           <FormInput
-            label="Last name"
+            label={t('last_name')}
             returnKeyType="next"
             value={value}
             onChangeText={onChange}
@@ -127,7 +130,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
         name="emailAddress"
         render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
           <FormInput
-            label="Email"
+            label={t('email')}
             returnKeyType="next"
             value={value}
             onBlur={onBlur}
@@ -155,7 +158,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
             name="phoneNumber"
             render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
               <FormInput
-                label="Phone number"
+                label={t('phone_number')}
                 placeholder="82345 54389"
                 placeholderTextColor="#aaa"
                 returnKeyType="done"
@@ -188,7 +191,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
         name="password"
         render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
           <FormInput
-            label="Password"
+            label={t('password')}
             returnKeyType="done"
             value={value}
             onBlur={onBlur}
@@ -214,7 +217,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
                 onPress={() => onChange(!value)}
               />
             </TouchableOpacity>
-            <Paragraph style={styles.checkboxText}>I agree to the Terms and Conditions</Paragraph>
+            <Paragraph style={styles.checkboxText}>{t('terms_and_conditions')}</Paragraph>
           </View>
         )}
       />
@@ -227,10 +230,10 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
         style={styles.button}
         disabled={signUpForm.formState.isSubmitting || !signUpForm.formState.isValid}
       >
-        Sign Up
+        {t('sign_up')}
       </Button>
       <View style={styles.row}>
-        <Paragraph style={styles.label}>Already have an account? </Paragraph>
+        <Paragraph style={styles.label}>{t('dont_have_account')} </Paragraph>
         <TouchableOpacity
           onPress={() => {
             setSignUpError(undefined);
@@ -238,7 +241,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
             navigation.navigate('Login');
           }}
         >
-          <Paragraph style={styles.link}>Login</Paragraph>
+          <Paragraph style={styles.link}>{t('login')}</Paragraph>
         </TouchableOpacity>
       </View>
       <TouchableOpacity
@@ -249,7 +252,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
           navigation.goBack();
         }}
       >
-        <Paragraph style={styles.goBackText}>Go Back</Paragraph>
+        <Paragraph style={styles.goBackText}>{t('go_back')}</Paragraph>
       </TouchableOpacity>
     </Background>
   );

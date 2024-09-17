@@ -1,5 +1,6 @@
 import { useClerk } from '@clerk/clerk-expo';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Switch } from 'react-native-paper';
 
 import Background from '../components/Background';
@@ -8,10 +9,11 @@ import Header from '../components/Header';
 
 export default function SettingsScreen() {
   const { signOut } = useClerk();
+  const { t } = useTranslation();
 
   return (
     <Background>
-      <Header>Settings</Header>
+      <Header>{t('settings')}</Header>
       <Switch color="red" value={false} onValueChange={() => {}} />
       <Button mode="contained" onPress={() => signOut()}>
         Sign out

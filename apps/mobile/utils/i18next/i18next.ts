@@ -1,7 +1,8 @@
 import i18next from 'i18next';
+import 'intl-pluralrules';
 import { initReactI18next } from 'react-i18next';
 
-import { en, es, hi, pt, fr, de } from './locales';
+import { de, en, es, fr, hi, pt } from './locales';
 
 export const languageResources = {
   en: { translation: en },

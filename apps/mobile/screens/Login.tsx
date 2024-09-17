@@ -9,6 +9,7 @@ import {
 } from '@ingeniti/shared';
 import React, { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import Background from '../components/Background';
@@ -22,6 +23,7 @@ import { LoginProps } from '../types';
 import { countries, CountryData } from '../utils/country-data';
 
 const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
+  const { t } = useTranslation();
   const { signIn, setActive, isLoaded } = useSignIn();
   const [usePhone, setUsePhone] = useState(false);
   const [loginError, setLoginError] = useState<string | undefined>(undefined);
@@ -125,7 +127,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
 
   return (
     <Background>
-      <Header>Welcome back</Header>
+      <Header>{t('welcome_back')}</Header>
 
       <View style={styles.usePhoneContainer}>
         <TouchableOpacity
@@ -136,7 +138,9 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
             setUsePhone(!usePhone);
           }}
         >
-          <Paragraph style={styles.usePhoneText}>{!usePhone ? 'Use Phone' : 'Use email'}</Paragraph>
+          <Paragraph style={styles.usePhoneText}>
+            {!usePhone ? t('use_phone') : t('use_email')}
+          </Paragraph>
         </TouchableOpacity>
       </View>
 
@@ -147,7 +151,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
             name="emailAddress"
             render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
               <FormInput
-                label="Email"
+                label={t('email')}
                 returnKeyType="next"
                 value={value}
                 onChangeText={(text) => {
@@ -169,7 +173,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
             name="password"
             render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
               <FormInput
-                label="Password"
+                label={t('password')}
                 returnKeyType="done"
                 value={value}
                 onChangeText={(text) => {
@@ -185,7 +189,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
 
           <View style={styles.forgotPasswordContainer}>
             <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
-              <Paragraph style={styles.secondaryText}>Forgot your password?</Paragraph>
+              <Paragraph style={styles.secondaryText}>{t('forgot_password')}</Paragraph>
             </TouchableOpacity>
           </View>
         </>
@@ -201,7 +205,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
               name="phoneNumber"
               render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
                 <FormInput
-                  label="Phone number"
+                  label={t('phone_number')}
                   placeholder="82345 54389"
                   placeholderTextColor="#aaa"
                   returnKeyType="done"
@@ -231,28 +235,24 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
 
       {loginError && <Paragraph style={styles.errorText}>{loginError}</Paragraph>}
 
-      {!usePhone ? (
-        <Button
-          mode="contained"
-          style={{ marginTop: 28 }}
-          onPress={loginEmailForm.handleSubmit(onEmailSignInPress)}
-          disabled={loginEmailForm.formState.isSubmitting || !loginEmailForm.formState.isValid}
-        >
-          Login
-        </Button>
-      ) : (
-        <Button
-          mode="contained"
-          style={{ marginTop: 28 }}
-          onPress={loginPhoneForm.handleSubmit(onPhoneSignInPress)}
-          disabled={loginPhoneForm.formState.isSubmitting || !loginPhoneForm.formState.isValid}
-        >
-          Login
-        </Button>
-      )}
+      <Button
+        mode="contained"
+        style={{ marginTop: 28 }}
+        onPress={
+          !usePhone
+            ? loginEmailForm.handleSubmit(onEmailSignInPress)
+            : loginPhoneForm.handleSubmit(onPhoneSignInPress)
+        }
+        disabled={
+          (!usePhone ? loginEmailForm : loginPhoneForm).formState.isSubmitting ||
+          !(!usePhone ? loginEmailForm : loginPhoneForm).formState.isValid
+        }
+      >
+        {t('login')}
+      </Button>
 
       <View style={styles.signUpContainer}>
-        <Paragraph style={styles.secondaryText}>Don't have an account? </Paragraph>
+        <Paragraph style={styles.secondaryText}>{t('dont_have_account')} </Paragraph>
         <TouchableOpacity
           onPress={() => {
             setLoginError(undefined);
@@ -261,7 +261,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
             navigation.navigate('SignUp');
           }}
         >
-          <Paragraph style={styles.primaryText}>Sign up</Paragraph>
+          <Paragraph style={styles.primaryText}>{t('sign_up')}</Paragraph>
         </TouchableOpacity>
       </View>
 
@@ -274,7 +274,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
           navigation.goBack();
         }}
       >
-        <Paragraph style={styles.goBackText}>Go Back</Paragraph>
+        <Paragraph style={styles.goBackText}>{t('go_back')}</Paragraph>
       </TouchableOpacity>
     </Background>
   );

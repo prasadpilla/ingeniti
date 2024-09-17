@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import i18next from 'i18next';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Image } from 'react-native';
 
 import Background from '../components/Background';
@@ -9,6 +11,12 @@ import Paragraph from '../components/Paragraph';
 import { HomeProps } from '../types';
 
 const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
+  const { t } = useTranslation();
+
+  const handleLanguageChange = (language: string) => {
+    i18next.changeLanguage(language);
+  };
+
   return (
     <Background>
       <Image
@@ -19,14 +27,15 @@ const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
         <Image source={require('../assets/logo-title.jpeg')} style={{ width: 200, height: 50 }} />
       </Header>
       <Paragraph style={{ marginTop: -20, marginBottom: 20, fontStyle: 'italic' }}>
-        Energy and water optimization
+        {t('tagline')}
       </Paragraph>
       <Button mode="contained" onPress={() => navigation.navigate('Login')}>
-        Login
+        {t('login')}
       </Button>
       <Button mode="outlined" onPress={() => navigation.navigate('SignUp')}>
-        Sign Up
+        {t('sign_up')}
       </Button>
+      <LanguagePicker selectedLanguage={i18next.language} onSelectLanguage={handleLanguageChange} />
     </Background>
   );
 };

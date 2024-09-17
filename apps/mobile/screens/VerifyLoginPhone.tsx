@@ -2,9 +2,11 @@ import { useSignIn } from '@clerk/clerk-expo';
 import { ClerkAPIError } from '@clerk/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { VerificationCodeForm, verificationCodeFormSchema } from '@ingeniti/shared';
+import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
@@ -15,8 +17,10 @@ import { Themes } from '../styles/themes';
 import { VerifyLoginPhoneProps } from '../types';
 
 const VerifyLoginPhoneScreen: React.FC<VerifyLoginPhoneProps> = ({ route }) => {
+  const { t } = useTranslation();
   const { isLoaded, signIn, setActive } = useSignIn();
   const { phoneNumber } = route.params;
+  const navigation = useNavigation();
 
   const verificationCodeForm = useForm<VerificationCodeForm>({
     resolver: zodResolver(verificationCodeFormSchema),
@@ -41,9 +45,9 @@ const VerifyLoginPhoneScreen: React.FC<VerifyLoginPhoneProps> = ({ route }) => {
       if (signInAttempt.status === 'complete') {
         await setActive({ session: signInAttempt.createdSessionId });
       } else {
-        setVerificationError('Something went wrong. Please try again.');
+        setVerificationError(t('something_went_wrong'));
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error:', JSON.stringify(err, null, 2));
       handleVerificationErrors(err.errors);
     }
@@ -56,18 +60,18 @@ const VerifyLoginPhoneScreen: React.FC<VerifyLoginPhoneProps> = ({ route }) => {
       const paramName = err.meta?.paramName;
 
       if (`${errCode}-${paramName}` === 'form_code_incorrect-code') {
-        setVerificationError('The code is incorrect. Please try again.');
+        setVerificationError(t('otp_incorrect'));
       } else {
-        setVerificationError('Something went wrong. Try again');
+        setVerificationError(t('something_went_wrong'));
       }
     }
   };
 
   return (
     <Background>
-      <Header>Verify Your Phone</Header>
+      <Header>{t('verify_your_phone')}</Header>
       <View>
-        <Paragraph style={styles.paragraph}>Enter the code sent to your phone number</Paragraph>
+        <Paragraph style={styles.paragraph}>{t('enter_verification_code')}</Paragraph>
         <View style={styles.credentialContainer}>
           <Paragraph style={styles.credential}>{phoneNumber}</Paragraph>
         </View>
@@ -77,7 +81,7 @@ const VerifyLoginPhoneScreen: React.FC<VerifyLoginPhoneProps> = ({ route }) => {
         name="code"
         render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
           <FormInput
-            label="Verification Code"
+            label={t('verification_code')}
             returnKeyType="done"
             value={value}
             onChangeText={onChange}
@@ -95,8 +99,18 @@ const VerifyLoginPhoneScreen: React.FC<VerifyLoginPhoneProps> = ({ route }) => {
           verificationCodeForm.formState.isSubmitting || !verificationCodeForm.formState.isValid
         }
       >
-        Verify
+        {t('verify')}
       </Button>
+      <TouchableOpacity
+        style={styles.goBackButton}
+        onPress={() => {
+          setVerificationError(undefined);
+          verificationCodeForm.reset();
+          navigation.goBack();
+        }}
+      >
+        <Paragraph style={styles.goBackText}>{t('go_back')}</Paragraph>
+      </TouchableOpacity>
     </Background>
   );
 };
@@ -125,6 +139,15 @@ const styles = StyleSheet.create({
     color: 'red',
     marginTop: 8,
     textAlign: 'center',
+  },
+  goBackButton: {
+    marginTop: 24,
+    alignSelf: 'center',
+  },
+  goBackText: {
+    color: Themes.colors.primary,
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

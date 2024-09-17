@@ -1,8 +1,9 @@
-import { useSignIn, useAuth } from '@clerk/clerk-expo';
+import { useAuth, useSignIn } from '@clerk/clerk-expo';
 import MaterialIcons from '@expo/vector-icons/build/MaterialIcons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { z } from 'zod';
 
@@ -37,6 +38,7 @@ type VerifyOTPForm = z.infer<typeof verifyOTPSchema>;
 type NewPasswordForm = z.infer<typeof newPasswordSchema>;
 
 const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => {
+  const { t } = useTranslation();
   const { signIn, isLoaded } = useSignIn();
   const { signOut } = useAuth();
   const [resetError, setResetError] = useState<string | undefined>();
@@ -143,7 +145,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
 
   return (
     <Background>
-      <Header>Reset Password</Header>
+      <Header>{t('reset_password')}</Header>
       {!resetSent ? (
         <>
           <Controller
@@ -151,7 +153,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
             name="emailAddress"
             render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
               <FormInput
-                label="Email"
+                label={t('email')}
                 returnKeyType="done"
                 value={value}
                 onChangeText={(text) => {
@@ -175,14 +177,12 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
               forgotPasswordForm.formState.isSubmitting || !forgotPasswordForm.formState.isValid
             }
           >
-            Send OTP
+            {t('send_otp')}
           </Button>
         </>
       ) : !otpVerified ? (
         <>
-          <Text style={styles.centeredText}>
-            OTP sent to your email. Please enter the OTP below.
-          </Text>
+          <Text style={styles.centeredText}>{t('enter_email_verification_code')}</Text>
           <Controller
             control={verifyOTPForm.control}
             name="otp"
@@ -207,7 +207,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
             onPress={verifyOTPForm.handleSubmit(onVerifyOTP)}
             disabled={verifyOTPForm.formState.isSubmitting || !verifyOTPForm.formState.isValid}
           >
-            Verify OTP
+            {t('verify_otp')}
           </Button>
         </>
       ) : !verificationComplete ? (
@@ -220,7 +220,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
             name="password"
             render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
               <FormInput
-                label="New Password"
+                label={t('new_password')}
                 returnKeyType="next"
                 value={value}
                 onChangeText={(text) => {
@@ -238,7 +238,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
             name="confirmPassword"
             render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
               <FormInput
-                label="Confirm New Password"
+                label={t('confirm_new_password')}
                 returnKeyType="done"
                 value={value}
                 onChangeText={(text) => {
@@ -257,15 +257,13 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
             onPress={newPasswordForm.handleSubmit(onNewPasswordSubmit)}
             disabled={newPasswordForm.formState.isSubmitting || !newPasswordForm.formState.isValid}
           >
-            Reset Password
+            {t('reset_password')}
           </Button>
         </View>
       ) : (
         <View style={styles.successContainer}>
           <MaterialIcons name="check-circle" size={24} color="green" />
-          <Paragraph>
-            Password reset successful. You can now log in with your new password.
-          </Paragraph>
+          <Paragraph>{t('password_reset_successful')}</Paragraph>
         </View>
       )}
       <View style={styles.backToLoginContainer}>
@@ -277,7 +275,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
             navigation.navigate('Login');
           }}
         >
-          <Text style={styles.backToLoginText}>Back to Login</Text>
+          <Text style={styles.backToLoginText}>{t('login')}</Text>
         </TouchableOpacity>
       </View>
     </Background>

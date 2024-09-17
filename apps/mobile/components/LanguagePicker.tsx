@@ -1,17 +1,11 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Modal, FlatList, StyleSheet } from 'react-native';
-
-import Button from './Button';
+import { useTranslation } from 'react-i18next';
+import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Themes } from '../styles/themes';
 import { languageResources } from '../utils/i18next/i18next';
 import languagesList from '../utils/i18next/language-list.json';
-
-interface Language {
-  key: string;
-  label: string;
-  nativeLabel: string;
-}
+import Button from './Button';
 
 interface LanguagePickerProps {
   selectedLanguage: string;
@@ -20,7 +14,7 @@ interface LanguagePickerProps {
 
 const LanguagePicker: React.FC<LanguagePickerProps> = ({ selectedLanguage, onSelectLanguage }) => {
   const [modalVisible, setModalVisible] = useState(false);
-
+  const { t } = useTranslation();
   const renderItem = ({ item }: { item: string }) => {
     const language = languagesList[item as keyof typeof languagesList];
 
@@ -41,6 +35,7 @@ const LanguagePicker: React.FC<LanguagePickerProps> = ({ selectedLanguage, onSel
 
   return (
     <View>
+      <Text style={styles.label}>{t('choose_language')}</Text>
       <TouchableOpacity style={styles.pickerButtonContainer} onPress={() => setModalVisible(true)}>
         <View style={styles.pickerButton}>
           <Text style={styles.pickerButtonText}>
@@ -51,10 +46,10 @@ const LanguagePicker: React.FC<LanguagePickerProps> = ({ selectedLanguage, onSel
       </TouchableOpacity>
       <Modal visible={modalVisible} animationType="slide">
         <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>Select a Language</Text>
+          <Text style={styles.modalTitle}>{t('select_language')}</Text>
           <FlatList data={languageData} renderItem={renderItem} keyExtractor={(item) => item} />
           <Button mode="contained" onPress={() => setModalVisible(false)}>
-            Close
+            {t('close')}
           </Button>
         </View>
       </Modal>
@@ -63,15 +58,20 @@ const LanguagePicker: React.FC<LanguagePickerProps> = ({ selectedLanguage, onSel
 };
 
 const styles = StyleSheet.create({
+  label: {
+    fontSize: 16,
+    fontWeight: 'semibold',
+    marginBottom: 5,
+    marginTop: 10,
+  },
   pickerButtonContainer: {
     borderWidth: 1,
-    borderColor: Themes.colors.secondary,
+    borderColor: Themes.colors.secondaryContainer,
     borderRadius: 5,
-    height: 51,
-    backgroundColor: Themes.colors.secondaryContainer,
+    height: 30,
+    backgroundColor: Themes.colors.background,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 4.5,
     paddingHorizontal: 8,
   },
   pickerButton: {
