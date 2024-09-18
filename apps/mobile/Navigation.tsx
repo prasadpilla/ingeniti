@@ -34,9 +34,7 @@ function TabNavigation() {
         component={ProfileScreen}
         options={{
           tabBarLabel: 'Profile',
-          tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="account" color={color} size={26} />
-          ),
+          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="account" color={color} size={26} />,
         }}
       />
       <Tab.Screen
@@ -57,7 +55,11 @@ const Navigation = ({ theme }) => {
 
   return (
     <NavigationContainer theme={theme}>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
         {isSignedIn ? (
           <Stack.Screen name="DashboardHome" component={TabNavigation} />
         ) : (
