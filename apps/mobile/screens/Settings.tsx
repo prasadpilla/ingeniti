@@ -16,7 +16,7 @@ export default function SettingsScreen() {
       <Header>{t('settings')}</Header>
       <Switch color="red" value={false} onValueChange={() => {}} />
       <Button mode="contained" onPress={() => signOut()}>
-        Sign out
+        {t('sign_out')}
       </Button>
     </Background>
   );

@@ -319,15 +319,14 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   checkboxTouchable: {
     padding: 8,
     zIndex: 100,
   },
   checkboxText: {
-    flex: 1,
     fontSize: 14,
-    marginLeft: -48,
     zIndex: 1,
   },
 });

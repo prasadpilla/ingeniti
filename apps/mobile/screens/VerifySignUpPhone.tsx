@@ -73,7 +73,7 @@ const VerifySignUpPhoneScreen: React.FC<VerifySignUpPhoneProps> = ({ route }) =>
       <Header>{t('verify_your_phone')}</Header>
 
       <View>
-        <Paragraph style={styles.paragraph}>Enter the code sent to your phone number</Paragraph>
+        <Paragraph style={styles.paragraph}>{t('enter_phone_verification_code')}</Paragraph>
         <View style={styles.credentialContainer}>
           <Paragraph style={styles.credential}>{phoneNumber}</Paragraph>
         </View>

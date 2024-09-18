@@ -216,7 +216,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
         </>
       ) : !verificationComplete ? (
         <View style={styles.fullWidth}>
-          <Text style={[styles.centeredText, styles.marginBottom]}>OTP verified. Please enter your new password.</Text>
+          <Text style={[styles.centeredText, styles.marginBottom]}>{t('otp_verified_enter_password')}</Text>
           <Controller
             control={newPasswordForm.control}
             name="password"

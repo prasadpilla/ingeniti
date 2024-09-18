@@ -1,5 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { View, Text, TouchableOpacity, Modal, FlatList, StyleSheet } from 'react-native';
 
 import Button from './Button';
@@ -11,10 +12,8 @@ interface CountryCodePickerProps {
   onSelectCountry: (country: CountryData) => void;
 }
 
-const CountryCodePicker: React.FC<CountryCodePickerProps> = ({
-  selectedCountry,
-  onSelectCountry,
-}) => {
+const CountryCodePicker: React.FC<CountryCodePickerProps> = ({ selectedCountry, onSelectCountry }) => {
+  const { t } = useTranslation();
   const [modalVisible, setModalVisible] = useState(false);
 
   const renderItem = ({ item }: { item: CountryData }) => (
@@ -26,7 +25,7 @@ const CountryCodePicker: React.FC<CountryCodePickerProps> = ({
       }}
     >
       <Text style={styles.countryFlag}>{item.flag}</Text>
-      <Text style={styles.countryName}>{item.name}</Text>
+      <Text style={styles.countryName}>{item.nativeName}</Text>
       <Text style={styles.countryCode}>{item.code}</Text>
     </TouchableOpacity>
   );
@@ -43,10 +42,10 @@ const CountryCodePicker: React.FC<CountryCodePickerProps> = ({
       </TouchableOpacity>
       <Modal visible={modalVisible} animationType="slide">
         <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>Select a country</Text>
+          <Text style={styles.modalTitle}>{t('select_a_country')}</Text>
           <FlatList data={countries} renderItem={renderItem} keyExtractor={(item) => item.name} />
           <Button mode="contained" onPress={() => setModalVisible(false)}>
-            Close
+            {t('close')}
           </Button>
         </View>
       </Modal>
