@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator } from 'react-native-paper';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
@@ -96,6 +97,7 @@ const VerifySignUpEmailScreen: React.FC<VerifySignUpEmailProps> = ({ route, navi
               if (verificationError) setVerificationError(undefined);
             }}
             onBlur={onBlur}
+            keyboardType="number-pad"
             errorText={error?.message}
           />
         )}
@@ -107,11 +109,13 @@ const VerifySignUpEmailScreen: React.FC<VerifySignUpEmailProps> = ({ route, navi
         mode="contained"
         onPress={verificationCodeForm.handleSubmit(onPressVerify)}
         style={styles.button}
-        disabled={
-          verificationCodeForm.formState.isSubmitting || !verificationCodeForm.formState.isValid
-        }
+        disabled={verificationCodeForm.formState.isSubmitting || !verificationCodeForm.formState.isValid}
       >
-        {t('verify_otp')}
+        {verificationCodeForm.formState.isSubmitting ? (
+          <ActivityIndicator animating={true} color={Themes.colors.secondary} />
+        ) : (
+          t('verify_otp')
+        )}
       </Button>
 
       <TouchableOpacity

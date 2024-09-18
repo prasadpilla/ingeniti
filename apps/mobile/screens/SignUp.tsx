@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Checkbox } from 'react-native-paper';
+import { Checkbox, ActivityIndicator } from 'react-native-paper';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
@@ -149,10 +149,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
 
       <View style={styles.phoneInputContainer}>
         <View style={styles.phoneInput}>
-          <CountryCodePicker
-            selectedCountry={selectedCountry}
-            onSelectCountry={setSelectedCountry}
-          />
+          <CountryCodePicker selectedCountry={selectedCountry} onSelectCountry={setSelectedCountry} />
           <Controller
             control={signUpForm.control}
             name="phoneNumber"
@@ -180,9 +177,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
         </View>
 
         {signUpForm.formState.errors.phoneNumber && (
-          <Paragraph style={styles.phoneInputFieldError}>
-            {signUpForm.formState.errors.phoneNumber.message}
-          </Paragraph>
+          <Paragraph style={styles.phoneInputFieldError}>{signUpForm.formState.errors.phoneNumber.message}</Paragraph>
         )}
       </View>
 
@@ -230,7 +225,11 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
         style={styles.button}
         disabled={signUpForm.formState.isSubmitting || !signUpForm.formState.isValid}
       >
-        {t('sign_up')}
+        {signUpForm.formState.isSubmitting ? (
+          <ActivityIndicator animating={true} color={Themes.colors.secondary} />
+        ) : (
+          t('sign_up')
+        )}
       </Button>
       <View style={styles.row}>
         <Paragraph style={styles.label}>{t('dont_have_account')} </Paragraph>

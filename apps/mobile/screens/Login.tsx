@@ -1,16 +1,12 @@
 import { useSignIn } from '@clerk/clerk-expo';
 import { ClerkAPIError, PhoneCodeFactor, SignInFirstFactor } from '@clerk/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  LoginFormEmail,
-  loginFormEmailSchema,
-  LoginFormPhone,
-  loginFormPhoneSchema,
-} from '@ingeniti/shared';
+import { LoginFormEmail, loginFormEmailSchema, LoginFormPhone, loginFormPhoneSchema } from '@ingeniti/shared';
 import React, { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator } from 'react-native-paper';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
@@ -138,9 +134,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
             setUsePhone(!usePhone);
           }}
         >
-          <Paragraph style={styles.usePhoneText}>
-            {!usePhone ? t('use_phone') : t('use_email')}
-          </Paragraph>
+          <Paragraph style={styles.usePhoneText}>{!usePhone ? t('use_phone') : t('use_email')}</Paragraph>
         </TouchableOpacity>
       </View>
 
@@ -188,7 +182,13 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
           />
 
           <View style={styles.forgotPasswordContainer}>
-            <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+            <TouchableOpacity
+              onPress={() => {
+                setLoginError(undefined);
+                loginEmailForm.reset();
+                navigation.navigate('ForgotPassword');
+              }}
+            >
               <Paragraph style={styles.secondaryText}>{t('forgot_password')}</Paragraph>
             </TouchableOpacity>
           </View>
@@ -196,10 +196,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
       ) : (
         <View style={styles.phoneInputContainer}>
           <View style={styles.phoneInput}>
-            <CountryCodePicker
-              selectedCountry={selectedCountry}
-              onSelectCountry={setSelectedCountry}
-            />
+            <CountryCodePicker selectedCountry={selectedCountry} onSelectCountry={setSelectedCountry} />
             <Controller
               control={loginPhoneForm.control}
               name="phoneNumber"
@@ -239,16 +236,18 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
         mode="contained"
         style={{ marginTop: 28 }}
         onPress={
-          !usePhone
-            ? loginEmailForm.handleSubmit(onEmailSignInPress)
-            : loginPhoneForm.handleSubmit(onPhoneSignInPress)
+          !usePhone ? loginEmailForm.handleSubmit(onEmailSignInPress) : loginPhoneForm.handleSubmit(onPhoneSignInPress)
         }
         disabled={
           (!usePhone ? loginEmailForm : loginPhoneForm).formState.isSubmitting ||
           !(!usePhone ? loginEmailForm : loginPhoneForm).formState.isValid
         }
       >
-        {t('login')}
+        {(!usePhone ? loginEmailForm : loginPhoneForm).formState.isSubmitting ? (
+          <ActivityIndicator animating={true} color={Themes.colors.secondary} />
+        ) : (
+          t('login')
+        )}
       </Button>
 
       <View style={styles.signUpContainer}>

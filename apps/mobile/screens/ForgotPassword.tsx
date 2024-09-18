@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator } from 'react-native-paper';
 import { z } from 'zod';
 
 import Background from '../components/Background';
@@ -110,10 +111,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
       }
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
-      if (
-        err.errors[0]?.code === 'form_code_incorrect' &&
-        err.errors[0]?.meta.paramName === 'code'
-      ) {
+      if (err.errors[0]?.code === 'form_code_incorrect' && err.errors[0]?.meta.paramName === 'code') {
         setResetError('Invalid OTP. Please try again.');
       } else {
         setResetError('Something went wrong. Please try again.');
@@ -173,11 +171,13 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
           <Button
             mode="contained"
             onPress={forgotPasswordForm.handleSubmit(onResetPress)}
-            disabled={
-              forgotPasswordForm.formState.isSubmitting || !forgotPasswordForm.formState.isValid
-            }
+            disabled={forgotPasswordForm.formState.isSubmitting || !forgotPasswordForm.formState.isValid}
           >
-            {t('send_otp')}
+            {forgotPasswordForm.formState.isSubmitting ? (
+              <ActivityIndicator animating={true} color={Themes.colors.secondary} />
+            ) : (
+              t('send_otp')
+            )}
           </Button>
         </>
       ) : !otpVerified ? (
@@ -207,14 +207,16 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
             onPress={verifyOTPForm.handleSubmit(onVerifyOTP)}
             disabled={verifyOTPForm.formState.isSubmitting || !verifyOTPForm.formState.isValid}
           >
-            {t('verify_otp')}
+            {verifyOTPForm.formState.isSubmitting ? (
+              <ActivityIndicator animating={true} color={Themes.colors.secondary} />
+            ) : (
+              t('verify_otp')
+            )}
           </Button>
         </>
       ) : !verificationComplete ? (
         <View style={styles.fullWidth}>
-          <Text style={[styles.centeredText, styles.marginBottom]}>
-            OTP verified. Please enter your new password.
-          </Text>
+          <Text style={[styles.centeredText, styles.marginBottom]}>OTP verified. Please enter your new password.</Text>
           <Controller
             control={newPasswordForm.control}
             name="password"
@@ -257,7 +259,11 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
             onPress={newPasswordForm.handleSubmit(onNewPasswordSubmit)}
             disabled={newPasswordForm.formState.isSubmitting || !newPasswordForm.formState.isValid}
           >
-            {t('reset_password')}
+            {newPasswordForm.formState.isSubmitting ? (
+              <ActivityIndicator animating={true} color={Themes.colors.secondary} />
+            ) : (
+              t('reset_password')
+            )}
           </Button>
         </View>
       ) : (
