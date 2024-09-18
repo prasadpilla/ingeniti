@@ -1,0 +1,22 @@
+{
+  "name": "@ingeniti/shared",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "main": "./dist/shared.umd.cjs",
+  "module": "./dist/shared.js",
+  "types": "./dist/main.d.ts",
+  "scripts": {
+    "dev": "tsc && vite build --watch",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "vite": "^5.2.0",
+    "vite-plugin-dts": "^3.9.1"
+  },
+  "dependencies": {
+    "zod": "^3.22.1"
+  }
+}

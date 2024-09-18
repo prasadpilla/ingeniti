@@ -75,7 +75,7 @@ resource "google_cloud_run_service" "ingeniti-api-server" {
           value = "pk_live_Y2xlcmsuc3VwYXRlc3QuYWkk"
         }
         env {
-          name  = "WEB_APP_URL"
+          name  = "FRONTEND_URL"
           value = "https://app.ingeniti.ai"
         }
         env {
@@ -195,39 +195,6 @@ resource "google_cloud_run_service_iam_policy" "ingeniti-api-server-noauth" {
   service  = google_cloud_run_service.ingeniti-api-server.name
 
   policy_data = data.google_iam_policy.noauth.policy_data
-}
-
-resource "google_cloud_run_service" "ingeniti-runner" {
-  name     = "ingeniti-runner"
-  location = var.region
-
-  template {
-    spec {
-      containers {
-        image = "asia-south1-docker.pkg.dev/${var.project_id}/ingeniti-runner/image"
-        resources {
-          limits = {
-            cpu    = "1000m"
-            memory = "2Gi"
-          }
-        }
-      }
-    }
-    metadata {
-      labels = {
-        "run.googleapis.com/startupProbeType" = "Default"
-      }
-      annotations = {
-        "autoscaling.knative.dev/maxScale"     = "3"
-        "run.googleapis.com/startup-cpu-boost" = "true"
-      }
-    }
-  }
-
-  traffic {
-    percent         = 100
-    latest_revision = true
-  }
 }
 
 resource "google_cloud_run_service_iam_policy" "ingeniti-runner-noauth" {

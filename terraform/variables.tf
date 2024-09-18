@@ -1,5 +1,5 @@
 variable "project_id" {
-  default = "ingeniti-ai"
+  default = "ingeniti"
 }
 
 variable "environment" {
@@ -10,5 +10,5 @@ variable "region" {
   default = "asia-south1"
 }
 variable "app_db_instance" {
-  default = "ingeniti-ai:asia-south1:ingeniti-prod"
+  default = "ingeniti:asia-south1:ingeniti-prod"
 }

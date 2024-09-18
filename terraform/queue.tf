@@ -1,5 +1,5 @@
-resource "google_cloud_tasks_queue" "test-runs" {
-  name     = "test-runs"
+resource "google_cloud_tasks_queue" "async-tasks" {
+  name     = "ingeniti-async-tasks"
   location = var.region
 
   rate_limits {

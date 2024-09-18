@@ -3,11 +3,10 @@ pnpm-lock.yaml
 pnpm-workspace.yaml
 package.json
 
-web/dist
-web/node_modules
-web/src/shadcn
-mobile/dist
-mobile/node_modules
+frontend/dist
+frontend/package.json
+frontend/node_modules
+frontend/src/shadcn
 
 api/package.json
 api/dist

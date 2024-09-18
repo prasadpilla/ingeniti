@@ -12,12 +12,6 @@ resource "google_artifact_registry_repository" "ingeniti_task_worker_repo" {
   format        = "DOCKER"
 }
 
-resource "google_artifact_registry_repository" "ingeniti_runner_repo" {
-  location      = var.region
-  repository_id = "ingeniti-runner"
-  description   = "Runner"
-  format        = "DOCKER"
-}
 
 resource "google_artifact_registry_repository" "ingeniti_migration_job_repo" {
   location      = var.region
