@@ -1,23 +1,23 @@
 import React from 'react';
 import { StyleSheet, Text } from 'react-native';
-
-import { Themes } from '../styles/themes';
+import { useTheme } from 'react-native-paper';
 
 interface ParagraphProps extends React.ComponentProps<typeof Text> {
   children: React.ReactNode;
 }
 
-const Paragraph: React.FC<ParagraphProps> = ({ children, style, ...props }) => (
-  <Text style={StyleSheet.compose(styles.text, style)} {...props}>
-    {children}
-  </Text>
-);
-
+const Paragraph: React.FC<ParagraphProps> = ({ children, style, ...props }) => {
+  const theme = useTheme();
+  return (
+    <Text style={StyleSheet.compose({ color: theme.colors.secondary, ...styles.text }, style)} {...props}>
+      {children}
+    </Text>
+  );
+};
 const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     lineHeight: 20,
-    color: Themes.colors.secondary,
     textAlign: 'center',
   },
 });

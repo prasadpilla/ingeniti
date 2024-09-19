@@ -1,20 +1,19 @@
 import React from 'react';
 import { StyleSheet, Text } from 'react-native';
-
-import { Themes } from '../styles/themes';
+import { useTheme } from 'react-native-paper';
 
 interface HeaderProps {
   children: React.ReactNode;
 }
 
-const Header: React.FC<HeaderProps> = ({ children }) => (
-  <Text style={styles.header}>{children}</Text>
-);
+const Header: React.FC<HeaderProps> = ({ children }) => {
+  const theme = useTheme();
+  return <Text style={[styles.header, { color: theme.colors.secondary }]}>{children}</Text>;
+};
 
 const styles = StyleSheet.create({
   header: {
     fontSize: 26,
-    color: Themes.colors.secondary,
     fontWeight: 'bold',
     paddingVertical: 14,
   },

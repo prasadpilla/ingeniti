@@ -26,13 +26,11 @@ const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
       <Header>
         <Image source={require('../assets/logo-title.jpeg')} style={{ width: 200, height: 50 }} />
       </Header>
-      <Paragraph style={{ marginTop: -20, marginBottom: 20, fontStyle: 'italic' }}>
-        {t('tagline')}
-      </Paragraph>
+      <Paragraph style={{ marginTop: -20, marginBottom: 20, fontStyle: 'italic' }}>{t('tagline')}</Paragraph>
       <Button mode="contained" onPress={() => navigation.navigate('Login')}>
         {t('login')}
       </Button>
-      <Button mode="outlined" onPress={() => navigation.navigate('SignUp')}>
+      <Button mode="outlined" onPress={() => navigation.navigate('SignUp')} style={{ marginBottom: 40 }}>
         {t('sign_up')}
       </Button>
       <LanguagePicker selectedLanguage={i18next.language} onSelectLanguage={handleLanguageChange} />

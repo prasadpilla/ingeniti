@@ -1,11 +1,13 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Themes } from '../styles/themes';
+import { FlatList, Modal, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useTheme } from 'react-native-paper';
+
+import Button from './Button';
+import Paragraph from './Paragraph';
 import { languageResources } from '../utils/i18next/i18next';
 import languagesList from '../utils/i18next/language-list.json';
-import Button from './Button';
 
 interface LanguagePickerProps {
   selectedLanguage: string;
@@ -13,6 +15,7 @@ interface LanguagePickerProps {
 }
 
 const LanguagePicker: React.FC<LanguagePickerProps> = ({ selectedLanguage, onSelectLanguage }) => {
+  const theme = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
   const { t } = useTranslation();
   const renderItem = ({ item }: { item: string }) => {
@@ -20,13 +23,13 @@ const LanguagePicker: React.FC<LanguagePickerProps> = ({ selectedLanguage, onSel
 
     return (
       <TouchableOpacity
-        style={styles.languageItem}
+        style={[styles.languageItem, { borderBottomColor: theme.colors.outlineVariant }]}
         onPress={() => {
           onSelectLanguage(language.key);
           setModalVisible(false);
         }}
       >
-        <Text style={styles.languageName}>{language.nativeLabel}</Text>
+        <Paragraph style={styles.languageName}>{language.nativeLabel}</Paragraph>
       </TouchableOpacity>
     );
   };
@@ -34,19 +37,28 @@ const LanguagePicker: React.FC<LanguagePickerProps> = ({ selectedLanguage, onSel
   const languageData = Object.keys(languageResources);
 
   return (
-    <View>
-      <Text style={styles.label}>{t('choose_language')}</Text>
-      <TouchableOpacity style={styles.pickerButtonContainer} onPress={() => setModalVisible(true)}>
+    <View style={{ alignItems: 'center' }}>
+      <Paragraph style={styles.label}>{t('choose_language')}</Paragraph>
+      <TouchableOpacity
+        style={[
+          styles.pickerButtonContainer,
+          {
+            backgroundColor: theme.colors.background,
+            borderColor: theme.colors.outlineVariant,
+          },
+        ]}
+        onPress={() => setModalVisible(true)}
+      >
         <View style={styles.pickerButton}>
-          <Text style={styles.pickerButtonText}>
+          <Paragraph style={styles.pickerButtonText}>
             {languagesList[selectedLanguage as keyof typeof languagesList].nativeLabel}
-          </Text>
-          <MaterialIcons name="arrow-drop-down" size={20} color={Themes.colors.secondary} />
+          </Paragraph>
+          <MaterialIcons name="arrow-drop-down" size={20} color={theme.colors.secondary} />
         </View>
       </TouchableOpacity>
       <Modal visible={modalVisible} animationType="slide">
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>{t('select_language')}</Text>
+        <View style={[styles.modalContainer, { backgroundColor: theme.colors.background }]}>
+          <Paragraph style={styles.modalTitle}>{t('select_language')}</Paragraph>
           <FlatList data={languageData} renderItem={renderItem} keyExtractor={(item) => item} />
           <Button mode="contained" onPress={() => setModalVisible(false)}>
             {t('close')}
@@ -65,14 +77,14 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   pickerButtonContainer: {
+    marginTop: 8,
     borderWidth: 1,
-    borderColor: Themes.colors.secondaryContainer,
-    borderRadius: 5,
-    height: 30,
-    backgroundColor: Themes.colors.background,
+    width: 130,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 8,
+    paddingHorizontal: 2,
+    paddingVertical: 6,
   },
   pickerButton: {
     flexDirection: 'row',
@@ -85,7 +97,6 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     padding: 20,
-    backgroundColor: Themes.colors.background,
   },
   modalTitle: {
     fontSize: 20,
@@ -95,10 +106,10 @@ const styles = StyleSheet.create({
   languageItem: {
     padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
   },
   languageName: {
     fontSize: 16,
+    textAlign: 'left',
   },
 });
 

@@ -1,13 +1,6 @@
 import React, { useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  Text,
-  ViewStyle,
-  NativeSyntheticEvent,
-  TextInputFocusEventData,
-} from 'react-native';
-import { TextInput as Input } from 'react-native-paper';
+import { View, StyleSheet, Text, ViewStyle, NativeSyntheticEvent, TextInputFocusEventData } from 'react-native';
+import { TextInput as Input, useTheme } from 'react-native-paper';
 
 import { Themes } from '../styles/themes';
 
@@ -19,14 +12,8 @@ interface FormInputProps extends React.ComponentProps<typeof Input> {
   containerStyles?: ViewStyle;
 }
 
-const FormInput: React.FC<FormInputProps> = ({
-  errorText,
-  hasError,
-  isPassword,
-  containerStyles,
-  label,
-  ...props
-}) => {
+const FormInput: React.FC<FormInputProps> = ({ errorText, hasError, isPassword, containerStyles, label, ...props }) => {
+  const theme = useTheme();
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
 
   const togglePasswordVisibility = () => {
@@ -42,8 +29,8 @@ const FormInput: React.FC<FormInputProps> = ({
   return (
     <View style={[styles.container, containerStyles]}>
       <Input
-        style={styles.input}
-        selectionColor={Themes.colors.primary}
+        style={[{ backgroundColor: theme.colors.surface }]}
+        selectionColor={theme.colors.primary}
         underlineColor="transparent"
         mode="outlined"
         label={label}
@@ -64,7 +51,7 @@ const FormInput: React.FC<FormInputProps> = ({
         onBlur={(e) => handleBlur(e)}
         {...props}
       />
-      {errorText && <Text style={styles.error}>{errorText}</Text>}
+      {errorText && <Text style={[styles.error, { color: theme.colors.error }]}>{errorText}</Text>}
     </View>
   );
 };
@@ -74,12 +61,8 @@ const styles = StyleSheet.create({
     width: '100%',
     marginVertical: 10,
   },
-  input: {
-    backgroundColor: Themes.colors.surface,
-  },
   error: {
     fontSize: 12,
-    color: Themes.colors.error,
     paddingHorizontal: 4,
     paddingTop: 4,
   },
