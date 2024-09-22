@@ -98,7 +98,9 @@ const VerifySignUpPhoneScreen: React.FC<VerifySignUpPhoneProps> = ({ route }) =>
         )}
       />
 
-      {verificationError && <Paragraph style={styles.errorText}>{verificationError}</Paragraph>}
+      {verificationError && (
+        <Paragraph style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>{verificationError}</Paragraph>
+      )}
 
       <Button
         mode="contained"

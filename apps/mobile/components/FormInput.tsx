@@ -51,7 +51,7 @@ const FormInput: React.FC<FormInputProps> = ({ errorText, hasError, isPassword, 
         onBlur={(e) => handleBlur(e)}
         {...props}
       />
-      {errorText && <Text style={[styles.error, { color: theme.colors.error }]}>{errorText}</Text>}
+      {errorText && <Text style={[styles.error, { color: theme.colors.onErrorContainer }]}>{errorText}</Text>}
     </View>
   );
 };

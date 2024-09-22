@@ -225,14 +225,16 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
             />
           </View>
           {loginPhoneForm.formState.errors.phoneNumber && (
-            <Paragraph style={[styles.phoneInputFieldError, { color: theme.colors.error }]}>
+            <Paragraph style={[styles.phoneInputFieldError, { color: theme.colors.onErrorContainer }]}>
               {loginPhoneForm.formState.errors.phoneNumber.message}
             </Paragraph>
           )}
         </View>
       )}
 
-      {loginError && <Paragraph style={styles.errorText}>{loginError}</Paragraph>}
+      {loginError && (
+        <Paragraph style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>{loginError}</Paragraph>
+      )}
 
       <Button
         mode="contained"

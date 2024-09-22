@@ -103,7 +103,9 @@ const VerifySignUpEmailScreen: React.FC<VerifySignUpEmailProps> = ({ route, navi
         )}
       />
 
-      {verificationError && <Paragraph style={styles.errorText}>{verificationError}</Paragraph>}
+      {verificationError && (
+        <Paragraph style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>{verificationError}</Paragraph>
+      )}
 
       <Button
         mode="contained"

@@ -177,7 +177,9 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
         </View>
 
         {signUpForm.formState.errors.phoneNumber && (
-          <Paragraph style={styles.phoneInputFieldError}>{signUpForm.formState.errors.phoneNumber.message}</Paragraph>
+          <Paragraph style={[styles.phoneInputFieldError, { color: theme.colors.onErrorContainer }]}>
+            {signUpForm.formState.errors.phoneNumber.message}
+          </Paragraph>
         )}
       </View>
 
@@ -217,7 +219,9 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
         )}
       />
 
-      {signUpError && <Paragraph style={styles.errorText}>{signUpError}</Paragraph>}
+      {signUpError && (
+        <Paragraph style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>{signUpError}</Paragraph>
+      )}
 
       <Button
         mode="contained"

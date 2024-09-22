@@ -167,7 +167,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
               />
             )}
           />
-          {resetError && <Text style={[styles.errorText, { color: theme.colors.error }]}>{resetError}</Text>}
+          {resetError && <Text style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>{resetError}</Text>}
           <Button
             mode="contained"
             onPress={forgotPasswordForm.handleSubmit(onResetPress)}
@@ -201,7 +201,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
               />
             )}
           />
-          {resetError && <Text style={styles.errorText}>{resetError}</Text>}
+          {resetError && <Text style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>{resetError}</Text>}
           <Button
             mode="contained"
             onPress={verifyOTPForm.handleSubmit(onVerifyOTP)}
@@ -253,7 +253,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
               />
             )}
           />
-          {resetError && <Text style={styles.errorText}>{resetError}</Text>}
+          {resetError && <Text style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>{resetError}</Text>}
           <Button
             mode="contained"
             onPress={newPasswordForm.handleSubmit(onNewPasswordSubmit)}

@@ -4,7 +4,7 @@ export type Color = keyof typeof Colors.light;
 
 const Colors = {
   light: {
-    primary: 'rgb(0, 103, 127)',
+    primary: 'rgb(56, 157, 181)',
     onPrimary: 'rgb(255, 255, 255)',
     primaryContainer: 'rgb(183, 234, 255)',
     onPrimaryContainer: 'rgb(0, 31, 40)',
@@ -16,10 +16,10 @@ const Colors = {
     onTertiary: 'rgb(255, 255, 255)',
     tertiaryContainer: 'rgb(225, 224, 255)',
     onTertiaryContainer: 'rgb(23, 25, 55)',
-    error: 'rgb(186, 26, 26)',
+    error: 'rgb(194, 58, 58)',
     onError: 'rgb(255, 255, 255)',
     errorContainer: 'rgb(255, 218, 214)',
-    onErrorContainer: 'rgb(65, 0, 2)',
+    onErrorContainer: 'rgb(194, 58, 58)',
     background: 'rgb(251, 252, 254)',
     onBackground: 'rgb(25, 28, 29)',
     surface: 'rgb(251, 252, 254)',
@@ -32,7 +32,7 @@ const Colors = {
     scrim: 'rgb(0, 0, 0)',
     inverseSurface: 'rgb(46, 49, 50)',
     inverseOnSurface: 'rgb(239, 241, 242)',
-    inversePrimary: 'rgb(84, 213, 254)',
+    inversePrimary: 'rgb(79, 172, 194)',
     elevation: {
       level0: 'transparent',
       level1: 'rgb(238, 245, 248)',
@@ -46,7 +46,7 @@ const Colors = {
     backdrop: 'rgba(42, 50, 53, 0.4)',
   },
   dark: {
-    primary: 'rgb(84, 213, 254)',
+    primary: 'rgb(79, 172, 194)',
     onPrimary: 'rgb(0, 53, 67)',
     primaryContainer: 'rgb(0, 78, 97)',
     onPrimaryContainer: 'rgb(183, 234, 255)',
@@ -58,10 +58,10 @@ const Colors = {
     onTertiary: 'rgb(44, 46, 77)',
     tertiaryContainer: 'rgb(66, 68, 101)',
     onTertiaryContainer: 'rgb(225, 224, 255)',
-    error: 'rgb(255, 180, 171)',
+    error: 'rgb(250, 127, 112)',
     onError: 'rgb(105, 0, 5)',
     errorContainer: 'rgb(147, 0, 10)',
-    onErrorContainer: 'rgb(255, 180, 171)',
+    onErrorContainer: 'rgb(250, 127, 112)',
     background: 'rgb(25, 28, 29)',
     onBackground: 'rgb(225, 227, 228)',
     surface: 'rgb(25, 28, 29)',
@@ -74,7 +74,7 @@ const Colors = {
     scrim: 'rgb(0, 0, 0)',
     inverseSurface: 'rgb(225, 227, 228)',
     inverseOnSurface: 'rgb(46, 49, 50)',
-    inversePrimary: 'rgb(0, 103, 127)',
+    inversePrimary: 'rgb(56, 157, 181)',
     elevation: {
       level0: 'transparent',
       level1: 'rgb(28, 37, 40)',

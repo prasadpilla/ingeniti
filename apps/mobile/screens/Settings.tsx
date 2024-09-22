@@ -1,14 +1,17 @@
 import { useClerk } from '@clerk/clerk-expo';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useColorScheme } from 'react-native';
 import { ActivityIndicator, Switch, useTheme } from 'react-native-paper';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
 import Header from '../components/Header';
+import { DarkTheme, LightTheme } from '../styles/themes';
 
 export default function SettingsScreen() {
   const theme = useTheme();
+  const colorScheme = useColorScheme();
   const { signOut } = useClerk();
   const { t } = useTranslation();
 
