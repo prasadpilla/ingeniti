@@ -9,7 +9,7 @@ interface ParagraphProps extends React.ComponentProps<typeof Text> {
 const Paragraph: React.FC<ParagraphProps> = ({ children, style, ...props }) => {
   const theme = useTheme();
   return (
-    <Text style={StyleSheet.compose({ color: theme.colors.secondary, ...styles.text }, style)} {...props}>
+    <Text style={[{ color: theme.colors.secondary }, styles.text, style]} {...props}>
       {children}
     </Text>
   );

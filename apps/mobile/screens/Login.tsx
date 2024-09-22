@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { ActivityIndicator } from 'react-native-paper';
+import { ActivityIndicator, useTheme } from 'react-native-paper';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
@@ -14,11 +14,11 @@ import CountryCodePicker from '../components/CountryCodePicker';
 import FormInput from '../components/FormInput';
 import Header from '../components/Header';
 import Paragraph from '../components/Paragraph';
-import { Themes } from '../styles/themes';
 import { LoginProps } from '../types';
 import { countries, CountryData } from '../utils/country-data';
 
 const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
+  const theme = useTheme();
   const { t } = useTranslation();
   const { signIn, setActive, isLoaded } = useSignIn();
   const [usePhone, setUsePhone] = useState(false);
@@ -134,7 +134,9 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
             setUsePhone(!usePhone);
           }}
         >
-          <Paragraph style={styles.usePhoneText}>{!usePhone ? t('use_phone') : t('use_email')}</Paragraph>
+          <Paragraph style={[styles.usePhoneText, { color: theme.colors.primary }]}>
+            {!usePhone ? t('use_phone') : t('use_email')}
+          </Paragraph>
         </TouchableOpacity>
       </View>
 
@@ -214,7 +216,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
                   onBlur={onBlur}
                   hasError={!!error?.message}
                   keyboardType="phone-pad"
-                  selectionColor={Themes.colors.primary}
+                  selectionColor={theme.colors.primary}
                   underlineColor="transparent"
                   mode="outlined"
                   containerStyles={styles.phoneInputField}
@@ -223,7 +225,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
             />
           </View>
           {loginPhoneForm.formState.errors.phoneNumber && (
-            <Paragraph style={styles.phoneInputFieldError}>
+            <Paragraph style={[styles.phoneInputFieldError, { color: theme.colors.error }]}>
               {loginPhoneForm.formState.errors.phoneNumber.message}
             </Paragraph>
           )}
@@ -244,7 +246,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
         }
       >
         {(!usePhone ? loginEmailForm : loginPhoneForm).formState.isSubmitting ? (
-          <ActivityIndicator animating={true} color={Themes.colors.secondary} />
+          <ActivityIndicator animating={true} color={theme.colors.secondary} />
         ) : (
           t('login')
         )}
@@ -260,7 +262,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
             navigation.navigate('SignUp');
           }}
         >
-          <Paragraph style={styles.primaryText}>{t('sign_up')}</Paragraph>
+          <Paragraph style={[styles.primaryText, { color: theme.colors.primary }]}>{t('sign_up')}</Paragraph>
         </TouchableOpacity>
       </View>
 
@@ -273,7 +275,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
           navigation.goBack();
         }}
       >
-        <Paragraph style={styles.goBackText}>{t('go_back')}</Paragraph>
+        <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>{t('go_back')}</Paragraph>
       </TouchableOpacity>
     </Background>
   );
@@ -287,7 +289,6 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   usePhoneText: {
-    color: Themes.colors.primary,
     fontSize: 14,
     fontWeight: '500',
   },
@@ -311,14 +312,12 @@ const styles = StyleSheet.create({
   primaryText: {
     fontWeight: 'bold',
     fontSize: 14,
-    color: Themes.colors.primary,
   },
   goBackButton: {
     marginTop: 24,
     alignSelf: 'center',
   },
   goBackText: {
-    color: Themes.colors.primary,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -335,7 +334,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   phoneInputFieldError: {
-    color: 'red',
     textAlign: 'left',
     fontSize: 12,
     marginTop: -8,

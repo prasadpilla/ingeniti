@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { ActivityIndicator } from 'react-native-paper';
+import { ActivityIndicator, useTheme } from 'react-native-paper';
 import { z } from 'zod';
 
 import Background from '../components/Background';
@@ -13,7 +13,6 @@ import Button from '../components/Button';
 import FormInput from '../components/FormInput';
 import Header from '../components/Header';
 import Paragraph from '../components/Paragraph';
-import { Themes } from '../styles/themes';
 import { ForgotPasswordProps } from '../types';
 
 const forgotPasswordSchema = z.object({
@@ -39,6 +38,7 @@ type VerifyOTPForm = z.infer<typeof verifyOTPSchema>;
 type NewPasswordForm = z.infer<typeof newPasswordSchema>;
 
 const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => {
+  const theme = useTheme();
   const { t } = useTranslation();
   const { signIn, isLoaded } = useSignIn();
   const { signOut } = useAuth();
@@ -167,14 +167,14 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
               />
             )}
           />
-          {resetError && <Text style={styles.errorText}>{resetError}</Text>}
+          {resetError && <Text style={[styles.errorText, { color: theme.colors.error }]}>{resetError}</Text>}
           <Button
             mode="contained"
             onPress={forgotPasswordForm.handleSubmit(onResetPress)}
             disabled={forgotPasswordForm.formState.isSubmitting || !forgotPasswordForm.formState.isValid}
           >
             {forgotPasswordForm.formState.isSubmitting ? (
-              <ActivityIndicator animating={true} color={Themes.colors.secondary} />
+              <ActivityIndicator animating={true} color={theme.colors.secondary} />
             ) : (
               t('send_otp')
             )}
@@ -208,7 +208,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
             disabled={verifyOTPForm.formState.isSubmitting || !verifyOTPForm.formState.isValid}
           >
             {verifyOTPForm.formState.isSubmitting ? (
-              <ActivityIndicator animating={true} color={Themes.colors.secondary} />
+              <ActivityIndicator animating={true} color={theme.colors.secondary} />
             ) : (
               t('verify_otp')
             )}
@@ -260,7 +260,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
             disabled={newPasswordForm.formState.isSubmitting || !newPasswordForm.formState.isValid}
           >
             {newPasswordForm.formState.isSubmitting ? (
-              <ActivityIndicator animating={true} color={Themes.colors.secondary} />
+              <ActivityIndicator animating={true} color={theme.colors.secondary} />
             ) : (
               t('reset_password')
             )}
@@ -281,7 +281,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
             navigation.navigate('Login');
           }}
         >
-          <Text style={styles.backToLoginText}>{t('login')}</Text>
+          <Text style={[styles.backToLoginText, { color: theme.colors.primary }]}>{t('login')}</Text>
         </TouchableOpacity>
       </View>
     </Background>
@@ -294,7 +294,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   errorText: {
-    color: 'red',
     textAlign: 'center',
     marginVertical: 8,
   },
@@ -304,7 +303,6 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   backToLoginText: {
-    color: Themes.colors.primary,
     fontSize: 16,
     fontWeight: '600',
   },

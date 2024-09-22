@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Checkbox, ActivityIndicator } from 'react-native-paper';
+import { Checkbox, ActivityIndicator, useTheme } from 'react-native-paper';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
@@ -14,11 +14,11 @@ import CountryCodePicker from '../components/CountryCodePicker';
 import FormInput from '../components/FormInput';
 import Header from '../components/Header';
 import Paragraph from '../components/Paragraph';
-import { Themes } from '../styles/themes';
 import { SignupProps } from '../types';
 import { countries, CountryData } from '../utils/country-data';
 
 const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
+  const theme = useTheme();
   const { t } = useTranslation();
   const { isLoaded, signUp } = useSignUp();
   const [signUpError, setSignUpError] = useState<string | undefined>(undefined);
@@ -167,7 +167,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
                 onBlur={onBlur}
                 hasError={!!error?.message}
                 keyboardType="phone-pad"
-                selectionColor={Themes.colors.primary}
+                selectionColor={theme.colors.onPrimaryContainer}
                 underlineColor="transparent"
                 mode="outlined"
                 containerStyles={styles.phoneInputField}
@@ -208,7 +208,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
             <TouchableOpacity onPress={() => onChange(!value)} style={styles.checkboxTouchable}>
               <Checkbox
                 status={value ? 'checked' : 'unchecked'}
-                color={Themes.colors.primary}
+                color={theme.colors.primary}
                 onPress={() => onChange(!value)}
               />
             </TouchableOpacity>
@@ -226,7 +226,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
         disabled={signUpForm.formState.isSubmitting || !signUpForm.formState.isValid}
       >
         {signUpForm.formState.isSubmitting ? (
-          <ActivityIndicator animating={true} color={Themes.colors.secondary} />
+          <ActivityIndicator animating={true} color={theme.colors.secondary} />
         ) : (
           t('sign_up')
         )}
@@ -240,7 +240,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
             navigation.navigate('Login');
           }}
         >
-          <Paragraph style={styles.link}>{t('login')}</Paragraph>
+          <Paragraph style={[styles.link, { color: theme.colors.primary }]}>{t('login')}</Paragraph>
         </TouchableOpacity>
       </View>
       <TouchableOpacity
@@ -251,7 +251,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
           navigation.goBack();
         }}
       >
-        <Paragraph style={styles.goBackText}>{t('go_back')}</Paragraph>
+        <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>{t('go_back')}</Paragraph>
       </TouchableOpacity>
     </Background>
   );
@@ -271,14 +271,12 @@ const styles = StyleSheet.create({
   link: {
     fontWeight: 'bold',
     fontSize: 14,
-    color: Themes.colors.primary,
   },
   inputContainer: {
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'center',
-    backgroundColor: Themes.colors.surface,
   },
   countryCodeInput: {
     backgroundColor: '#eee',
@@ -293,7 +291,6 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   goBackText: {
-    color: Themes.colors.primary,
     fontWeight: '600',
   },
   phoneInputContainer: {

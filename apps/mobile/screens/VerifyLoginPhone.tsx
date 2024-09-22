@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { ActivityIndicator } from 'react-native-paper';
+import { ActivityIndicator, useTheme } from 'react-native-paper';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
@@ -18,6 +18,7 @@ import { Themes } from '../styles/themes';
 import { VerifyLoginPhoneProps } from '../types';
 
 const VerifyLoginPhoneScreen: React.FC<VerifyLoginPhoneProps> = ({ route }) => {
+  const theme = useTheme();
   const { t } = useTranslation();
   const { isLoaded, signIn, setActive } = useSignIn();
   const { phoneNumber } = route.params;
@@ -99,7 +100,7 @@ const VerifyLoginPhoneScreen: React.FC<VerifyLoginPhoneProps> = ({ route }) => {
         disabled={verificationCodeForm.formState.isSubmitting || !verificationCodeForm.formState.isValid}
       >
         {verificationCodeForm.formState.isSubmitting ? (
-          <ActivityIndicator animating={true} color={Themes.colors.secondary} />
+          <ActivityIndicator animating={true} color={theme.colors.secondary} />
         ) : (
           t('verify')
         )}
@@ -112,7 +113,7 @@ const VerifyLoginPhoneScreen: React.FC<VerifyLoginPhoneProps> = ({ route }) => {
           navigation.goBack();
         }}
       >
-        <Paragraph style={styles.goBackText}>{t('go_back')}</Paragraph>
+        <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>{t('go_back')}</Paragraph>
       </TouchableOpacity>
     </Background>
   );
@@ -132,9 +133,6 @@ const styles = StyleSheet.create({
   credential: {
     fontSize: 14,
   },
-  editIcon: {
-    color: Themes.colors.secondary,
-  },
   button: {
     marginTop: 24,
   },
@@ -148,7 +146,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   goBackText: {
-    color: Themes.colors.primary,
     fontSize: 16,
     fontWeight: '600',
   },
