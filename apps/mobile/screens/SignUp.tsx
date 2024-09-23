@@ -69,7 +69,6 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
     const { firstName, lastName, emailAddress, password } = data;
     const phone = `${selectedCountry.code}${data.phoneNumber}`;
     try {
-      console.log('signUp', emailAddress, phone, password);
       await signUp.create({
         emailAddress,
         phoneNumber: phone,

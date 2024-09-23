@@ -20,7 +20,7 @@ const VerifySignUpPhoneScreen: React.FC<VerifySignUpPhoneProps> = ({ route }) =>
   const theme = useTheme();
   const { t } = useTranslation();
   const { isLoaded, signUp, setActive } = useSignUp();
-  const { phoneNumber } = route.params;
+  const { phoneNumber, firstName, lastName } = route.params;
   const navigation = useNavigation();
 
   const [verificationError, setVerificationError] = useState<string | undefined>(undefined);
@@ -47,7 +47,10 @@ const VerifySignUpPhoneScreen: React.FC<VerifySignUpPhoneProps> = ({ route }) =>
         return;
       }
 
+      console.log('completeSignUp', completeSignUp);
+
       await setActive({ session: completeSignUp.createdSessionId });
+      // await signUp.update({ firstName, lastName });
     } catch (err: any) {
       handleVerificationErrors(err.errors);
       console.error('Error during verification:', err.message || err);

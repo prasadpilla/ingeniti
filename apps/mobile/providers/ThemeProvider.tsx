@@ -1,6 +1,6 @@
 import * as SecureStore from 'expo-secure-store';
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useColorScheme } from 'react-native';
+import { useColorScheme, Platform } from 'react-native';
 
 import { LightTheme, DarkTheme } from '../styles/themes';
 
@@ -18,11 +18,23 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   useEffect(() => {
     const loadTheme = async () => {
-      const storedTheme = await SecureStore.getItemAsync('appThemeType');
-      if (storedTheme) {
-        setAppThemeType(storedTheme as 'light' | 'dark' | 'system');
+      try {
+        if (Platform.OS !== 'web') {
+          const storedTheme = await SecureStore.getItemAsync('appThemeType');
+          if (storedTheme) {
+            setAppThemeType(storedTheme as 'light' | 'dark' | 'system');
+          }
+        } else {
+          const storedTheme = localStorage.getItem('appThemeType');
+          if (storedTheme) {
+            setAppThemeType(storedTheme as 'light' | 'dark' | 'system');
+          }
+        }
+      } catch (error) {
+        console.error('Error loading theme from storage', error);
       }
     };
+
     loadTheme();
   }, []);
 
@@ -37,7 +49,15 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const setAppTheme = async (newTheme: 'light' | 'dark' | 'system') => {
     setAppThemeType(newTheme);
-    await SecureStore.setItemAsync('appThemeType', newTheme);
+    try {
+      if (Platform.OS !== 'web') {
+        await SecureStore.setItemAsync('appThemeType', newTheme);
+      } else {
+        localStorage.setItem('appThemeType', newTheme);
+      }
+    } catch (error) {
+      console.error('Error saving theme to storage', error);
+    }
   };
 
   useEffect(() => {
