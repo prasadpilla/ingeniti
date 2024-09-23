@@ -1,19 +1,20 @@
 import { useClerk } from '@clerk/clerk-expo';
+import { MaterialIcons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useColorScheme } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { ActivityIndicator, Switch, useTheme } from 'react-native-paper';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
 import Header from '../components/Header';
-import { DarkTheme, LightTheme } from '../styles/themes';
+import { useAppTheme } from '../providers/ThemeProvider';
 
 export default function SettingsScreen() {
   const theme = useTheme();
-  const colorScheme = useColorScheme();
   const { signOut } = useClerk();
   const { t } = useTranslation();
+  const { appThemeType, setAppTheme } = useAppTheme();
 
   const [isSigningOut, setIsSigningOut] = useState<boolean>(false);
 
@@ -33,13 +34,42 @@ export default function SettingsScreen() {
     }
   };
 
+  const toggleTheme = () => {
+    setAppTheme(appThemeType === 'light' ? 'dark' : 'light');
+  };
+
   return (
     <Background>
+      <View style={styles.headerContainer}>
+        <MaterialIcons
+          name={appThemeType === 'light' ? 'wb-sunny' : 'nightlight-round'}
+          size={24}
+          color={theme.colors.primary}
+          style={styles.icon}
+        />
+        <Switch color={theme.colors.primary} value={appThemeType === 'dark'} onValueChange={toggleTheme} />
+      </View>
       <Header>{t('settings')}</Header>
-      <Switch color={theme.colors.primary} value={false} onValueChange={() => {}} />
+
       <Button mode="contained" onPress={handleSignOut} disabled={isSigningOut}>
         {isSigningOut ? <ActivityIndicator animating={true} color={theme.colors.secondary} /> : t('sign_out')}
       </Button>
     </Background>
   );
 }
+
+const styles = StyleSheet.create({
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    paddingHorizontal: 5,
+    position: 'absolute',
+    top: 50,
+    right: 0,
+  },
+  icon: {
+    marginLeft: 'auto',
+  },
+});

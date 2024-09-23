@@ -1,11 +1,10 @@
 import { ClerkLoaded, ClerkProvider } from '@clerk/clerk-expo';
 import * as SecureStore from 'expo-secure-store';
 import React from 'react';
-import { PaperProvider, useTheme } from 'react-native-paper';
+import { PaperProvider } from 'react-native-paper';
 
 import Navigation from './Navigation';
-import { DarkTheme, LightTheme, Themes } from './styles/themes';
-import { useColorScheme } from 'react-native';
+import { useAppTheme, ThemeProvider } from './providers/ThemeProvider';
 
 const PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY as string;
 
@@ -38,20 +37,24 @@ const tokenCache = {
   },
 };
 
-export default function App() {
-  const colorScheme = useColorScheme();
-  const theme = useTheme();
+const AppContent = () => {
+  const { appTheme } = useAppTheme();
 
+  return (
+    <PaperProvider theme={appTheme}>
+      <Navigation theme={appTheme} />
+    </PaperProvider>
+  );
+};
+
+export default function App() {
   return (
     <ClerkProvider tokenCache={tokenCache} publishableKey={PUBLISHABLE_KEY}>
       <ClerkLoaded>
-        <PaperProvider theme={colorScheme === 'dark' ? DarkTheme : LightTheme}>
-          <Navigation theme={Themes} />
-        </PaperProvider>
+        <ThemeProvider>
+          <AppContent />
+        </ThemeProvider>
       </ClerkLoaded>
     </ClerkProvider>
   );
-}
-function useMaterial3Theme(): { theme: any } {
-  throw new Error('Function not implemented.');
 }
