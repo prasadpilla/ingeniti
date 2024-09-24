@@ -14,7 +14,9 @@ import {
   UtilityBenefitsSchema,
   SmartPanelBenefitsSchema,
 } from '../../types/forms.schemas';
-import DeviceDetails from './DeviceDetails';
+import DeviceDetails from './DeviceDetails/DeviceDetails';
+import DeviceProtection from './DeviceProtection';
+import BenefitsUtility from './BenefitsUtility';
 
 const DeviceRegistrationForm = () => {
   const [activeTab, setActiveTab] = useState('DeviceDetails');
@@ -38,26 +40,11 @@ const DeviceRegistrationForm = () => {
           Please fill the following details to complete the Device Registration process:
         </Paragraph>
 
-        <DeviceDetails />
-
-        <TouchableOpacity onPress={() => setActiveTab('Protection')} style={styles.tab}>
-          <Text style={styles.tabText}>Enable Protection</Text>
-        </TouchableOpacity>
-        {activeTab === 'Protection' && <View style={styles.formSection}>{/* Add Protection form fields */}</View>}
-
-        <TouchableOpacity onPress={() => setActiveTab('UtilityBenefits')} style={styles.tab}>
-          <Text style={styles.tabText}>Enable Benefits from Utility</Text>
-        </TouchableOpacity>
-        {activeTab === 'UtilityBenefits' && (
-          <View style={styles.formSection}>{/* Add Utility Benefits form fields */}</View>
-        )}
-
-        <TouchableOpacity onPress={() => setActiveTab('SmartPanelBenefits')} style={styles.tab}>
-          <Text style={styles.tabText}>Enable Benefits via Smart Panel</Text>
-        </TouchableOpacity>
-        {activeTab === 'SmartPanelBenefits' && (
-          <View style={styles.formSection}>{/* Add Smart Panel Benefits form fields */}</View>
-        )}
+        <View style={styles.formSection}>
+          <DeviceDetails />
+          <DeviceProtection />
+          <BenefitsUtility />
+        </View>
 
         <Button mode="contained" style={styles.registerButton} onPress={handleSubmit(onSubmit)}>
           Register Device
@@ -94,7 +81,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   formSection: {
-    marginBottom: 20,
+    rowGap: 10,
   },
   input: {
     borderWidth: 1,

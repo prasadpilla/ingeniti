@@ -1,12 +1,12 @@
 import { z } from 'zod';
 
-const DeviceDetailsSchema = z.object({
-  deviceSerial: z.string().nonempty('Device Serial is required'),
-  deviceUsage: z.enum(['Agriculture', 'Industrial', 'Commercial', 'Residential']),
-  deviceType: z.enum(['Pump/Motor', 'Meter', 'Others']),
-  deviceName: z.string().nonempty('Device Name is required'),
-  deviceIdentifier: z.string().nonempty('Device Identifier is required'),
-  deviceLocation: z.string().nonempty('Device Location is required'),
+const deviceDetailsFormSchema = z.object({
+  deviceSerial: z.string().min(1, 'Device Serial is required'),
+  deviceUsage: z.enum(['Select an option', 'Agriculture', 'Industrial', 'Commercial', 'Residential']),
+  deviceType: z.enum(['Select an option', 'Pump/Motor', 'Meter', 'Others']),
+  deviceName: z.string().min(1, 'Device Name is required'),
+  deviceIdentifier: z.string().min(1, 'Device Identifier is required'),
+  deviceLocation: z.string().min(1, 'Device Location is required'),
   averageEnergyCost: z.number().positive('Average Energy Cost must be positive'),
 });
 
@@ -28,4 +28,6 @@ const SmartPanelBenefitsSchema = z.object({
   associatedDevice: z.string().optional(),
 });
 
-export { DeviceDetailsSchema, ProtectionSchema, UtilityBenefitsSchema, SmartPanelBenefitsSchema };
+export { deviceDetailsFormSchema, ProtectionSchema, UtilityBenefitsSchema, SmartPanelBenefitsSchema };
+
+export type DeviceDetailsForm = z.infer<typeof deviceDetailsFormSchema>;

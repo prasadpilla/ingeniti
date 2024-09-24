@@ -27,7 +27,7 @@ const FormSection: React.FC<FormSectionProps> = ({ children, sectionTitle, isOpe
       >
         <Paragraph style={styles.sectionHeaderText}>{sectionTitle}</Paragraph>
         <TouchableOpacity onPress={() => setIsContentVisible(!isContentVisible)}>
-          <MaterialCommunityIcons name="arrow-expand" size={24} color={theme.colors.secondary} />
+          <MaterialCommunityIcons name="chevron-down" size={24} color={theme.colors.secondary} />
         </TouchableOpacity>
       </View>
       {isContentVisible && <View style={styles.sectionContent}>{children}</View>}
