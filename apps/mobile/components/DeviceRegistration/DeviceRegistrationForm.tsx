@@ -1,37 +1,20 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import React, { useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native';
-import { z } from 'zod';
+import React from 'react';
+import { View, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import Background from '../Background';
 import Button from '../Button';
-
 import Paragraph from '../Paragraph';
-import {
-  DeviceDetailsSchema,
-  ProtectionSchema,
-  UtilityBenefitsSchema,
-  SmartPanelBenefitsSchema,
-} from '../../types/forms.schemas';
 import DeviceDetails from './DeviceDetails/DeviceDetails';
 import DeviceProtection from './DeviceProtection';
 import BenefitsUtility from './BenefitsUtility';
 
-const DeviceRegistrationForm = () => {
-  const [activeTab, setActiveTab] = useState('DeviceDetails');
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: zodResolver(DeviceDetailsSchema),
-  });
+interface DeviceRegistrationFormProps {
+  closeModal: () => void;
+}
 
-  const onSubmit = (data: any) => {
-    console.log(data);
-  };
-
+const DeviceRegistrationForm = ({ closeModal }: DeviceRegistrationFormProps) => {
   return (
     <Background>
       <ScrollView style={styles.scrollViewContainer}>
@@ -46,7 +29,7 @@ const DeviceRegistrationForm = () => {
           <BenefitsUtility />
         </View>
 
-        <Button mode="contained" style={styles.registerButton} onPress={handleSubmit(onSubmit)}>
+        <Button mode="contained" style={styles.registerButton} onPress={() => {}}>
           Register Device
         </Button>
       </ScrollView>
@@ -70,36 +53,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'left',
   },
-  tab: {
-    padding: 10,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  tabText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
   formSection: {
     rowGap: 10,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 10,
-  },
-  errorText: {
-    color: 'red',
-    marginBottom: 10,
-  },
   registerButton: {
     alignItems: 'center',
-  },
-  registerButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
   },
 });
 

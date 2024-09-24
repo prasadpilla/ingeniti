@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Modal } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
 
 import AddDeviceDropdown from '../components/AddDeviceDropdown';
 import DeviceRegistrationForm from '../components/DeviceRegistration/DeviceRegistrationForm';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const HomeScreen = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
   const handleSelect = (option: string) => {
     if (option === 'Scan Code') {
@@ -16,12 +17,17 @@ const HomeScreen = () => {
     }
   };
 
+  const closeModal = () => {
+    setIsModalVisible(false);
+    console.log('closeModal');
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.greeting}>Hello Name,</Text>
       <AddDeviceDropdown onSelect={handleSelect} />
       <Modal visible={isModalVisible} animationType="slide">
-        <DeviceRegistrationForm />
+        <DeviceRegistrationForm closeModal={closeModal} />
       </Modal>
     </View>
   );
