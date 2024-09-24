@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, Modal } from 'react-native';
 
 import AddDeviceDropdown from '../components/AddDeviceDropdown';
-import Background from '../components/Background';
 import DeviceRegistrationForm from '../components/DeviceRegistration/DeviceRegistrationForm';
 
-const Dashboard = () => {
+const HomeScreen = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const handleSelect = (option: string) => {
@@ -18,15 +17,13 @@ const Dashboard = () => {
   };
 
   return (
-    <Background>
-      <View style={styles.container}>
-        <Text style={styles.greeting}>Hello Name,</Text>
-        <AddDeviceDropdown onSelect={handleSelect} />
-        <Modal visible={isModalVisible} animationType="slide">
-          <DeviceRegistrationForm />
-        </Modal>
-      </View>
-    </Background>
+    <View style={styles.container}>
+      <Text style={styles.greeting}>Hello Name,</Text>
+      <AddDeviceDropdown onSelect={handleSelect} />
+      <Modal visible={isModalVisible} animationType="slide">
+        <DeviceRegistrationForm />
+      </Modal>
+    </View>
   );
 };
 
@@ -41,4 +38,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Dashboard;
+export default HomeScreen;

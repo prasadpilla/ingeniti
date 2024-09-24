@@ -25,19 +25,10 @@ type RootStackNavigationParamList = {
 
 type HomeProps = NativeStackScreenProps<RootStackNavigationParamList, 'Home'>;
 type LoginProps = NativeStackScreenProps<RootStackNavigationParamList, 'Login'>;
-type VerifyLoginPhoneProps = NativeStackScreenProps<
-  RootStackNavigationParamList,
-  'VerifyLoginPhone'
->;
+type VerifyLoginPhoneProps = NativeStackScreenProps<RootStackNavigationParamList, 'VerifyLoginPhone'>;
 type SignupProps = NativeStackScreenProps<RootStackNavigationParamList, 'SignUp'>;
-type VerifySignUpEmailProps = NativeStackScreenProps<
-  RootStackNavigationParamList,
-  'VerifySignUpEmail'
->;
-type VerifySignUpPhoneProps = NativeStackScreenProps<
-  RootStackNavigationParamList,
-  'VerifySignUpPhone'
->;
+type VerifySignUpEmailProps = NativeStackScreenProps<RootStackNavigationParamList, 'VerifySignUpEmail'>;
+type VerifySignUpPhoneProps = NativeStackScreenProps<RootStackNavigationParamList, 'VerifySignUpPhone'>;
 type DashboardHomeProps = NativeStackScreenProps<RootStackNavigationParamList, 'DashboardHome'>;
 
 // bottom tab types
@@ -66,5 +57,5 @@ export type {
   SignupProps,
   VerifyLoginPhoneProps,
   VerifySignUpEmailProps,
-  VerifySignUpPhoneProps
+  VerifySignUpPhoneProps,
 };
