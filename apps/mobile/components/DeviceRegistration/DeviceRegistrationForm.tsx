@@ -6,8 +6,7 @@ import { z } from 'zod';
 
 import Background from '../Background';
 import Button from '../Button';
-import FormInput from '../FormInput';
-import Header from '../Header';
+
 import Paragraph from '../Paragraph';
 import {
   DeviceDetailsSchema,
@@ -15,6 +14,7 @@ import {
   UtilityBenefitsSchema,
   SmartPanelBenefitsSchema,
 } from '../../types/forms.schemas';
+import DeviceDetails from './DeviceDetails';
 
 const DeviceRegistrationForm = () => {
   const [activeTab, setActiveTab] = useState('DeviceDetails');
@@ -35,32 +35,10 @@ const DeviceRegistrationForm = () => {
       <ScrollView style={styles.scrollViewContainer}>
         <Paragraph style={[styles.successMessage, { color: 'green' }]}>Device scan is successful</Paragraph>
         <Paragraph style={styles.instruction}>
-          Please fill the following details to complete the Device Registration process
+          Please fill the following details to complete the Device Registration process:
         </Paragraph>
 
-        <TouchableOpacity onPress={() => setActiveTab('DeviceDetails')} style={styles.tab}>
-          <Text style={styles.tabText}>Device Details</Text>
-        </TouchableOpacity>
-        {activeTab === 'DeviceDetails' && (
-          <View style={styles.formSection}>
-            <Controller
-              control={control}
-              name="deviceSerial"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  style={styles.input}
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  value={value}
-                  placeholder="Device Serial #"
-                  editable={false}
-                />
-              )}
-            />
-            {errors.deviceSerial && <Text style={styles.errorText}>{errors.deviceSerial.message}</Text>}
-            {/* Add other fields similarly */}
-          </View>
-        )}
+        <DeviceDetails />
 
         <TouchableOpacity onPress={() => setActiveTab('Protection')} style={styles.tab}>
           <Text style={styles.tabText}>Enable Protection</Text>
@@ -81,9 +59,9 @@ const DeviceRegistrationForm = () => {
           <View style={styles.formSection}>{/* Add Smart Panel Benefits form fields */}</View>
         )}
 
-        <TouchableOpacity onPress={handleSubmit(onSubmit)} style={styles.registerButton}>
-          <Text style={styles.registerButtonText}>Register</Text>
-        </TouchableOpacity>
+        <Button mode="contained" style={styles.registerButton} onPress={handleSubmit(onSubmit)}>
+          Register Device
+        </Button>
       </ScrollView>
     </Background>
   );
@@ -91,6 +69,7 @@ const DeviceRegistrationForm = () => {
 
 const styles = StyleSheet.create({
   scrollViewContainer: {
+    width: '100%',
     paddingVertical: 10,
   },
   successMessage: {
@@ -100,6 +79,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   instruction: {
+    fontSize: 14,
     marginBottom: 20,
     textAlign: 'left',
   },
@@ -128,9 +108,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   registerButton: {
-    padding: 15,
-    backgroundColor: '#007bff',
-    borderRadius: 5,
     alignItems: 'center',
   },
   registerButtonText: {

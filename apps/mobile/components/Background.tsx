@@ -30,7 +30,8 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     flexGrow: 1,
-    padding: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 20,
     width: '100%',
     maxWidth: 340,
     alignSelf: 'center',
