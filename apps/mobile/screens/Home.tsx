@@ -9,9 +9,11 @@ import Header from '../components/Header';
 import LanguagePicker from '../components/LanguagePicker';
 import Paragraph from '../components/Paragraph';
 import { HomeProps } from '../types';
+import { useTheme } from 'react-native-paper';
 
 const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
   const { t } = useTranslation();
+  const theme = useTheme();
 
   const handleLanguageChange = (language: string) => {
     i18next.changeLanguage(language);
@@ -30,7 +32,10 @@ const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
       <Button mode="contained" onPress={() => navigation.navigate('Login')}>
         {t('login')}
       </Button>
-      <Button mode="outlined" onPress={() => navigation.navigate('SignUp')} style={{ marginBottom: 40 }}>
+      <Button
+        onPress={() => navigation.navigate('SignUp')}
+        style={{ marginBottom: 40, borderWidth: 1, borderColor: theme.colors.primary }}
+      >
         {t('sign_up')}
       </Button>
       <LanguagePicker selectedLanguage={i18next.language} onSelectLanguage={handleLanguageChange} />

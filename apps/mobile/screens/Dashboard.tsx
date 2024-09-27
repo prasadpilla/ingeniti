@@ -17,18 +17,18 @@ const Dashboard = () => {
 
   return (
     <>
-      <Appbar.Header>
+      <Appbar.Header style={{ backgroundColor: theme.colors.secondaryContainer, height: 60, zIndex: 100 }}>
         <Appbar.Content title="Dashboard" />
         <Appbar.Action icon="devices" onPress={() => setIsDevicePopoverVisible(!isDevicePopoverVisible)} />
       </Appbar.Header>
+      {isDevicePopoverVisible && (
+        <AddDevicePopover
+          onScanCode={() => setIsDevicePopoverVisible(false)}
+          onEnterCode={() => setIsDevicePopoverVisible(false)}
+          containerStyles={styles.popoverContainer}
+        />
+      )}
       <Background>
-        {isDevicePopoverVisible && (
-          <AddDevicePopover
-            onScanCode={() => setIsDevicePopoverVisible(false)}
-            onEnterCode={() => setIsDevicePopoverVisible(false)}
-            containerStyles={styles.popoverContainer}
-          />
-        )}
         {devices.length > 0 ? (
           <View>
             <Text>Devices</Text>
@@ -72,9 +72,9 @@ const Dashboard = () => {
 const styles = StyleSheet.create({
   popoverContainer: {
     position: 'absolute',
-    right: 10,
-    top: 0,
-    zIndex: 100,
+    right: 20,
+    top: 90,
+    zIndex: 1000,
   },
   container: {
     flex: 1,
