@@ -6,6 +6,7 @@ import React from 'react';
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation';
 
 import DashboardScreen from './screens/Dashboard';
+import DeviceOnBoardingFormScreen from './screens/DeviceOnBoardingForm';
 import ForgotPasswordScreen from './screens/ForgotPassword';
 import HomeScreen from './screens/Home';
 import LoginScreen from './screens/Login';
@@ -61,7 +62,10 @@ const Navigation = ({ theme }) => {
         }}
       >
         {isSignedIn ? (
-          <Stack.Screen name="DashboardHome" component={TabNavigation} />
+          <>
+            <Stack.Screen name="DashboardHome" component={TabNavigation} />
+            <Stack.Screen name="DeviceOnBoardingForm" component={DeviceOnBoardingFormScreen} />
+          </>
         ) : (
           <>
             <Stack.Screen name="Home" component={HomeScreen} />

@@ -24,6 +24,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: '100%',
+    paddingVertical: 20,
   },
   keyboardAvoidingView: {
     flex: 1,

@@ -4,13 +4,13 @@ import { Button as PaperButton, useTheme } from 'react-native-paper';
 
 interface ButtonProps extends React.ComponentProps<typeof PaperButton> {}
 
-const Button: React.FC<ButtonProps> = ({ mode, style, buttonContentStyles, children, ...props }) => {
+const Button: React.FC<ButtonProps> = ({ mode, style, children, ...props }) => {
   const theme = useTheme();
 
   return (
     <PaperButton
-      style={[style, styles.button, mode === 'outlined' && { backgroundColor: theme.colors.surface }]}
-      labelStyle={styles.text}
+      style={[style, styles.button, mode === 'outlined' && { backgroundColor: theme.colors.primary }]}
+      labelStyle={[styles.text, mode === 'outlined' && { color: theme.colors.onPrimary }]}
       mode={mode}
       {...props}
     >

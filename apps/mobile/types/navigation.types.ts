@@ -21,6 +21,7 @@ type RootStackNavigationParamList = {
   };
   ForgotPassword: undefined;
   DashboardHome: undefined;
+  DeviceOnBoardingForm: undefined;
 };
 
 type HomeProps = NativeStackScreenProps<RootStackNavigationParamList, 'Home'>;
@@ -30,6 +31,7 @@ type SignupProps = NativeStackScreenProps<RootStackNavigationParamList, 'SignUp'
 type VerifySignUpEmailProps = NativeStackScreenProps<RootStackNavigationParamList, 'VerifySignUpEmail'>;
 type VerifySignUpPhoneProps = NativeStackScreenProps<RootStackNavigationParamList, 'VerifySignUpPhone'>;
 type DashboardHomeProps = NativeStackScreenProps<RootStackNavigationParamList, 'DashboardHome'>;
+type DeviceOnBoardingFormProps = NativeStackScreenProps<RootStackNavigationParamList, 'DeviceOnBoardingForm'>;
 
 // bottom tab types
 type BottomTabNavigationParamList = {
@@ -58,4 +60,5 @@ export type {
   VerifyLoginPhoneProps,
   VerifySignUpEmailProps,
   VerifySignUpPhoneProps,
+  DeviceOnBoardingFormProps,
 };

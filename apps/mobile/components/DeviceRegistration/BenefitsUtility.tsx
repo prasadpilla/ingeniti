@@ -56,7 +56,7 @@ const BenefitsUtility = () => {
   );
 
   return (
-    <FormSection sectionTitle="Enable Benefits from Utility" isOpen={true}>
+    <FormSection sectionTitle="Enable Benefits from Utility" isOpen={false}>
       <View style={styles.fieldItems}>
         <Dropdown
           label="Enrollment Status"

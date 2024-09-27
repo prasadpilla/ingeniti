@@ -1,4 +1,5 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Appbar, Paragraph, useTheme } from 'react-native-paper';
@@ -10,6 +11,7 @@ import DeviceRegistrationForm from '../components/DeviceRegistration/DeviceRegis
 
 const Dashboard = () => {
   const theme = useTheme();
+  const navigation = useNavigation();
 
   const [isDevicePopoverVisible, setIsDevicePopoverVisible] = useState(false);
   const [devices, setDevices] = useState<[]>([]);
@@ -46,11 +48,16 @@ const Dashboard = () => {
               />
               <Paragraph style={styles.emptyDeviceHeading}>Lets get started</Paragraph>
               <Paragraph style={styles.emptyDeviceSubheading}>
-                You can add your first device/sensor by scanning the QR code or entering the code manually.
+                Add your first device/sensor by scanning the QR code or entering the code manually.
               </Paragraph>
 
               <View style={styles.emptyDeviceButtonContainer}>
-                <Button mode="contained" onPress={() => {}}>
+                <Button
+                  mode="contained"
+                  onPress={() => {
+                    navigation.navigate('DeviceOnBoardingForm');
+                  }}
+                >
                   Scan QR Code
                 </Button>
                 <Button onPress={() => {}}>Enter Code</Button>
