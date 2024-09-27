@@ -25,14 +25,18 @@ const AddDevicePopover: React.FC<AddDevicePopoverProps> = ({
       style={[
         styles.container,
         containerStyles,
-        { backgroundColor: theme.colors.background, shadowColor: theme.colors.shadow },
+        {
+          backgroundColor: theme.colors.background,
+          shadowColor: theme.colors.shadow,
+          borderColor: theme.colors.outlineVariant,
+          borderWidth: 1,
+        },
       ]}
     >
       <TouchableOpacity style={[styles.option, optionStyles]} onPress={onScanCode}>
         <MaterialCommunityIcons name="line-scan" size={18} color={theme.colors.inverseSurface} />
         <Paragraph style={optionTextStyles}>Scan code</Paragraph>
       </TouchableOpacity>
-      <View style={styles.separator} />
       <TouchableOpacity style={[styles.option, optionStyles]} onPress={onEnterCode}>
         <MaterialCommunityIcons name="pencil-plus-outline" size={18} color={theme.colors.inverseSurface} />
         <Paragraph style={optionTextStyles}>Enter code</Paragraph>
@@ -44,10 +48,6 @@ const AddDevicePopover: React.FC<AddDevicePopoverProps> = ({
 const styles = StyleSheet.create({
   container: {
     borderRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
   },
   option: {
     flexDirection: 'row',

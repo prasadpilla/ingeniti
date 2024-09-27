@@ -1,31 +1,18 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Modal } from 'react-native';
-import { Appbar } from 'react-native-paper';
+import { View, Text, StyleSheet } from 'react-native';
+import { Appbar, Paragraph, useTheme } from 'react-native-paper';
 
-import AddDeviceDropdown from '../components/AddDeviceDropdown';
 import Background from '../components/Background';
-import DeviceRegistrationForm from '../components/DeviceRegistration/DeviceRegistrationForm';
-import { Popover, PopoverContent, PopoverTrigger } from '../components/PopOver';
+import Button from '../components/Button';
 import AddDevicePopover from '../components/DeviceRegistration/AddDevicePopover';
+import DeviceRegistrationForm from '../components/DeviceRegistration/DeviceRegistrationForm';
 
 const Dashboard = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const theme = useTheme();
+
   const [isDevicePopoverVisible, setIsDevicePopoverVisible] = useState(false);
-
-  const handleSelect = (option: string) => {
-    if (option === 'Scan Code') {
-      // Open scanner and on successful scan, set isModalVisible to true
-      setIsModalVisible(true);
-    } else if (option === 'Enter Code') {
-      // Handle enter code logic
-    }
-  };
-
-  const closeModal = () => {
-    setIsModalVisible(false);
-    console.log('closeModal');
-  };
+  const [devices, setDevices] = useState<[]>([]);
 
   return (
     <>
@@ -36,15 +23,45 @@ const Dashboard = () => {
       <Background>
         {isDevicePopoverVisible && (
           <AddDevicePopover
-            onClick={() => setIsDevicePopoverVisible(false)}
+            onScanCode={() => setIsDevicePopoverVisible(false)}
+            onEnterCode={() => setIsDevicePopoverVisible(false)}
             containerStyles={styles.popoverContainer}
           />
         )}
-        <Text style={styles.greeting}>Hello Name,</Text>
-        <AddDeviceDropdown onSelect={handleSelect} />
+        {devices.length > 0 ? (
+          <View>
+            <Text>Devices</Text>
+            {devices.map((device) => (
+              <Text>{device.name}</Text>
+            ))}
+          </View>
+        ) : (
+          <View>
+            <View style={styles.emptyDeviceContainer}>
+              <MaterialCommunityIcons
+                name="devices"
+                size={24}
+                color={theme.colors.secondary}
+                style={[styles.emptyDeviceIcon, { backgroundColor: theme.colors.secondaryContainer }]}
+              />
+              <Paragraph style={styles.emptyDeviceHeading}>Lets get started</Paragraph>
+              <Paragraph style={styles.emptyDeviceSubheading}>
+                You can add your first device/sensor by scanning the QR code or entering the code manually.
+              </Paragraph>
+
+              <View style={styles.emptyDeviceButtonContainer}>
+                <Button mode="contained" onPress={() => {}}>
+                  Scan QR Code
+                </Button>
+                <Button onPress={() => {}}>Enter Code</Button>
+              </View>
+            </View>
+          </View>
+        )}
+        {/* <AddDeviceDropdown onSelect={handleSelect} />
         <Modal visible={isModalVisible} animationType="slide">
           <DeviceRegistrationForm closeModal={closeModal} />
-        </Modal>
+        </Modal> */}
       </Background>
     </>
   );
@@ -55,15 +72,36 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 10,
     top: 0,
-    zIndex: 10,
+    zIndex: 100,
   },
   container: {
     flex: 1,
     padding: 20,
   },
+  emptyDeviceContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 6,
+  },
   greeting: {
     fontSize: 24,
     marginBottom: 20,
+  },
+  emptyDeviceHeading: {
+    fontSize: 24,
+    paddingTop: 10,
+    fontWeight: '700',
+  },
+  emptyDeviceSubheading: {
+    textAlign: 'center',
+  },
+  emptyDeviceButtonContainer: {
+    alignItems: 'center',
+    width: '60%',
+  },
+  emptyDeviceIcon: {
+    padding: 8,
+    borderRadius: 100,
   },
 });
 

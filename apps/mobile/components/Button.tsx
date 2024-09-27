@@ -4,7 +4,7 @@ import { Button as PaperButton, useTheme } from 'react-native-paper';
 
 interface ButtonProps extends React.ComponentProps<typeof PaperButton> {}
 
-const Button: React.FC<ButtonProps> = ({ mode, style, children, ...props }) => {
+const Button: React.FC<ButtonProps> = ({ mode, style, buttonContentStyles, children, ...props }) => {
   const theme = useTheme();
 
   return (
@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontWeight: 'bold',
-    fontSize: 15,
+    fontSize: 16,
     lineHeight: 26,
   },
 });
