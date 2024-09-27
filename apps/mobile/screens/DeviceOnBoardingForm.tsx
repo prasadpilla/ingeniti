@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useTheme } from 'react-native-paper';
 
 import Background from '../components/Background';
@@ -43,7 +43,9 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
                 navigation.goBack();
               }}
             >
-              <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>{t('go_back')}</Paragraph>
+              <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>
+                {t('go_back')}
+              </Paragraph>
             </TouchableOpacity>
           </View>
         </>
@@ -71,7 +73,9 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
                 setIsDeviceProtectionOpen(false);
               }}
             >
-              <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>{t('go_back')}</Paragraph>
+              <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>
+                {t('go_back')}
+              </Paragraph>
             </TouchableOpacity>
           </View>
         </>
@@ -80,9 +84,9 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
       {isBenefitsUtilityOpen && (
         <>
           <Header>Enable Benefits from Utilities</Header>
-
           <Paragraph style={[styles.sectionDescriptionText, { color: theme.colors.primary }]}>
-            inGeniti will executed intelligent operations to reduce your energy costs. You will have options to opt out
+            inGeniti will executed intelligent operations to reduce your energy costs. You will have
+            options to opt out
           </Paragraph>
           <View style={styles.sectionContainer}>
             <BenefitsUtility />
@@ -103,7 +107,9 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
                 setIsBenefitsUtilityOpen(false);
               }}
             >
-              <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>{t('go_back')}</Paragraph>
+              <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>
+                {t('go_back')}
+              </Paragraph>
             </TouchableOpacity>
           </View>
         </>
@@ -124,7 +130,9 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
                 setIsBenefitsUtilityOpen(true);
               }}
             >
-              <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>{t('go_back')}</Paragraph>
+              <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>
+                {t('go_back')}
+              </Paragraph>
             </TouchableOpacity>
           </View>
         </>
@@ -136,14 +144,13 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
 const styles = StyleSheet.create({
   sectionContainer: {
     width: '100%',
-    marginTop: 12,
   },
   sectionButton: {
     width: '100%',
-    marginTop: 40,
+    marginTop: 10,
   },
   goBackButton: {
-    marginTop: 24,
+    marginTop: 10,
   },
   goBackText: {
     fontWeight: '600',

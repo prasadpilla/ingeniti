@@ -1,11 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
+import { DeviceDetailsForm, deviceDetailsFormSchema } from '../../types/forms.schemas';
 import { deviceTypeOptions, deviceUsageOptions } from '../../utils/dropdownOptions';
 import Dropdown from '../Dropdown';
 import FormInput from '../FormInput';
-import { DeviceDetailsForm, deviceDetailsFormSchema } from '../../types/forms.schemas';
 
 const DeviceDetails = () => {
   const deviceDetailsForm = useForm<DeviceDetailsForm>({
@@ -15,7 +15,6 @@ const DeviceDetails = () => {
       deviceUsage: '',
       deviceType: '',
       deviceName: '',
-      deviceIdentifier: '',
       deviceLocation: '',
       averageEnergyCost: 0,
     },
@@ -29,8 +28,24 @@ const DeviceDetails = () => {
         name="deviceSerial"
         render={({ field: { value, onChange, onBlur } }) => (
           <FormInput
-            label="Serial #"
+            label="PR250*********"
             placeholder="PR250*********"
+            disabled
+            value={value}
+            onChangeText={onChange}
+            onBlur={onBlur}
+            containerStyles={styles.input}
+          />
+        )}
+      />
+      <Controller
+        control={deviceDetailsForm.control}
+        name="deviceLocation"
+        render={({ field: { value, onChange, onBlur } }) => (
+          <FormInput
+            label="Location"
+            disabled
+            placeholder="Enter Device Location"
             value={value}
             onChangeText={onChange}
             onBlur={onBlur}
@@ -47,7 +62,7 @@ const DeviceDetails = () => {
               options={deviceUsageOptions}
               selectedValue={value}
               onSelect={onChange}
-              placeholder="Select Device Usage"
+              placeholder="Select Usage"
             />
           </View>
         )}
@@ -62,7 +77,7 @@ const DeviceDetails = () => {
               options={deviceTypeOptions}
               selectedValue={value}
               onSelect={onChange}
-              placeholder="Select Device Type"
+              placeholder="Select Type"
             />
           </View>
         )}
@@ -82,42 +97,14 @@ const DeviceDetails = () => {
           />
         )}
       />
-      <Controller
-        control={deviceDetailsForm.control}
-        name="deviceIdentifier"
-        render={({ field: { value, onChange, onBlur } }) => (
-          <FormInput
-            label="Identifier"
-            placeholder="Enter Device Identifier"
-            value={value}
-            onChangeText={onChange}
-            onBlur={onBlur}
-            containerStyles={styles.input}
-          />
-        )}
-      />
-      <Controller
-        control={deviceDetailsForm.control}
-        name="deviceLocation"
-        render={({ field: { value, onChange, onBlur } }) => (
-          <FormInput
-            label="Location"
-            placeholder="Enter Device Location"
-            value={value}
-            onChangeText={onChange}
-            onBlur={onBlur}
-            containerStyles={styles.input}
-          />
-        )}
-      />
       <View style={styles.averageEnergyCost}>
         <Controller
           control={deviceDetailsForm.control}
           name="averageEnergyCost"
           render={({ field: { value, onChange, onBlur } }) => (
             <FormInput
-              label="Average Energy Cost"
-              placeholder="Enter Average Energy Cost"
+              label="Average Energy Cost per kWh"
+              placeholder="0.00"
               value={value.toString()}
               onChangeText={onChange}
               onBlur={onBlur}

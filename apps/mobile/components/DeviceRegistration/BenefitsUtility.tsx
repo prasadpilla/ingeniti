@@ -1,10 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { z } from 'zod';
 
-import { utilityOptions, countryOptions, enrollmentStatusOptions } from '../../utils/dropdownOptions';
+import {
+  countryOptions,
+  enrollmentStatusOptions,
+  utilityOptions,
+} from '../../utils/dropdownOptions';
 import Dropdown from '../Dropdown';
 import FormInput from '../FormInput';
 
@@ -50,7 +54,12 @@ const BenefitsUtility = () => {
         name="utility"
         render={({ field: { value, onChange } }) => (
           <View style={styles.dropdownContainer}>
-            <Dropdown options={utilityOptions} selectedValue={value} onSelect={onChange} placeholder="Select Utility" />
+            <Dropdown
+              options={utilityOptions}
+              selectedValue={value}
+              onSelect={onChange}
+              placeholder="Select Utility"
+            />
           </View>
         )}
       />
@@ -59,7 +68,12 @@ const BenefitsUtility = () => {
         name="country"
         render={({ field: { value, onChange } }) => (
           <View style={styles.dropdownContainer}>
-            <Dropdown options={countryOptions} selectedValue={value} onSelect={onChange} placeholder="Select Country" />
+            <Dropdown
+              options={countryOptions}
+              selectedValue={value}
+              onSelect={onChange}
+              placeholder="Select Country"
+            />
           </View>
         )}
       />
@@ -86,7 +100,7 @@ const styles = StyleSheet.create({
     rowGap: 0,
   },
   input: {
-    marginVertical: 6,
+    marginVertical: 5,
   },
   dropdownContainer: {
     marginVertical: 8,

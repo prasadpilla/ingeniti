@@ -1,6 +1,14 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { View, TouchableOpacity, Modal, FlatList, StyleSheet, ViewStyle, TextStyle } from 'react-native';
+import {
+  FlatList,
+  Modal,
+  StyleSheet,
+  TextStyle,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
 import { useTheme } from 'react-native-paper';
 
 import Button from './Button';
@@ -50,7 +58,8 @@ const Dropdown: React.FC<DropdownProps> = ({
     </TouchableOpacity>
   );
 
-  const selectedLabel = options.find((option) => option.value === selectedValue)?.label || placeholder;
+  const selectedLabel =
+    options.find((option) => option.value === selectedValue)?.label || placeholder;
 
   return (
     <View>
@@ -66,14 +75,26 @@ const Dropdown: React.FC<DropdownProps> = ({
         onPress={() => setModalVisible(true)}
       >
         <View style={styles.pickerButton}>
-          <Paragraph style={[styles.pickerButtonText, { color: theme.colors.onSurface }]}>{selectedLabel}</Paragraph>
+          <Paragraph style={[styles.pickerButtonText, { color: theme.colors.onSurface }]}>
+            {selectedLabel}
+          </Paragraph>
           <MaterialIcons name="arrow-drop-down" size={20} color={theme.colors.secondary} />
         </View>
       </TouchableOpacity>
       <Modal visible={modalVisible} animationType="slide" style={modalStyles}>
-        <View style={[styles.modalContainer, { backgroundColor: theme.colors.background }, modalContainerStyles]}>
+        <View
+          style={[
+            styles.modalContainer,
+            { backgroundColor: theme.colors.background },
+            modalContainerStyles,
+          ]}
+        >
           <Paragraph style={[styles.modalTitle, modalTitleStyles]}>{placeholder}</Paragraph>
-          <FlatList data={options} renderItem={renderItem} keyExtractor={(item) => item.id as string} />
+          <FlatList
+            data={options}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id as string}
+          />
           <Button mode="contained" onPress={() => setModalVisible(false)}>
             Close
           </Button>
@@ -107,6 +128,7 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     padding: 20,
+    marginVertical: 10,
   },
   modalTitle: {
     fontSize: 20,
@@ -115,7 +137,6 @@ const styles = StyleSheet.create({
   },
   item: {
     padding: 10,
-    borderBottomWidth: 1,
   },
 });
 

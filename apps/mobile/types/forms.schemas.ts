@@ -5,7 +5,6 @@ const deviceDetailsFormSchema = z.object({
   deviceUsage: z.string().min(1, 'Device Usage is required'),
   deviceType: z.string().min(1, 'Device Type is required'),
   deviceName: z.string().min(1, 'Device Name is required'),
-  deviceIdentifier: z.string().min(1, 'Device Identifier is required'),
   deviceLocation: z.string().min(1, 'Device Location is required'),
   averageEnergyCost: z.number().positive('Average Energy Cost must be positive'),
 });
@@ -28,6 +27,11 @@ const SmartPanelBenefitsSchema = z.object({
   associatedDevice: z.string().optional(),
 });
 
-export { deviceDetailsFormSchema, ProtectionSchema, UtilityBenefitsSchema, SmartPanelBenefitsSchema };
+export {
+  deviceDetailsFormSchema,
+  ProtectionSchema,
+  SmartPanelBenefitsSchema,
+  UtilityBenefitsSchema,
+};
 
 export type DeviceDetailsForm = z.infer<typeof deviceDetailsFormSchema>;

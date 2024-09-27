@@ -1,7 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Text } from 'react-native-paper';
 import { z } from 'zod';
 
 import FormInput from '../FormInput';
@@ -18,7 +19,7 @@ const DeviceProtection = () => {
   const deviceProtectionForm = useForm<DeviceProtectionForm>({
     resolver: zodResolver(deviceProtectionFormSchema),
     defaultValues: {
-      minOffTime: '',
+      minOffTime: '3',
       brownOutVoltageChange: '',
       brownOutFrequencyChange: '',
     },
@@ -32,7 +33,7 @@ const DeviceProtection = () => {
         name="minOffTime"
         render={({ field: { value, onChange, onBlur } }) => (
           <FormInput
-            label="Minimum Off-Time"
+            label="Minimum Off-Time (minutes)"
             placeholder="3"
             value={value.toString()}
             onChangeText={(text) => onChange(Number(text))}
@@ -42,12 +43,15 @@ const DeviceProtection = () => {
           />
         )}
       />
+      <Text variant="titleMedium" style={styles.advancedSettingsLabel}>
+        Advanced Settings
+      </Text>
       <Controller
         control={deviceProtectionForm.control}
         name="brownOutVoltageChange"
         render={({ field: { value, onChange, onBlur } }) => (
           <FormInput
-            label="Brownout: Voltage changes"
+            label="Power off if voltage changes by"
             placeholder="20%"
             value={value.toString()}
             onChangeText={(text) => onChange(Number(text))}
@@ -62,7 +66,7 @@ const DeviceProtection = () => {
         name="brownOutFrequencyChange"
         render={({ field: { value, onChange, onBlur } }) => (
           <FormInput
-            label="Brownout: Frequency changes"
+            label="Power off if frequency changes by"
             placeholder="4 Hz"
             value={value.toString()}
             onChangeText={(text) => onChange(Number(text))}
@@ -81,7 +85,11 @@ const styles = StyleSheet.create({
     rowGap: 0,
   },
   input: {
-    marginVertical: 6,
+    marginVertical: 5,
+  },
+  advancedSettingsLabel: {
+    fontSize: 16,
+    marginTop: 20,
   },
 });
 

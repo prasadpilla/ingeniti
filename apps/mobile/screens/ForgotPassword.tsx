@@ -111,7 +111,10 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
       }
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
-      if (err.errors[0]?.code === 'form_code_incorrect' && err.errors[0]?.meta.paramName === 'code') {
+      if (
+        err.errors[0]?.code === 'form_code_incorrect' &&
+        err.errors[0]?.meta.paramName === 'code'
+      ) {
         setResetError('Invalid OTP. Please try again.');
       } else {
         setResetError('Something went wrong. Please try again.');
@@ -167,11 +170,17 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
               />
             )}
           />
-          {resetError && <Text style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>{resetError}</Text>}
+          {resetError && (
+            <Text style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>
+              {resetError}
+            </Text>
+          )}
           <Button
             mode="contained"
             onPress={forgotPasswordForm.handleSubmit(onResetPress)}
-            disabled={forgotPasswordForm.formState.isSubmitting || !forgotPasswordForm.formState.isValid}
+            disabled={
+              forgotPasswordForm.formState.isSubmitting || !forgotPasswordForm.formState.isValid
+            }
           >
             {forgotPasswordForm.formState.isSubmitting ? (
               <ActivityIndicator animating={true} color={theme.colors.secondary} />
@@ -201,7 +210,11 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
               />
             )}
           />
-          {resetError && <Text style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>{resetError}</Text>}
+          {resetError && (
+            <Text style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>
+              {resetError}
+            </Text>
+          )}
           <Button
             mode="contained"
             onPress={verifyOTPForm.handleSubmit(onVerifyOTP)}
@@ -216,7 +229,9 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
         </>
       ) : !verificationComplete ? (
         <View style={styles.fullWidth}>
-          <Text style={[styles.centeredText, styles.marginBottom]}>{t('otp_verified_enter_password')}</Text>
+          <Text style={[styles.centeredText, styles.marginBottom]}>
+            {t('otp_verified_enter_password')}
+          </Text>
           <Controller
             control={newPasswordForm.control}
             name="password"
@@ -253,7 +268,11 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
               />
             )}
           />
-          {resetError && <Text style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>{resetError}</Text>}
+          {resetError && (
+            <Text style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>
+              {resetError}
+            </Text>
+          )}
           <Button
             mode="contained"
             onPress={newPasswordForm.handleSubmit(onNewPasswordSubmit)}
@@ -281,7 +300,9 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
             navigation.navigate('Login');
           }}
         >
-          <Text style={[styles.backToLoginText, { color: theme.colors.primary }]}>{t('login')}</Text>
+          <Text style={[styles.backToLoginText, { color: theme.colors.primary }]}>
+            {t('go_back')}
+          </Text>
         </TouchableOpacity>
       </View>
     </Background>
