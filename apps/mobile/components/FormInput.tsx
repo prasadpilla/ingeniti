@@ -31,6 +31,7 @@ const FormInput: React.FC<FormInputProps> = ({ errorText, hasError, isPassword, 
       <Input
         style={[{ backgroundColor: theme.colors.surface }]}
         selectionColor={theme.colors.primary}
+        placeholderTextColor={theme.colors.mutedForeground}
         underlineColor="transparent"
         mode="outlined"
         label={label}

@@ -1,38 +1,56 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { View, TouchableOpacity, Modal, FlatList, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, Modal, FlatList, StyleSheet, ViewStyle, TextStyle } from 'react-native';
 import { useTheme } from 'react-native-paper';
 
-import Button from '../../Button';
-import Paragraph from '../../Paragraph';
+import Button from './Button';
+import Paragraph from './Paragraph';
 
-const deviceUsageOptions = [
-  { label: 'Agriculture', value: 'agriculture' },
-  { label: 'Industrial', value: 'industrial' },
-  { label: 'Commercial', value: 'commercial' },
-  { label: 'Residential', value: 'residential' },
-];
-
-interface DeviceUsagePickerProps {
-  selectedUsage: string;
-  onSelectUsage: (usage: string) => void;
+interface DropdownOption {
+  label: string;
+  value: string;
+  id: string | number;
 }
 
-const DeviceUsagePicker: React.FC<DeviceUsagePickerProps> = ({ selectedUsage, onSelectUsage }) => {
+interface DropdownProps {
+  options: DropdownOption[];
+  selectedValue: string;
+  onSelect: (value: string) => void;
+  placeholder?: string;
+  modalStyles?: ViewStyle;
+  pickerButtonStyles?: ViewStyle;
+  modalContainerStyles?: ViewStyle;
+  modalTitleStyles?: TextStyle;
+  itemStyles?: ViewStyle;
+}
+
+const Dropdown: React.FC<DropdownProps> = ({
+  options,
+  selectedValue,
+  onSelect,
+  placeholder = 'Select an option',
+  modalStyles,
+  pickerButtonStyles,
+  modalContainerStyles,
+  modalTitleStyles,
+  itemStyles,
+}) => {
   const theme = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
 
-  const renderUsageItem = ({ item }: { item: { label: string; value: string } }) => (
+  const renderItem = ({ item }: { item: DropdownOption }) => (
     <TouchableOpacity
-      style={[styles.item, { borderBottomColor: theme.colors.outlineVariant }]}
+      style={[styles.item, { borderBottomColor: theme.colors.outlineVariant }, itemStyles]}
       onPress={() => {
-        onSelectUsage(item.label);
+        onSelect(item.value);
         setModalVisible(false);
       }}
     >
       <Paragraph>{item.label}</Paragraph>
     </TouchableOpacity>
   );
+
+  const selectedLabel = options.find((option) => option.value === selectedValue)?.label || placeholder;
 
   return (
     <View>
@@ -43,20 +61,19 @@ const DeviceUsagePicker: React.FC<DeviceUsagePickerProps> = ({ selectedUsage, on
             backgroundColor: theme.colors.surface,
             borderColor: theme.colors.secondary,
           },
+          pickerButtonStyles,
         ]}
         onPress={() => setModalVisible(true)}
       >
         <View style={styles.pickerButton}>
-          <Paragraph style={[styles.pickerButtonText, { color: theme.colors.onSurface }]}>
-            {selectedUsage || 'Select Device Usage'}
-          </Paragraph>
+          <Paragraph style={[styles.pickerButtonText, { color: theme.colors.onSurface }]}>{selectedLabel}</Paragraph>
           <MaterialIcons name="arrow-drop-down" size={20} color={theme.colors.secondary} />
         </View>
       </TouchableOpacity>
-      <Modal visible={modalVisible} animationType="slide">
-        <View style={[styles.modalContainer, { backgroundColor: theme.colors.background }]}>
-          <Paragraph style={styles.modalTitle}>Select Device Usage</Paragraph>
-          <FlatList data={deviceUsageOptions} renderItem={renderUsageItem} keyExtractor={(item) => item.value} />
+      <Modal visible={modalVisible} animationType="slide" style={modalStyles}>
+        <View style={[styles.modalContainer, { backgroundColor: theme.colors.background }, modalContainerStyles]}>
+          <Paragraph style={[styles.modalTitle, modalTitleStyles]}>{placeholder}</Paragraph>
+          <FlatList data={options} renderItem={renderItem} keyExtractor={(item) => item.id as string} />
           <Button mode="contained" onPress={() => setModalVisible(false)}>
             Close
           </Button>
@@ -102,4 +119,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DeviceUsagePicker;
+export default Dropdown;

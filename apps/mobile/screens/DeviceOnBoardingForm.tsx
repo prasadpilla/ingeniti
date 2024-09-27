@@ -1,61 +1,72 @@
+import { useState } from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
 import BenefitsUtility from '../components/DeviceRegistration/BenefitsUtility';
 import DeviceDetails from '../components/DeviceRegistration/DeviceDetails/DeviceDetails';
+import Header from '../components/Header';
 import Paragraph from '../components/Paragraph';
 import { DeviceOnBoardingFormProps } from '../types/navigation.types';
-import { useState } from 'react';
+import DeviceProtection from '../components/DeviceRegistration/DeviceProtection';
+import { useTheme } from 'react-native-paper';
 
 const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navigation }) => {
-  const [isDeviceDetailsOpen, setIsDeviceDetailsOpen] = useState(false);
+  const theme = useTheme();
+  const [isDeviceDetailsOpen, setIsDeviceDetailsOpen] = useState(true);
   const [isDeviceProtectionOpen, setIsDeviceProtectionOpen] = useState(false);
   const [isBenefitsUtilityOpen, setIsBenefitsUtilityOpen] = useState(false);
 
   return (
     <Background>
-      <Paragraph style={[styles.successMessage, { color: 'green' }]}>Device scan is successful</Paragraph>
-      <Paragraph style={styles.instruction}>
-        Please fill the following details to complete the Device Registration process:
-      </Paragraph>
+      <Header>Add A New Device</Header>
 
-      <View style={styles.formSection}>
-        <DeviceDetails />
-        {/* <DeviceProtection /> */}
-        <BenefitsUtility />
-      </View>
+      {isDeviceDetailsOpen && (
+        <>
+          <Paragraph
+            style={[
+              styles.formSectionHeading,
+              { backgroundColor: theme.colors.secondaryContainer, color: theme.colors.primary },
+            ]}
+          >
+            Device Details
+          </Paragraph>
+          <View style={styles.sectionContainer}>
+            <DeviceDetails />
+            <Button mode="outlined" onPress={() => {}} style={styles.sectionButton}>
+              Continue
+            </Button>
+          </View>
+        </>
+      )}
 
       {/* <Button mode="contained" style={styles.registerButton} onPress={() => {}}>
           Register Device
         </Button> */}
 
-      <Button mode="outlined" onPress={() => {}}>
+      {/* <Button mode="outlined" onPress={() => {}} style={styles.registerButton}>
         Register Device
-      </Button>
+      </Button> */}
     </Background>
   );
 };
 
 const styles = StyleSheet.create({
-  scrollViewContainer: {
+  formSectionHeading: {
+    fontSize: 12,
+    fontWeight: '600',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  sectionContainer: {
     width: '100%',
-    height: '60%',
-    backgroundColor: 'red',
+    marginTop: 20,
   },
-  successMessage: {
-    fontSize: 20,
-    paddingVertical: 10,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  instruction: {
-    fontSize: 14,
-    marginBottom: 20,
-    textAlign: 'left',
-  },
-  formSection: {
-    rowGap: 10,
+  sectionButton: {
+    width: '100%',
+    marginTop: 32,
   },
 });
 

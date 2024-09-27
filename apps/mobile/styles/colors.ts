@@ -33,6 +33,7 @@ const Colors = {
     inverseSurface: 'rgb(46, 49, 50)',
     inverseOnSurface: 'rgb(239, 241, 242)',
     inversePrimary: 'rgb(79, 172, 194)',
+    mutedForeground: 'rgb(112, 120, 124)',
     elevation: {
       level0: 'transparent',
       level1: 'rgb(238, 245, 248)',
@@ -75,6 +76,7 @@ const Colors = {
     inverseSurface: 'rgb(225, 227, 228)',
     inverseOnSurface: 'rgb(46, 49, 50)',
     inversePrimary: 'rgb(56, 157, 181)',
+    mutedForeground: 'rgb(112, 120, 124)',
     elevation: {
       level0: 'transparent',
       level1: 'rgb(28, 37, 40)',

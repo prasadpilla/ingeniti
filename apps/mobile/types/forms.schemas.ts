@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 const deviceDetailsFormSchema = z.object({
   deviceSerial: z.string().min(1, 'Device Serial is required'),
-  deviceUsage: z.enum(['Select an option', 'Agriculture', 'Industrial', 'Commercial', 'Residential']),
-  deviceType: z.enum(['Select an option', 'Pump/Motor', 'Meter', 'Others']),
+  deviceUsage: z.string().min(1, 'Device Usage is required'),
+  deviceType: z.string().min(1, 'Device Type is required'),
   deviceName: z.string().min(1, 'Device Name is required'),
   deviceIdentifier: z.string().min(1, 'Device Identifier is required'),
   deviceLocation: z.string().min(1, 'Device Location is required'),

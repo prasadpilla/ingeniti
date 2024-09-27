@@ -7,7 +7,6 @@ import { Appbar, Paragraph, useTheme } from 'react-native-paper';
 import Background from '../components/Background';
 import Button from '../components/Button';
 import AddDevicePopover from '../components/DeviceRegistration/AddDevicePopover';
-import DeviceRegistrationForm from '../components/DeviceRegistration/DeviceRegistrationForm';
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -65,10 +64,6 @@ const Dashboard = () => {
             </View>
           </View>
         )}
-        {/* <AddDeviceDropdown onSelect={handleSelect} />
-        <Modal visible={isModalVisible} animationType="slide">
-          <DeviceRegistrationForm closeModal={closeModal} />
-        </Modal> */}
       </Background>
     </>
   );
