@@ -1,81 +1,87 @@
-import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { useTheme, TextInput } from 'react-native-paper';
-import Paragraph from '../Paragraph';
-import FormSection from './FormSection';
+import { zodResolver } from '@hookform/resolvers/zod';
+import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { View, StyleSheet } from 'react-native';
+import { z } from 'zod';
+
+import FormInput from '../FormInput';
+
+const deviceProtectionFormSchema = z.object({
+  minOffTime: z.string().min(1),
+  brownOutVoltageChange: z.string().min(1),
+  brownOutFrequencyChange: z.string().min(1),
+});
+
+type DeviceProtectionForm = z.infer<typeof deviceProtectionFormSchema>;
 
 const DeviceProtection = () => {
-  const theme = useTheme();
-  const { control } = useForm();
-  const [minOffTime, setMinOffTime] = useState('');
-  const [voltageChange, setVoltageChange] = useState('');
-  const [frequencyChange, setFrequencyChange] = useState('');
+  const deviceProtectionForm = useForm<DeviceProtectionForm>({
+    resolver: zodResolver(deviceProtectionFormSchema),
+    defaultValues: {
+      minOffTime: '',
+      brownOutVoltageChange: '',
+      brownOutFrequencyChange: '',
+    },
+    mode: 'onBlur',
+  });
 
   return (
-    <FormSection sectionTitle="Protection" isOpen={false}>
-      <View style={styles.fieldItems}>
-        <View style={styles.fieldItem}>
-          <Paragraph style={styles.label}>Minimum Off-Time</Paragraph>
-          <TextInput
-            mode="outlined"
-            label="Minutes"
-            style={styles.input}
-            value={minOffTime}
-            onChangeText={setMinOffTime}
+    <View style={styles.fieldItems}>
+      <Controller
+        control={deviceProtectionForm.control}
+        name="minOffTime"
+        render={({ field: { value, onChange, onBlur } }) => (
+          <FormInput
+            label="Minimum Off-Time"
             placeholder="3"
+            value={value.toString()}
+            onChangeText={(text) => onChange(Number(text))}
+            onBlur={onBlur}
+            containerStyles={styles.input}
             keyboardType="numeric"
           />
-        </View>
-        <View style={styles.fieldItem}>
-          <Paragraph style={styles.label}>Brownout: Power Off if Voltage changes by more than</Paragraph>
-          <TextInput
-            mode="outlined"
-            label="%"
-            style={styles.input}
-            value={voltageChange}
-            onChangeText={setVoltageChange}
-            placeholder="20"
+        )}
+      />
+      <Controller
+        control={deviceProtectionForm.control}
+        name="brownOutVoltageChange"
+        render={({ field: { value, onChange, onBlur } }) => (
+          <FormInput
+            label="Brownout: Voltage changes"
+            placeholder="20%"
+            value={value.toString()}
+            onChangeText={(text) => onChange(Number(text))}
+            onBlur={onBlur}
+            containerStyles={styles.input}
             keyboardType="numeric"
           />
-        </View>
-        <View style={styles.fieldItem}>
-          <Paragraph style={styles.label}>Brownout: Power Off if Frequency changes by more than</Paragraph>
-          <TextInput
-            mode="outlined"
-            label="Hz"
-            style={styles.input}
-            value={frequencyChange}
-            onChangeText={setFrequencyChange}
-            placeholder="4"
+        )}
+      />
+      <Controller
+        control={deviceProtectionForm.control}
+        name="brownOutFrequencyChange"
+        render={({ field: { value, onChange, onBlur } }) => (
+          <FormInput
+            label="Brownout: Frequency changes"
+            placeholder="4 Hz"
+            value={value.toString()}
+            onChangeText={(text) => onChange(Number(text))}
+            onBlur={onBlur}
+            containerStyles={styles.input}
             keyboardType="numeric"
           />
-        </View>
-      </View>
-    </FormSection>
+        )}
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   fieldItems: {
-    rowGap: 10,
-  },
-  fieldItem: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-  },
-  label: {
-    width: '60%',
-    textAlign: 'left',
-    paddingHorizontal: 0,
-    fontSize: 14,
+    rowGap: 0,
   },
   input: {
-    marginLeft: 'auto',
-    width: '35%',
-    fontSize: 14,
+    marginVertical: 6,
   },
 });
 
