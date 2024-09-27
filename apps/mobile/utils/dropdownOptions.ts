@@ -29,3 +29,8 @@ export const enrollmentStatusOptions = [
   { id: 1, label: 'Enrolled', value: 'Enrolled' },
   { id: 2, label: 'Not Enrolled', value: 'Not Enrolled' },
 ];
+
+export const smartPanelConnectionStatusOptions = [
+  { id: 1, label: 'Connected', value: 'Connected' },
+  { id: 2, label: 'Disconnected', value: 'Disconnected' },
+];

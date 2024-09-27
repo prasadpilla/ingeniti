@@ -1,61 +1,40 @@
 import { useState } from 'react';
-import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { useTheme } from 'react-native-paper';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
+import BenefitsSmartPanel from '../components/DeviceRegistration/BenefitsSmartPanel';
 import BenefitsUtility from '../components/DeviceRegistration/BenefitsUtility';
 import DeviceDetails from '../components/DeviceRegistration/DeviceDetails';
+import DeviceProtection from '../components/DeviceRegistration/DeviceProtection';
 import Header from '../components/Header';
 import Paragraph from '../components/Paragraph';
 import { DeviceOnBoardingFormProps } from '../types/navigation.types';
-import DeviceProtection from '../components/DeviceRegistration/DeviceProtection';
-import { useTheme } from 'react-native-paper';
-import { t } from 'i18next';
-import { useTranslation } from 'react-i18next';
 
 const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navigation }) => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const [isDeviceDetailsOpen, setIsDeviceDetailsOpen] = useState(false);
+  const [isDeviceDetailsOpen, setIsDeviceDetailsOpen] = useState(true);
   const [isDeviceProtectionOpen, setIsDeviceProtectionOpen] = useState(false);
-  const [isBenefitsUtilityOpen, setIsBenefitsUtilityOpen] = useState(true);
-
+  const [isBenefitsUtilityOpen, setIsBenefitsUtilityOpen] = useState(false);
+  const [isBenefitsSmartPanelOpen, setIsBenefitsSmartPanelOpen] = useState(false);
   return (
     <Background>
-      <Header>Add A New Device</Header>
-
       {isDeviceDetailsOpen && (
         <>
-          <Paragraph
-            style={[
-              styles.formSectionHeading,
-              { backgroundColor: theme.colors.secondaryContainer, color: theme.colors.primary },
-            ]}
-          >
-            Device Details
-          </Paragraph>
+          <Header>Device Details</Header>
           <View style={styles.sectionContainer}>
             <DeviceDetails />
-            <Button mode="outlined" onPress={() => {}} style={styles.sectionButton}>
-              Continue
-            </Button>
-          </View>
-        </>
-      )}
-
-      {isDeviceProtectionOpen && (
-        <>
-          <Paragraph
-            style={[
-              styles.formSectionHeading,
-              { backgroundColor: theme.colors.secondaryContainer, color: theme.colors.primary },
-            ]}
-          >
-            Device Protection
-          </Paragraph>
-          <View style={styles.sectionContainer}>
-            <DeviceProtection />
-            <Button mode="outlined" onPress={() => {}} style={styles.sectionButton}>
+            <Button
+              mode="outlined"
+              onPress={() => {
+                setIsDeviceDetailsOpen(false);
+                setIsDeviceProtectionOpen(true);
+              }}
+              style={styles.sectionButton}
+            >
               Continue
             </Button>
             <TouchableOpacity
@@ -70,28 +49,79 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
         </>
       )}
 
-      {isBenefitsUtilityOpen && (
+      {isDeviceProtectionOpen && (
         <>
-          <Paragraph
-            style={[
-              styles.formSectionHeading,
-              { backgroundColor: theme.colors.secondaryContainer, color: theme.colors.primary },
-            ]}
-          >
-            Enable Benefits from Utilities
-          </Paragraph>
-          <Paragraph style={[styles.sectionDescriptionText, { color: theme.colors.primary }]}>
-            inGeniti will executed intelligent operations to reduce your energy costs. You will have options to opt out
-          </Paragraph>
+          <Header>Device Protection</Header>
           <View style={styles.sectionContainer}>
-            <BenefitsUtility />
-            <Button mode="outlined" onPress={() => {}} style={styles.sectionButton}>
+            <DeviceProtection />
+            <Button
+              mode="outlined"
+              onPress={() => {
+                setIsDeviceProtectionOpen(false);
+                setIsBenefitsUtilityOpen(true);
+              }}
+              style={styles.sectionButton}
+            >
               Continue
             </Button>
             <TouchableOpacity
               style={styles.goBackButton}
               onPress={() => {
-                navigation.goBack();
+                setIsDeviceDetailsOpen(true);
+                setIsDeviceProtectionOpen(false);
+              }}
+            >
+              <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>{t('go_back')}</Paragraph>
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
+
+      {isBenefitsUtilityOpen && (
+        <>
+          <Header>Enable Benefits from Utilities</Header>
+
+          <Paragraph style={[styles.sectionDescriptionText, { color: theme.colors.primary }]}>
+            inGeniti will executed intelligent operations to reduce your energy costs. You will have options to opt out
+          </Paragraph>
+          <View style={styles.sectionContainer}>
+            <BenefitsUtility />
+            <Button
+              mode="outlined"
+              onPress={() => {
+                setIsBenefitsUtilityOpen(false);
+                setIsBenefitsSmartPanelOpen(true);
+              }}
+              style={styles.sectionButton}
+            >
+              Continue
+            </Button>
+            <TouchableOpacity
+              style={styles.goBackButton}
+              onPress={() => {
+                setIsDeviceProtectionOpen(true);
+                setIsBenefitsUtilityOpen(false);
+              }}
+            >
+              <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>{t('go_back')}</Paragraph>
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
+
+      {isBenefitsSmartPanelOpen && (
+        <>
+          <Header>Benefits Smart Panel</Header>
+          <View style={styles.sectionContainer}>
+            <BenefitsSmartPanel />
+            <Button mode="outlined" onPress={() => {}} style={styles.sectionButton}>
+              Register Device
+            </Button>
+            <TouchableOpacity
+              style={styles.goBackButton}
+              onPress={() => {
+                setIsBenefitsSmartPanelOpen(false);
+                setIsBenefitsUtilityOpen(true);
               }}
             >
               <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>{t('go_back')}</Paragraph>
@@ -104,17 +134,9 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
 };
 
 const styles = StyleSheet.create({
-  formSectionHeading: {
-    fontSize: 12,
-    fontWeight: '600',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    alignItems: 'center',
-    borderRadius: 8,
-  },
   sectionContainer: {
     width: '100%',
-    marginTop: 20,
+    marginTop: 12,
   },
   sectionButton: {
     width: '100%',
@@ -127,7 +149,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   sectionDescriptionText: {
-    marginTop: 12,
     fontSize: 12,
     fontStyle: 'italic',
   },
