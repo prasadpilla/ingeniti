@@ -17,8 +17,8 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
   const { t } = useTranslation();
   const theme = useTheme();
   const [isDeviceDetailsOpen, setIsDeviceDetailsOpen] = useState(false);
-  const [isDeviceProtectionOpen, setIsDeviceProtectionOpen] = useState(true);
-  const [isBenefitsUtilityOpen, setIsBenefitsUtilityOpen] = useState(false);
+  const [isDeviceProtectionOpen, setIsDeviceProtectionOpen] = useState(false);
+  const [isBenefitsUtilityOpen, setIsBenefitsUtilityOpen] = useState(true);
 
   return (
     <Background>
@@ -70,13 +70,35 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
         </>
       )}
 
-      {/* <Button mode="contained" style={styles.registerButton} onPress={() => {}}>
-          Register Device
-        </Button> */}
-
-      {/* <Button mode="outlined" onPress={() => {}} style={styles.registerButton}>
-        Register Device
-      </Button> */}
+      {isBenefitsUtilityOpen && (
+        <>
+          <Paragraph
+            style={[
+              styles.formSectionHeading,
+              { backgroundColor: theme.colors.secondaryContainer, color: theme.colors.primary },
+            ]}
+          >
+            Enable Benefits from Utilities
+          </Paragraph>
+          <Paragraph style={[styles.sectionDescriptionText, { color: theme.colors.primary }]}>
+            inGeniti will executed intelligent operations to reduce your energy costs. You will have options to opt out
+          </Paragraph>
+          <View style={styles.sectionContainer}>
+            <BenefitsUtility />
+            <Button mode="outlined" onPress={() => {}} style={styles.sectionButton}>
+              Continue
+            </Button>
+            <TouchableOpacity
+              style={styles.goBackButton}
+              onPress={() => {
+                navigation.goBack();
+              }}
+            >
+              <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>{t('go_back')}</Paragraph>
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
     </Background>
   );
 };
@@ -96,13 +118,18 @@ const styles = StyleSheet.create({
   },
   sectionButton: {
     width: '100%',
-    marginTop: 32,
+    marginTop: 40,
   },
   goBackButton: {
     marginTop: 24,
   },
   goBackText: {
     fontWeight: '600',
+  },
+  sectionDescriptionText: {
+    marginTop: 12,
+    fontSize: 12,
+    fontStyle: 'italic',
   },
 });
 

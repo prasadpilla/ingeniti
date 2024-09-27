@@ -1,128 +1,95 @@
-import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { useTheme, TextInput } from 'react-native-paper';
-import Paragraph from '../Paragraph';
-import FormSection from './FormSection';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { zodResolver } from '@hookform/resolvers/zod';
+import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { View, StyleSheet } from 'react-native';
+import { z } from 'zod';
+
+import { utilityOptions, countryOptions, enrollmentStatusOptions } from '../../utils/dropdownOptions';
+import Dropdown from '../Dropdown';
+import FormInput from '../FormInput';
+
+const benefitsUtilityFormSchema = z.object({
+  enrollmentStatus: z.enum(['Enrolled', 'Not Enrolled']),
+  utility: z.string().min(1, 'Utility is required'),
+  country: z.string().min(1, 'Country is required'),
+  meterServiceID: z.string().min(1, 'Meter Service ID is required'),
+});
+
+type BenefitsUtilityForm = z.infer<typeof benefitsUtilityFormSchema>;
 
 const BenefitsUtility = () => {
-  const theme = useTheme();
-  const { control } = useForm();
-  const [enrollmentStatus, setEnrollmentStatus] = useState<string>('Enrolled');
-  const [utility, setUtility] = useState<string>('APSPDC');
-  const [meterServiceID, setMeterServiceID] = useState('');
-  const [country, setCountry] = useState<string>('India');
-
-  const enrollmentStatusOptions = [
-    { label: 'Enrolled', value: 'Enrolled' },
-    { label: 'Not Enrolled', value: 'Not Enrolled' },
-  ];
-
-  const utilityOptions = [
-    { label: 'India', value: 'India' },
-    { label: 'APSPDC', value: 'APSPDC' },
-  ];
-
-  const countryOptions = [
-    { label: 'India', value: 'India' },
-    { label: 'USA', value: 'USA' },
-    { label: 'Canada', value: 'Canada' },
-  ];
-
-  const Dropdown = ({ label, value, onSelect, options }) => (
-    <View style={styles.dropdownContainer}>
-      <Paragraph style={styles.label}>{label}</Paragraph>
-      <View style={styles.dropdown}>
-        <Controller
-          control={control}
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              mode="outlined"
-              value={value}
-              onChangeText={onChange}
-              render={(props) => (
-                <View {...props}>
-                  <MaterialCommunityIcons name="chevron-down" size={24} color="black" />
-                </View>
-              )}
-            />
-          )}
-          name={label}
-          defaultValue={value}
-        />
-      </View>
-    </View>
-  );
+  const benefitsUtilityForm = useForm<BenefitsUtilityForm>({
+    resolver: zodResolver(benefitsUtilityFormSchema),
+    defaultValues: {
+      enrollmentStatus: 'Enrolled',
+      utility: '',
+      country: '',
+      meterServiceID: '',
+    },
+    mode: 'onBlur',
+  });
 
   return (
-    <FormSection sectionTitle="Enable Benefits from Utility" isOpen={false}>
-      <View style={styles.fieldItems}>
-        <Dropdown
-          label="Enrollment Status"
-          value={enrollmentStatus}
-          onSelect={setEnrollmentStatus}
-          options={enrollmentStatusOptions}
-        />
-        <View style={styles.fieldItem}>
-          <Paragraph style={styles.label}>Utility</Paragraph>
-          <View style={styles.dropdownInput}>
-            <Dropdown label="Utility" value={utility} onSelect={setUtility} options={utilityOptions} />
-            <Dropdown label="Country" value={country} onSelect={setCountry} options={countryOptions} />
+    <View style={styles.fieldItems}>
+      <Controller
+        control={benefitsUtilityForm.control}
+        name="enrollmentStatus"
+        render={({ field: { value, onChange } }) => (
+          <View style={styles.dropdownContainer}>
+            <Dropdown
+              options={enrollmentStatusOptions}
+              selectedValue={value}
+              onSelect={onChange}
+              placeholder="Select Enrollment Status"
+            />
           </View>
-        </View>
-        <View style={styles.fieldItem}>
-          <Paragraph style={styles.label}>Meter Service ID</Paragraph>
-          <TextInput
-            mode="outlined"
-            label=""
-            style={styles.input}
-            value={meterServiceID}
-            onChangeText={setMeterServiceID}
+        )}
+      />
+      <Controller
+        control={benefitsUtilityForm.control}
+        name="utility"
+        render={({ field: { value, onChange } }) => (
+          <View style={styles.dropdownContainer}>
+            <Dropdown options={utilityOptions} selectedValue={value} onSelect={onChange} placeholder="Select Utility" />
+          </View>
+        )}
+      />
+      <Controller
+        control={benefitsUtilityForm.control}
+        name="country"
+        render={({ field: { value, onChange } }) => (
+          <View style={styles.dropdownContainer}>
+            <Dropdown options={countryOptions} selectedValue={value} onSelect={onChange} placeholder="Select Country" />
+          </View>
+        )}
+      />
+      <Controller
+        control={benefitsUtilityForm.control}
+        name="meterServiceID"
+        render={({ field: { value, onChange, onBlur } }) => (
+          <FormInput
+            label="Meter Service ID"
             placeholder="Enter Meter Service ID"
+            value={value}
+            onChangeText={onChange}
+            onBlur={onBlur}
+            containerStyles={styles.input}
           />
-        </View>
-      </View>
-    </FormSection>
+        )}
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   fieldItems: {
-    rowGap: 10,
-  },
-  fieldItem: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-  },
-  label: {
-    width: '40%',
-    textAlign: 'left',
-    paddingHorizontal: 0,
-    fontSize: 14,
+    rowGap: 0,
   },
   input: {
-    marginLeft: 'auto',
-    width: '55%',
-    fontSize: 14,
+    marginVertical: 6,
   },
   dropdownContainer: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-  },
-  dropdown: {
-    marginLeft: 'auto',
-    width: '55%',
-    fontSize: 14,
-  },
-  dropdownInput: {
-    marginLeft: 'auto',
-    fontSize: 14,
-    flexDirection: 'row',
+    marginVertical: 8,
   },
 });
 

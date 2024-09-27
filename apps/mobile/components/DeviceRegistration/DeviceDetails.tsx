@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { View, StyleSheet } from 'react-native';
 
-import { deviceTypeOptions, deviceUsageOptions } from './dropdownOptions';
+import { deviceTypeOptions, deviceUsageOptions } from '../../utils/dropdownOptions';
 import Dropdown from '../Dropdown';
 import FormInput from '../FormInput';
 import { DeviceDetailsForm, deviceDetailsFormSchema } from '../../types/forms.schemas';
