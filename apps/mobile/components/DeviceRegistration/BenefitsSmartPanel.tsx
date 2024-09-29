@@ -1,31 +1,37 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { z } from 'zod';
 
-import { utilityOptions, countryOptions, smartPanelConnectionStatusOptions } from '../../utils/dropdownOptions';
+import {
+  countryOptions,
+  smartPanelConnectionStatusOptions,
+  utilityOptions,
+} from '../../utils/dropdownOptions';
 import Dropdown from '../Dropdown';
 import FormInput from '../FormInput';
 
 const benefitsUtilityForConnectedDeviceFormSchema = z.object({
-  isConnectedToPrimaryDevice: z.enum(['Connected', 'Disconnected']),
+  isConnectedToPrimaryDevice: z.enum(['Connected', 'No']),
   utility: z.string().min(1, 'Utility is required'),
   country: z.string().min(1, 'Country is required'),
   meterServiceID: z.string().min(1, 'Meter Service ID is required'),
   maxLoad: z.number().min(1, 'Max Load is required'),
 });
 
-const benefitsUtilityForDisconnectedDeviceFormSchema = z.object({
-  isConnectedToPrimaryDevice: z.enum(['Connected', 'Disconnected']),
+const benefitsUtilityForNoDeviceFormSchema = z.object({
+  isConnectedToPrimaryDevice: z.enum(['Connected', 'No']),
   deviceIdentifier: z.string().min(1, 'Device Identifier is required'),
 });
 
-type BenefitsUtilityForConnectedDeviceForm = z.infer<typeof benefitsUtilityForConnectedDeviceFormSchema>;
-type BenefitsUtilityForDisconnectedDeviceForm = z.infer<typeof benefitsUtilityForDisconnectedDeviceFormSchema>;
+type BenefitsUtilityForConnectedDeviceForm = z.infer<
+  typeof benefitsUtilityForConnectedDeviceFormSchema
+>;
+type BenefitsUtilityForNoDeviceForm = z.infer<typeof benefitsUtilityForNoDeviceFormSchema>;
 
 const BenefitsSmartPanel = () => {
-  const [isConnectedToPrimaryDevice, setIsConnectedToPrimaryDevice] = useState(true);
+  const [isConnectedToPrimaryDevice, setIsConnectedToPrimaryDevice] = useState(false);
 
   const connectedDeviceForm = useForm<BenefitsUtilityForConnectedDeviceForm>({
     resolver: zodResolver(benefitsUtilityForConnectedDeviceFormSchema),
@@ -39,10 +45,10 @@ const BenefitsSmartPanel = () => {
     mode: 'onBlur',
   });
 
-  const disconnectedDeviceForm = useForm<BenefitsUtilityForDisconnectedDeviceForm>({
-    resolver: zodResolver(benefitsUtilityForDisconnectedDeviceFormSchema),
+  const NoDeviceForm = useForm<BenefitsUtilityForNoDeviceForm>({
+    resolver: zodResolver(benefitsUtilityForNoDeviceFormSchema),
     defaultValues: {
-      isConnectedToPrimaryDevice: 'Disconnected',
+      isConnectedToPrimaryDevice: 'No',
       deviceIdentifier: '',
     },
     mode: 'onBlur',
@@ -61,29 +67,15 @@ const BenefitsSmartPanel = () => {
                   options={smartPanelConnectionStatusOptions}
                   selectedValue={value}
                   onSelect={(value) => {
-                    if (value === 'Disconnected') {
+                    if (value === 'No') {
                       setIsConnectedToPrimaryDevice(false);
-                      onChange('Disconnected');
+                      onChange('No');
                     } else {
                       setIsConnectedToPrimaryDevice(true);
-                      onChange('Connected');
+                      onChange('Yes');
                     }
                   }}
-                  placeholder="Connected to Primary Device"
-                />
-              </View>
-            )}
-          />
-          <Controller
-            control={connectedDeviceForm.control}
-            name="utility"
-            render={({ field: { value, onChange } }) => (
-              <View style={styles.dropdownContainer}>
-                <Dropdown
-                  options={utilityOptions}
-                  selectedValue={value}
-                  onSelect={onChange}
-                  placeholder="Select Utility"
+                  placeholder="Device Connection Method"
                 />
               </View>
             )}
@@ -104,11 +96,25 @@ const BenefitsSmartPanel = () => {
           />
           <Controller
             control={connectedDeviceForm.control}
+            name="utility"
+            render={({ field: { value, onChange } }) => (
+              <View style={styles.dropdownContainer}>
+                <Dropdown
+                  options={utilityOptions}
+                  selectedValue={value}
+                  onSelect={onChange}
+                  placeholder="Select Utility"
+                />
+              </View>
+            )}
+          />
+          <Controller
+            control={connectedDeviceForm.control}
             name="meterServiceID"
             render={({ field: { value, onChange, onBlur } }) => (
               <FormInput
-                label="Meter Service ID"
-                placeholder="Enter Meter Service ID"
+                label="Meter / Service ID"
+                placeholder="Enter Meter / Service ID"
                 value={value}
                 onChangeText={onChange}
                 onBlur={onBlur}
@@ -121,7 +127,7 @@ const BenefitsSmartPanel = () => {
             name="maxLoad"
             render={({ field: { value, onChange } }) => (
               <FormInput
-                label="Max Load"
+                label="Max Load (kW)"
                 placeholder="Enter Max Load"
                 value={value.toString()}
                 onChangeText={onChange}
@@ -133,7 +139,7 @@ const BenefitsSmartPanel = () => {
       ) : (
         <>
           <Controller
-            control={disconnectedDeviceForm.control}
+            control={NoDeviceForm.control}
             name="isConnectedToPrimaryDevice"
             render={({ field: { value, onChange } }) => (
               <View style={styles.dropdownContainer}>
@@ -141,12 +147,12 @@ const BenefitsSmartPanel = () => {
                   options={smartPanelConnectionStatusOptions}
                   selectedValue={value}
                   onSelect={(value) => {
-                    if (value === 'Disconnected') {
+                    if (value === 'No') {
                       setIsConnectedToPrimaryDevice(false);
-                      onChange('Disconnected');
+                      onChange('No');
                     } else {
                       setIsConnectedToPrimaryDevice(true);
-                      onChange('Connected');
+                      onChange('Yes');
                     }
                   }}
                   placeholder="Connected to Primary Device"
@@ -155,12 +161,12 @@ const BenefitsSmartPanel = () => {
             )}
           />
           <Controller
-            control={disconnectedDeviceForm.control}
+            control={NoDeviceForm.control}
             name="deviceIdentifier"
             render={({ field: { value, onChange, onBlur } }) => (
               <FormInput
-                label="Identifier"
-                placeholder="Enter Device Identifier"
+                label="Primary Device Name"
+                placeholder="Enter Primary Device Name If Any"
                 value={value}
                 onChangeText={onChange}
                 onBlur={onBlur}

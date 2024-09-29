@@ -2,13 +2,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { StyleSheet, View } from 'react-native';
+import { HelperText } from 'react-native-paper';
 import { z } from 'zod';
 
-import {
-  countryOptions,
-  enrollmentStatusOptions,
-  utilityOptions,
-} from '../../utils/dropdownOptions';
+import { countryOptions, utilityOptions } from '../../utils/dropdownOptions';
 import Dropdown from '../Dropdown';
 import FormInput from '../FormInput';
 
@@ -37,14 +34,14 @@ const BenefitsUtility = () => {
     <View style={styles.fieldItems}>
       <Controller
         control={benefitsUtilityForm.control}
-        name="enrollmentStatus"
+        name="country"
         render={({ field: { value, onChange } }) => (
           <View style={styles.dropdownContainer}>
             <Dropdown
-              options={enrollmentStatusOptions}
+              options={countryOptions}
               selectedValue={value}
               onSelect={onChange}
-              placeholder="Select Enrollment Status"
+              placeholder="Select Country"
             />
           </View>
         )}
@@ -65,30 +62,19 @@ const BenefitsUtility = () => {
       />
       <Controller
         control={benefitsUtilityForm.control}
-        name="country"
-        render={({ field: { value, onChange } }) => (
-          <View style={styles.dropdownContainer}>
-            <Dropdown
-              options={countryOptions}
-              selectedValue={value}
-              onSelect={onChange}
-              placeholder="Select Country"
-            />
-          </View>
-        )}
-      />
-      <Controller
-        control={benefitsUtilityForm.control}
         name="meterServiceID"
         render={({ field: { value, onChange, onBlur } }) => (
-          <FormInput
-            label="Meter Service ID"
-            placeholder="Enter Meter Service ID"
-            value={value}
-            onChangeText={onChange}
-            onBlur={onBlur}
-            containerStyles={styles.input}
-          />
+          <>
+            <FormInput
+              label="Meter / Service ID"
+              placeholder="Enter Meter Service ID"
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              containerStyles={styles.input}
+            />
+            <HelperText type="info">Enter correctly to get benefits</HelperText>
+          </>
         )}
       />
     </View>

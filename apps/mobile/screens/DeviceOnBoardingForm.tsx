@@ -83,9 +83,9 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
 
       {isBenefitsUtilityOpen && (
         <>
-          <Header>Enable Benefits from Utilities</Header>
+          <Header>Enable Benefits via Utility programs</Header>
           <Paragraph style={[styles.sectionDescriptionText, { color: theme.colors.primary }]}>
-            inGeniti will executed intelligent operations to reduce your energy costs. You will have
+            inGeniti will execute intelligent operations to reduce your energy costs. You will have
             options to opt out
           </Paragraph>
           <View style={styles.sectionContainer}>
@@ -117,11 +117,12 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
 
       {isBenefitsSmartPanelOpen && (
         <>
-          <Header>Benefits Smart Panel</Header>
+          <Header>Enable Benefits via Smart Panel</Header>
           <View style={styles.sectionContainer}>
             <BenefitsSmartPanel />
+            {/* eslint-disable-next-line @typescript-eslint/no-empty-function */}
             <Button mode="outlined" onPress={() => {}} style={styles.sectionButton}>
-              Register Device
+              Complete Registration
             </Button>
             <TouchableOpacity
               style={styles.goBackButton}
@@ -156,8 +157,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   sectionDescriptionText: {
-    fontSize: 12,
+    fontSize: 14,
     fontStyle: 'italic',
+    fontWeight: '500',
   },
 });
 

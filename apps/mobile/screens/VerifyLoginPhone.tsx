@@ -14,7 +14,6 @@ import Button from '../components/Button';
 import FormInput from '../components/FormInput';
 import Header from '../components/Header';
 import Paragraph from '../components/Paragraph';
-import { Themes } from '../styles/themes';
 import { VerifyLoginPhoneProps } from '../types';
 
 const VerifyLoginPhoneScreen: React.FC<VerifyLoginPhoneProps> = ({ route }) => {

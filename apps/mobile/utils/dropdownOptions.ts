@@ -1,5 +1,5 @@
 export const deviceUsageOptions = [
-  { id: 1, label: 'Agriculture', value: 'agriculture' },
+  { id: 1, label: 'Agricultural', value: 'agricultural' },
   { id: 2, label: 'Industrial', value: 'industrial' },
   { id: 3, label: 'Commercial', value: 'commercial' },
   { id: 4, label: 'Residential', value: 'residential' },
@@ -25,12 +25,7 @@ export const countryOptions = [
   { id: 3, label: 'Canada', value: 'Canada' },
 ];
 
-export const enrollmentStatusOptions = [
-  { id: 1, label: 'Enrolled', value: 'Enrolled' },
-  { id: 2, label: 'Not Enrolled', value: 'Not Enrolled' },
-];
-
 export const smartPanelConnectionStatusOptions = [
-  { id: 1, label: 'Connected', value: 'Connected' },
-  { id: 2, label: 'Disconnected', value: 'Disconnected' },
+  { id: 1, label: 'Primary Device Connected to Meter', value: 'Yes' },
+  { id: 2, label: 'Secondary Device Connected to Load', value: 'No' },
 ];
