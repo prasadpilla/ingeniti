@@ -56,11 +56,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     columnGap: 8,
   },
-
-  separator: {
-    height: 1,
-    backgroundColor: '#E0E0E0',
-  },
 });
 
 export default AddDevicePopover;

@@ -1,14 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import {
-  FlatList,
-  Modal,
-  StyleSheet,
-  TextStyle,
-  TouchableOpacity,
-  View,
-  ViewStyle,
-} from 'react-native';
+import { FlatList, Modal, StyleSheet, TextStyle, TouchableOpacity, View, ViewStyle, Text } from 'react-native';
 import { useTheme } from 'react-native-paper';
 
 import Button from './Button';
@@ -30,6 +22,8 @@ interface DropdownProps {
   modalContainerStyles?: ViewStyle;
   modalTitleStyles?: TextStyle;
   itemStyles?: ViewStyle;
+  hasError?: boolean;
+  errorText?: string;
 }
 
 const Dropdown: React.FC<DropdownProps> = ({
@@ -42,6 +36,8 @@ const Dropdown: React.FC<DropdownProps> = ({
   modalContainerStyles,
   modalTitleStyles,
   itemStyles,
+  hasError,
+  errorText,
 }) => {
   const theme = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
@@ -58,8 +54,7 @@ const Dropdown: React.FC<DropdownProps> = ({
     </TouchableOpacity>
   );
 
-  const selectedLabel =
-    options.find((option) => option.value === selectedValue)?.label || placeholder;
+  const selectedLabel = options.find((option) => option.value === selectedValue)?.label || placeholder;
 
   return (
     <View>
@@ -71,30 +66,29 @@ const Dropdown: React.FC<DropdownProps> = ({
             borderColor: theme.colors.secondary,
           },
           pickerButtonStyles,
+          hasError && { borderColor: theme.colors.error, borderWidth: 2 },
         ]}
         onPress={() => setModalVisible(true)}
       >
         <View style={styles.pickerButton}>
-          <Paragraph style={[styles.pickerButtonText, { color: theme.colors.onSurface }]}>
+          <Paragraph
+            style={[
+              styles.pickerButtonText,
+              { color: theme.colors.onSurface },
+              hasError && { color: theme.colors.error },
+            ]}
+          >
             {selectedLabel}
           </Paragraph>
           <MaterialIcons name="arrow-drop-down" size={20} color={theme.colors.secondary} />
         </View>
       </TouchableOpacity>
+      {errorText && <Text style={[styles.error, { color: theme.colors.onErrorContainer }]}>{errorText}</Text>}
+
       <Modal visible={modalVisible} animationType="slide" style={modalStyles}>
-        <View
-          style={[
-            styles.modalContainer,
-            { backgroundColor: theme.colors.background },
-            modalContainerStyles,
-          ]}
-        >
+        <View style={[styles.modalContainer, { backgroundColor: theme.colors.background }, modalContainerStyles]}>
           <Paragraph style={[styles.modalTitle, modalTitleStyles]}>{placeholder}</Paragraph>
-          <FlatList
-            data={options}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id as string}
-          />
+          <FlatList data={options} renderItem={renderItem} keyExtractor={(item) => item.id as string} />
           <Button mode="contained" onPress={() => setModalVisible(false)}>
             Close
           </Button>
@@ -137,6 +131,11 @@ const styles = StyleSheet.create({
   },
   item: {
     padding: 10,
+  },
+  error: {
+    fontSize: 12,
+    paddingHorizontal: 4,
+    paddingTop: 4,
   },
 });
 
