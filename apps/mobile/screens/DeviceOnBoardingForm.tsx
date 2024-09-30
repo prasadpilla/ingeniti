@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useTheme } from 'react-native-paper';
 
 import Background from '../components/Background';
@@ -11,6 +11,7 @@ import BenefitsSmartPanel from '../components/DeviceRegistration/BenefitsSmartPa
 import BenefitsUtility from '../components/DeviceRegistration/BenefitsUtility';
 import DeviceDetails from '../components/DeviceRegistration/DeviceDetails';
 import DeviceProtection from '../components/DeviceRegistration/DeviceProtection';
+import FormSection from '../components/DeviceRegistration/FormSection';
 import Header from '../components/Header';
 import Paragraph from '../components/Paragraph';
 import { DeviceOnBoardingForm, deviceOnBoardingFormSchema } from '../types/forms.schemas';
@@ -63,119 +64,59 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
   });
   return (
     <Background>
-      {isDeviceDetailsOpen && (
-        <>
-          <Header>Device Details</Header>
-          <View style={styles.sectionContainer}>
+      <Header>Device On-Boarding</Header>
+
+      <ScrollView style={styles.scrollContainer}>
+        <View style={styles.formSections}>
+          <FormSection sectionTitle="Device Details" isOpen={isDeviceDetailsOpen}>
             <DeviceDetails />
-            <Button
-              mode="outlined"
-              onPress={() => {
-                setIsDeviceDetailsOpen(false);
-                setIsDeviceProtectionOpen(true);
-              }}
-              style={styles.sectionButton}
-            >
-              Continue
-            </Button>
-            <TouchableOpacity
-              style={styles.goBackButton}
-              onPress={() => {
-                navigation.goBack();
-              }}
-            >
-              <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>{t('go_back')}</Paragraph>
-            </TouchableOpacity>
-          </View>
-        </>
-      )}
+          </FormSection>
 
-      {isDeviceProtectionOpen && (
-        <>
-          <Header>Device Protection</Header>
-          <View style={styles.sectionContainer}>
+          <FormSection sectionTitle="Device Protection" isOpen={isDeviceProtectionOpen}>
             <DeviceProtection />
-            <Button
-              mode="outlined"
-              onPress={() => {
-                setIsDeviceProtectionOpen(false);
-                setIsBenefitsUtilityOpen(true);
-              }}
-              style={styles.sectionButton}
-            >
-              Continue
-            </Button>
-            <TouchableOpacity
-              style={styles.goBackButton}
-              onPress={() => {
-                setIsDeviceDetailsOpen(true);
-                setIsDeviceProtectionOpen(false);
-              }}
-            >
-              <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>{t('go_back')}</Paragraph>
-            </TouchableOpacity>
-          </View>
-        </>
-      )}
+          </FormSection>
 
-      {isBenefitsUtilityOpen && (
-        <>
-          <Header>Enable Benefits via Utility programs</Header>
-          <Paragraph style={[styles.sectionDescriptionText, { color: theme.colors.primary }]}>
-            inGeniti will execute intelligent operations to reduce your energy costs. You will have options to opt out
-          </Paragraph>
-          <View style={styles.sectionContainer}>
+          <FormSection sectionTitle="Enable Benefits via Utility" isOpen={isBenefitsUtilityOpen}>
             <BenefitsUtility />
-            <Button
-              mode="outlined"
-              onPress={() => {
-                setIsBenefitsUtilityOpen(false);
-                setIsBenefitsSmartPanelOpen(true);
-              }}
-              style={styles.sectionButton}
-            >
-              Continue
-            </Button>
-            <TouchableOpacity
-              style={styles.goBackButton}
-              onPress={() => {
-                setIsDeviceProtectionOpen(true);
-                setIsBenefitsUtilityOpen(false);
-              }}
-            >
-              <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>{t('go_back')}</Paragraph>
-            </TouchableOpacity>
-          </View>
-        </>
-      )}
+          </FormSection>
 
-      {isBenefitsSmartPanelOpen && (
-        <>
-          <Header>Enable Benefits via Smart Panel</Header>
-          <View style={styles.sectionContainer}>
+          <FormSection sectionTitle="Enable Benefits via Smart Panel" isOpen={isBenefitsSmartPanelOpen}>
             <BenefitsSmartPanel />
-            {/* eslint-disable-next-line @typescript-eslint/no-empty-function */}
-            <Button mode="outlined" onPress={() => {}} style={styles.sectionButton}>
-              Complete Registration
-            </Button>
-            <TouchableOpacity
-              style={styles.goBackButton}
-              onPress={() => {
-                setIsBenefitsSmartPanelOpen(false);
-                setIsBenefitsUtilityOpen(true);
-              }}
-            >
-              <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>{t('go_back')}</Paragraph>
-            </TouchableOpacity>
-          </View>
-        </>
-      )}
+          </FormSection>
+        </View>
+      </ScrollView>
+
+      <View style={styles.buttonContainers}>
+        <Button mode="outlined" onPress={() => {}} style={styles.sectionButton}>
+          Complete Registration
+        </Button>
+        <TouchableOpacity
+          style={styles.goBackButton}
+          onPress={() => {
+            navigation.goBack();
+          }}
+        >
+          <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>{t('go_back')}</Paragraph>
+        </TouchableOpacity>
+      </View>
     </Background>
   );
 };
 
 const styles = StyleSheet.create({
-  sectionContainer: {
+  scrollContainer: {
+    height: 180,
+    width: '100%',
+    marginTop: 20,
+  },
+  formSections: {
+    flexDirection: 'column',
+    gap: 20,
+    height: '100%',
+    overflow: 'scroll',
+  },
+  buttonContainers: {
+    marginTop: 20,
     width: '100%',
   },
   sectionButton: {

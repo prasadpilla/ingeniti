@@ -13,23 +13,29 @@ const FormSection: React.FC<FormSectionProps> = ({ children, sectionTitle, isOpe
   const theme = useTheme();
   const [isContentVisible, setIsContentVisible] = useState(isOpen);
 
+  const toggleContent = () => setIsContentVisible(!isContentVisible);
+
   return (
     <View style={[styles.container, { borderColor: theme.colors.surfaceVariant }]}>
-      <View
-        style={[
-          styles.sectionHeader,
-          {
-            borderBottomWidth: isContentVisible ? 1 : 0,
-            borderColor: theme.colors.surfaceVariant,
-            backgroundColor: theme.colors.secondaryContainer,
-          },
-        ]}
-      >
-        <Paragraph style={styles.sectionHeaderText}>{sectionTitle}</Paragraph>
-        <TouchableOpacity onPress={() => setIsContentVisible(!isContentVisible)}>
-          <MaterialCommunityIcons name="chevron-down" size={24} color={theme.colors.secondary} />
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity onPress={toggleContent} style={styles.touchableHeader}>
+        <View
+          style={[
+            styles.sectionHeader,
+            {
+              borderBottomWidth: isContentVisible ? 1 : 0,
+              borderColor: theme.colors.surfaceVariant,
+              backgroundColor: theme.colors.secondaryContainer,
+            },
+          ]}
+        >
+          <Paragraph style={styles.sectionHeaderText}>{sectionTitle}</Paragraph>
+          <MaterialCommunityIcons
+            name={isContentVisible ? 'chevron-up' : 'chevron-down'}
+            size={24}
+            color={theme.colors.secondary}
+          />
+        </View>
+      </TouchableOpacity>
       {isContentVisible && <View style={styles.sectionContent}>{children}</View>}
     </View>
   );
@@ -53,7 +59,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     justifyContent: 'space-between',
   },
-
   sectionHeaderText: {
     fontSize: 16,
     fontWeight: 'bold',
@@ -61,6 +66,9 @@ const styles = StyleSheet.create({
   sectionContent: {
     width: '100%',
     padding: 10,
+  },
+  touchableHeader: {
+    width: '100%',
   },
 });
 
