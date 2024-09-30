@@ -1,4 +1,6 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useTheme } from 'react-native-paper';
@@ -11,6 +13,7 @@ import DeviceDetails from '../components/DeviceRegistration/DeviceDetails';
 import DeviceProtection from '../components/DeviceRegistration/DeviceProtection';
 import Header from '../components/Header';
 import Paragraph from '../components/Paragraph';
+import { DeviceOnBoardingForm, deviceOnBoardingFormSchema } from '../types/forms.schemas';
 import { DeviceOnBoardingFormProps } from '../types/navigation.types';
 
 const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navigation }) => {
@@ -20,6 +23,44 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
   const [isDeviceProtectionOpen, setIsDeviceProtectionOpen] = useState(false);
   const [isBenefitsUtilityOpen, setIsBenefitsUtilityOpen] = useState(false);
   const [isBenefitsSmartPanelOpen, setIsBenefitsSmartPanelOpen] = useState(false);
+
+  const deviceOnBoardingForm = useForm<DeviceOnBoardingForm>({
+    resolver: zodResolver(deviceOnBoardingFormSchema),
+    defaultValues: {
+      deviceDetails: {
+        deviceSerial: '',
+        deviceUsage: '',
+        deviceType: '',
+        deviceName: '',
+        deviceLocation: '',
+        averageEnergyCost: 0,
+      },
+      deviceProtection: {
+        minOffTime: '3',
+        brownOutVoltageChange: '',
+        brownOutFrequencyChange: '',
+      },
+      benefitsUtility: {
+        enrollmentStatus: 'Enrolled',
+        utility: '',
+        country: '',
+        meterServiceID: '',
+      },
+      benefitsUtilitySmartPanel: {
+        connectedDevice: {
+          isConnectedToPrimaryDevice: 'Connected',
+          utility: '',
+          country: '',
+          meterServiceID: '',
+          maxLoad: 0,
+        },
+        noDevice: {
+          isConnectedToPrimaryDevice: 'No',
+          deviceIdentifier: '',
+        },
+      },
+    },
+  });
   return (
     <Background>
       {isDeviceDetailsOpen && (
@@ -43,9 +84,7 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
                 navigation.goBack();
               }}
             >
-              <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>
-                {t('go_back')}
-              </Paragraph>
+              <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>{t('go_back')}</Paragraph>
             </TouchableOpacity>
           </View>
         </>
@@ -73,9 +112,7 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
                 setIsDeviceProtectionOpen(false);
               }}
             >
-              <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>
-                {t('go_back')}
-              </Paragraph>
+              <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>{t('go_back')}</Paragraph>
             </TouchableOpacity>
           </View>
         </>
@@ -85,8 +122,7 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
         <>
           <Header>Enable Benefits via Utility programs</Header>
           <Paragraph style={[styles.sectionDescriptionText, { color: theme.colors.primary }]}>
-            inGeniti will execute intelligent operations to reduce your energy costs. You will have
-            options to opt out
+            inGeniti will execute intelligent operations to reduce your energy costs. You will have options to opt out
           </Paragraph>
           <View style={styles.sectionContainer}>
             <BenefitsUtility />
@@ -107,9 +143,7 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
                 setIsBenefitsUtilityOpen(false);
               }}
             >
-              <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>
-                {t('go_back')}
-              </Paragraph>
+              <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>{t('go_back')}</Paragraph>
             </TouchableOpacity>
           </View>
         </>
@@ -131,9 +165,7 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
                 setIsBenefitsUtilityOpen(true);
               }}
             >
-              <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>
-                {t('go_back')}
-              </Paragraph>
+              <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>{t('go_back')}</Paragraph>
             </TouchableOpacity>
           </View>
         </>

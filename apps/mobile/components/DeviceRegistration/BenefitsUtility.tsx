@@ -37,12 +37,7 @@ const BenefitsUtility = () => {
         name="country"
         render={({ field: { value, onChange } }) => (
           <View style={styles.dropdownContainer}>
-            <Dropdown
-              options={countryOptions}
-              selectedValue={value}
-              onSelect={onChange}
-              placeholder="Select Country"
-            />
+            <Dropdown options={countryOptions} selectedValue={value} onSelect={onChange} placeholder="Select Country" />
           </View>
         )}
       />
@@ -51,12 +46,7 @@ const BenefitsUtility = () => {
         name="utility"
         render={({ field: { value, onChange } }) => (
           <View style={styles.dropdownContainer}>
-            <Dropdown
-              options={utilityOptions}
-              selectedValue={value}
-              onSelect={onChange}
-              placeholder="Select Utility"
-            />
+            <Dropdown options={utilityOptions} selectedValue={value} onSelect={onChange} placeholder="Select Utility" />
           </View>
         )}
       />

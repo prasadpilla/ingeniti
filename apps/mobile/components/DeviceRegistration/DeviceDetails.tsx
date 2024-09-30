@@ -73,12 +73,7 @@ const DeviceDetails = () => {
         name="deviceType"
         render={({ field: { value, onChange, onBlur } }) => (
           <View style={styles.dropdownContainer}>
-            <Dropdown
-              options={deviceTypeOptions}
-              selectedValue={value}
-              onSelect={onChange}
-              placeholder="Select Type"
-            />
+            <Dropdown options={deviceTypeOptions} selectedValue={value} onSelect={onChange} placeholder="Select Type" />
           </View>
         )}
       />

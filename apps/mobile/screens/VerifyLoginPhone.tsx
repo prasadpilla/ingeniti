@@ -92,17 +92,13 @@ const VerifyLoginPhoneScreen: React.FC<VerifyLoginPhoneProps> = ({ route }) => {
         )}
       />
       {verificationError && (
-        <Paragraph style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>
-          {verificationError}
-        </Paragraph>
+        <Paragraph style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>{verificationError}</Paragraph>
       )}
       <Button
         mode="contained"
         onPress={verificationCodeForm.handleSubmit(onPressVerify)}
         style={styles.button}
-        disabled={
-          verificationCodeForm.formState.isSubmitting || !verificationCodeForm.formState.isValid
-        }
+        disabled={verificationCodeForm.formState.isSubmitting || !verificationCodeForm.formState.isValid}
       >
         {verificationCodeForm.formState.isSubmitting ? (
           <ActivityIndicator animating={true} color={theme.colors.secondary} />
@@ -118,9 +114,7 @@ const VerifyLoginPhoneScreen: React.FC<VerifyLoginPhoneProps> = ({ route }) => {
           navigation.goBack();
         }}
       >
-        <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>
-          {t('go_back')}
-        </Paragraph>
+        <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>{t('go_back')}</Paragraph>
       </TouchableOpacity>
     </Background>
   );

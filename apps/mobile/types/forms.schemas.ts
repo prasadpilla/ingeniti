@@ -9,29 +9,41 @@ const deviceDetailsFormSchema = z.object({
   averageEnergyCost: z.number().positive('Average Energy Cost must be positive'),
 });
 
-const ProtectionSchema = z.object({
-  minimumOffTime: z.number().positive('Minimum Off-Time must be positive'),
-  voltageChange: z.number().positive('Voltage change must be positive'),
-  frequencyChange: z.number().positive('Frequency change must be positive'),
+const deviceProtectionFormSchema = z.object({
+  minOffTime: z.string().min(1),
+  brownOutVoltageChange: z.string().min(1),
+  brownOutFrequencyChange: z.string().min(1),
 });
 
-const UtilityBenefitsSchema = z.object({
-  utilityCountry: z.string().nonempty('Country is required'),
-  utilityName: z.string().nonempty('Utility Name is required'),
-  meterServiceID: z.string().nonempty('Meter Service ID is required'),
+const benefitsUtilityFormSchema = z.object({
+  enrollmentStatus: z.enum(['Enrolled', 'Not Enrolled']),
+  utility: z.string().min(1, 'Utility is required'),
+  country: z.string().min(1, 'Country is required'),
+  meterServiceID: z.string().min(1, 'Meter Service ID is required'),
 });
 
-const SmartPanelBenefitsSchema = z.object({
-  isPrimaryDevice: z.boolean(),
-  maxLoad: z.number().positive('Max Load must be positive').optional(),
-  associatedDevice: z.string().optional(),
+const benefitsUtilityForConnectedDeviceFormSchema = z.object({
+  isConnectedToPrimaryDevice: z.enum(['Connected', 'No']),
+  utility: z.string().min(1, 'Utility is required'),
+  country: z.string().min(1, 'Country is required'),
+  meterServiceID: z.string().min(1, 'Meter Service ID is required'),
+  maxLoad: z.number().min(1, 'Max Load is required'),
 });
 
-export {
-  deviceDetailsFormSchema,
-  ProtectionSchema,
-  SmartPanelBenefitsSchema,
-  UtilityBenefitsSchema,
-};
+const benefitsUtilityForNoDeviceFormSchema = z.object({
+  isConnectedToPrimaryDevice: z.enum(['Connected', 'No']),
+  deviceIdentifier: z.string().min(1, 'Device Identifier is required'),
+});
+
+export const deviceOnBoardingFormSchema = z.object({
+  deviceDetails: deviceDetailsFormSchema,
+  deviceProtection: deviceProtectionFormSchema,
+  benefitsUtility: benefitsUtilityFormSchema,
+  benefitsUtilitySmartPanel: z.object({
+    connectedDevice: benefitsUtilityForConnectedDeviceFormSchema,
+    noDevice: benefitsUtilityForNoDeviceFormSchema,
+  }),
+});
 
 export type DeviceDetailsForm = z.infer<typeof deviceDetailsFormSchema>;
+export type DeviceOnBoardingForm = z.infer<typeof deviceOnBoardingFormSchema>;

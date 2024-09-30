@@ -4,11 +4,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { StyleSheet, View } from 'react-native';
 import { z } from 'zod';
 
-import {
-  countryOptions,
-  smartPanelConnectionStatusOptions,
-  utilityOptions,
-} from '../../utils/dropdownOptions';
+import { countryOptions, smartPanelConnectionStatusOptions, utilityOptions } from '../../utils/dropdownOptions';
 import Dropdown from '../Dropdown';
 import FormInput from '../FormInput';
 
@@ -25,9 +21,7 @@ const benefitsUtilityForNoDeviceFormSchema = z.object({
   deviceIdentifier: z.string().min(1, 'Device Identifier is required'),
 });
 
-type BenefitsUtilityForConnectedDeviceForm = z.infer<
-  typeof benefitsUtilityForConnectedDeviceFormSchema
->;
+type BenefitsUtilityForConnectedDeviceForm = z.infer<typeof benefitsUtilityForConnectedDeviceFormSchema>;
 type BenefitsUtilityForNoDeviceForm = z.infer<typeof benefitsUtilityForNoDeviceFormSchema>;
 
 const BenefitsSmartPanel = () => {
