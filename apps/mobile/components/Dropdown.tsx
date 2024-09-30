@@ -8,14 +8,14 @@ import Paragraph from './Paragraph';
 
 interface DropdownOption {
   label: string;
-  value: string;
+  value: string | boolean;
   id: string | number;
 }
 
 interface DropdownProps {
   options: DropdownOption[];
-  selectedValue: string;
-  onSelect: (value: string) => void;
+  selectedValue: string | boolean;
+  onSelect: (value: string | boolean) => void;
   placeholder?: string;
   modalStyles?: ViewStyle;
   pickerButtonStyles?: ViewStyle;

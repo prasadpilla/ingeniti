@@ -26,6 +26,6 @@ export const countryOptions = [
 ];
 
 export const smartPanelConnectionStatusOptions = [
-  { id: 1, label: 'Primary Device Connected to Meter', value: 'Yes' },
-  { id: 2, label: 'Secondary Device Connected to Load', value: 'No' },
+  { id: 1, label: 'Primary Device Connected to Meter', value: true },
+  { id: 2, label: 'Secondary Device Connected to Load', value: false },
 ];
