@@ -86,8 +86,8 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
   const onSubmit: SubmitHandler<DeviceOnBoardingForm> = (data) => {
     console.log('button clicked');
     console.log(data);
-    // deviceFormMutation.mutate(data);
-    // navigation.goBack();
+    deviceFormMutation.mutate(data);
+    navigation.goBack();
   };
 
   useEffect(() => {
