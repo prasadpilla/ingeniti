@@ -53,11 +53,11 @@ const deviceOnBoardingFormSchema = z
     brownOutFrequencyChange: z.number().positive('Brownout Frequency Change is required'),
     utility: z.string().min(1, 'Utility is required'),
     country: z.string().min(1, 'Country is required'),
-    meterServiceID: z.string().min(1, 'Meter Service ID is required'),
+    meterServiceId: z.string().min(1, 'Meter Service ID is required'),
     isConnectedToPrimaryDevice: z.boolean(),
     utilitySmartPanel: z.string().optional(),
     countrySmartPanel: z.string().optional(),
-    meterServiceIDSmartPanel: z.string().optional(),
+    meterServiceIdSmartPanel: z.string().optional(),
     maxLoad: z.number().optional(),
     identifier: z.string().optional(),
   })
@@ -77,11 +77,11 @@ const deviceOnBoardingFormSchema = z
           path: ['countrySmartPanel'],
         });
       }
-      if (!data.meterServiceIDSmartPanel) {
+      if (!data.meterServiceIdSmartPanel) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: 'Meter Service ID is required',
-          path: ['meterServiceIDSmartPanel'],
+          path: ['meterServiceIdSmartPanel'],
         });
       }
       if (!data.maxLoad) {

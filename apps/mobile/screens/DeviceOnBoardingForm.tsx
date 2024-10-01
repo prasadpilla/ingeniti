@@ -52,12 +52,12 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
 
       utility: '',
       country: '',
-      meterServiceID: '',
+      meterServiceId: '',
 
       isConnectedToPrimaryDevice: true,
       utilitySmartPanel: '',
       countrySmartPanel: '',
-      meterServiceIDSmartPanel: '',
+      meterServiceIdSmartPanel: '',
       maxLoad: 0,
       identifier: '',
     },
@@ -291,7 +291,7 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
             />
             <Controller
               control={deviceOnBoardingForm.control}
-              name="meterServiceID"
+              name="meterServiceId"
               render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
                 <>
                   <FormInput
@@ -326,7 +326,7 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
                       } else {
                         deviceOnBoardingForm.setValue('utilitySmartPanel', '');
                         deviceOnBoardingForm.setValue('countrySmartPanel', '');
-                        deviceOnBoardingForm.setValue('meterServiceIDSmartPanel', '');
+                        deviceOnBoardingForm.setValue('meterServiceIdSmartPanel', '');
                         deviceOnBoardingForm.setValue('maxLoad', 0);
                       }
                     }}
@@ -373,7 +373,7 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
                 />
                 <Controller
                   control={deviceOnBoardingForm.control}
-                  name="meterServiceIDSmartPanel"
+                  name="meterServiceIdSmartPanel"
                   render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
                     <FormInput
                       label="Meter / Service ID"

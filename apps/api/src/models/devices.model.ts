@@ -38,22 +38,24 @@ export const devices = pgTable(
 
 export type SelectedDevice = InferSelectModel<typeof devices>;
 
-export function getDevices(userId: string) {
+export async function getDevices(userId: string): Promise<SelectedDevice[]> {
   return db.select().from(devices).where(eq(devices.userId, userId));
 }
 
-export function getDevice(userId: string, deviceId: string) {
-  return db
+export async function getDevice(userId: string, deviceId: string): Promise<SelectedDevice> {
+  const device = await db
     .select()
     .from(devices)
     .where(and(eq(devices.userId, userId), eq(devices.id, deviceId)))
     .limit(1);
+
+  return device[0];
 }
 
 export async function insertDevice(deviceData: {
   userId: string;
   name: string;
-  identifier: string;
+  identifier: string | undefined;
   serialNumber: string;
   usage: string;
   type: string;
@@ -66,10 +68,10 @@ export async function insertDevice(deviceData: {
   country: string;
   meterServiceId: string;
   isConnectedToPrimaryDevice: boolean;
-  utilitySmartPanel: string;
-  countrySmartPanel: string;
-  meterServiceIdSmartPanel: string;
-  maxLoad: number;
+  utilitySmartPanel: string | undefined;
+  countrySmartPanel: string | undefined;
+  meterServiceIdSmartPanel: string | undefined;
+  maxLoad: number | undefined;
 }): Promise<SelectedDevice> {
   const device = await db
     .insert(devices)

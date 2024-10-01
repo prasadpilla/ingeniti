@@ -1,7 +1,7 @@
 import { WithAuthProp } from '@clerk/clerk-sdk-node';
 import { Request, Response } from 'express';
-import { GenericError, HttpStatusCode, deviceOnBoardingFormSchema } from '@ingeniti/shared';
-import { insertDevice } from '../models/devices.model';
+import { Device, GenericError, HttpStatusCode, deviceOnBoardingFormSchema } from '@ingeniti/shared';
+import { getDevices, insertDevice } from '../models/devices.model';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const express = require('express');
@@ -17,12 +17,35 @@ devicesController.post(
     const userId = req.auth.userId as string;
 
     const device = await insertDevice({
-      userId,
-      ...validatedBody,
+      userId: userId as string,
+      name: validatedBody.name,
+      identifier: validatedBody.identifier,
+      serialNumber: validatedBody.serialNumber,
+      usage: validatedBody.usage,
+      type: validatedBody.type,
+      location: validatedBody.location,
+      averageEnergyCost: validatedBody.averageEnergyCost,
+      minOffTime: validatedBody.minOffTime,
+      brownOutVoltageChange: validatedBody.brownOutVoltageChange,
+      brownOutFrequencyChange: validatedBody.brownOutFrequencyChange,
+      utility: validatedBody.utility,
+      country: validatedBody.country,
+      meterServiceId: validatedBody.meterServiceId,
+      isConnectedToPrimaryDevice: validatedBody.isConnectedToPrimaryDevice,
+      utilitySmartPanel: validatedBody.utilitySmartPanel,
+      countrySmartPanel: validatedBody.countrySmartPanel,
+      meterServiceIdSmartPanel: validatedBody.meterServiceIdSmartPanel,
+      maxLoad: validatedBody.maxLoad,
     });
 
     res.status(HttpStatusCode.CREATED_201).json({ success: true, id: device.id });
   }
 );
+
+devicesController.get('/', async (req: WithAuthProp<Request>, res: Response<Device[]>) => {
+  const userId = req.auth.userId as string;
+  const devices = await getDevices(userId);
+  res.status(HttpStatusCode.OK_200).json(devices);
+});
 
 export default devicesController;

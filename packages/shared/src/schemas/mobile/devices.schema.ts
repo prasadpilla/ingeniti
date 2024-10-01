@@ -13,11 +13,11 @@ export const deviceSchema = z.object({
   brownOutFrequencyChange: z.number().positive(),
   utility: z.string(),
   country: z.string(),
-  meterServiceID: z.string(),
+  meterServiceId: z.string(),
   isConnectedToPrimaryDevice: z.boolean(),
   utilitySmartPanel: z.string().nullable(),
   countrySmartPanel: z.string().nullable(),
-  meterServiceIDSmartPanel: z.string().nullable(),
+  meterServiceIdSmartPanel: z.string().nullable(),
   maxLoad: z.number().nullable(),
   identifier: z.string().nullable(),
 });
