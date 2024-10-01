@@ -25,7 +25,7 @@ import {
 } from '../utils/dropdownOptions';
 import { makeApiCall } from '../utils/api';
 
-const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navigation }) => {
+const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navigation, route }) => {
   const { getToken } = useAuth();
 
   const { t } = useTranslation();
@@ -77,6 +77,7 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
     },
     onSuccess: (data: Device) => {
       console.log('Device registered successfully', data);
+      route.params.refetchDevices();
       navigation.goBack();
     },
     onError: (error) => {

@@ -1,7 +1,7 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, TouchableWithoutFeedback } from 'react-native';
 import { Appbar, Paragraph, useTheme } from 'react-native-paper';
 
 import Background from '../components/Background';
@@ -22,7 +22,11 @@ const Dashboard = () => {
   const [isDevicePopoverVisible, setIsDevicePopoverVisible] = useState(false);
   const [devices, setDevices] = useState<Device[]>([]);
 
-  const { data, isLoading } = useQuery({
+  const {
+    data,
+    isLoading,
+    refetch: refetchDevices,
+  } = useQuery({
     queryKey: ['devices'],
     queryFn: async () => {
       const token = await getToken();
@@ -35,9 +39,18 @@ const Dashboard = () => {
     onError: (error) => {
       console.error(error);
     },
-    refetchInterval: 5000,
     refetchOnWindowFocus: false,
   });
+
+  const handleBackgroundPress = () => {
+    if (isDevicePopoverVisible) {
+      setIsDevicePopoverVisible(false);
+    }
+  };
+
+  useEffect(() => {
+    refetchDevices();
+  }, []);
 
   return (
     <>
@@ -47,55 +60,77 @@ const Dashboard = () => {
       </Appbar.Header>
       {isDevicePopoverVisible && (
         <AddDevicePopover
-          onScanCode={() => setIsDevicePopoverVisible(false)}
-          onEnterCode={() => setIsDevicePopoverVisible(false)}
+          onScanCode={() => {
+            setIsDevicePopoverVisible(false);
+            navigation.navigate('DeviceOnBoardingForm', { refetchDevices });
+          }}
+          onEnterCode={() => {
+            setIsDevicePopoverVisible(false);
+          }}
           containerStyles={styles.popoverContainer}
         />
       )}
-      <Background>
-        {isLoading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator animating={true} color={theme.colors.secondary} />
-            <Paragraph>Loading...</Paragraph>
-          </View>
-        ) : devices.length > 0 ? (
-          <View style={styles.devicesContainer}>
-            <Header>All Devices</Header>
-            <View style={styles.devicesList}>
-              {devices.map((device) => (
-                <DeviceItem key={device.id} device={device} />
-              ))}
-            </View>
-          </View>
-        ) : (
-          <View>
-            <View style={styles.emptyDeviceContainer}>
-              <MaterialCommunityIcons
-                name="devices"
-                size={24}
-                color={theme.colors.secondary}
-                style={[styles.emptyDeviceIcon, { backgroundColor: theme.colors.secondaryContainer }]}
-              />
-              <Paragraph style={styles.emptyDeviceHeading}>Lets get started</Paragraph>
-              <Paragraph style={styles.emptyDeviceSubheading}>
-                Add your first device/sensor by scanning the QR code or entering the code manually.
-              </Paragraph>
-
-              <View style={styles.emptyDeviceButtonContainer}>
-                <Button
-                  mode="contained"
-                  onPress={() => {
-                    navigation.navigate('DeviceOnBoardingForm');
-                  }}
-                >
-                  Scan QR Code
-                </Button>
-                <Button onPress={() => {}}>Enter Code</Button>
+      <TouchableWithoutFeedback onPress={handleBackgroundPress}>
+        <View style={{ flex: 1 }}>
+          <Background>
+            {isLoading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator animating={true} color={theme.colors.secondary} />
+                <Paragraph>Loading...</Paragraph>
               </View>
-            </View>
-          </View>
-        )}
-      </Background>
+            ) : devices.length > 0 ? (
+              <>
+                <Header>All Devices</Header>
+                <View style={styles.devicesContainer}>
+                  <View style={styles.devicesList}>
+                    {devices.map((device) => (
+                      <DeviceItem key={device.id} device={device} />
+                    ))}
+                  </View>
+                  <View style={[styles.emptyDeviceButtonContainer, { marginTop: 54 }]}>
+                    <Button
+                      mode="contained"
+                      onPress={() => {
+                        navigation.navigate('DeviceOnBoardingForm', { refetchDevices });
+                      }}
+                    >
+                      Scan QR Code
+                    </Button>
+                    <Button onPress={() => {}}>Enter Code</Button>
+                  </View>
+                </View>
+              </>
+            ) : (
+              <View>
+                <View style={styles.emptyDeviceContainer}>
+                  <MaterialCommunityIcons
+                    name="devices"
+                    size={24}
+                    color={theme.colors.secondary}
+                    style={[styles.emptyDeviceIcon, { backgroundColor: theme.colors.secondaryContainer }]}
+                  />
+                  <Paragraph style={styles.emptyDeviceHeading}>Lets get started</Paragraph>
+                  <Paragraph style={styles.emptyDeviceSubheading}>
+                    Add your first device/sensor by scanning the QR code or entering the code manually.
+                  </Paragraph>
+
+                  <View style={styles.emptyDeviceButtonContainer}>
+                    <Button
+                      mode="contained"
+                      onPress={() => {
+                        navigation.navigate('DeviceOnBoardingForm', { refetchDevices });
+                      }}
+                    >
+                      Scan QR Code
+                    </Button>
+                    <Button onPress={() => {}}>Enter Code</Button>
+                  </View>
+                </View>
+              </View>
+            )}
+          </Background>
+        </View>
+      </TouchableWithoutFeedback>
     </>
   );
 };
@@ -119,6 +154,8 @@ const styles = StyleSheet.create({
   devicesContainer: {
     width: '100%',
     padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   devicesList: {
     width: '100%',

@@ -21,7 +21,9 @@ type RootStackNavigationParamList = {
   };
   ForgotPassword: undefined;
   DashboardHome: undefined;
-  DeviceOnBoardingForm: undefined;
+  DeviceOnBoardingForm: {
+    refetchDevices: () => void;
+  };
 };
 
 type HomeProps = NativeStackScreenProps<RootStackNavigationParamList, 'Home'>;
