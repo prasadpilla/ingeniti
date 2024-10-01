@@ -5,6 +5,7 @@ import { PaperProvider } from 'react-native-paper';
 
 import Navigation from './Navigation';
 import { useAppTheme, ThemeProvider } from './providers/ThemeProvider';
+import QueryProvider from './providers/QueryProvider';
 
 const PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY as string;
 
@@ -52,7 +53,9 @@ export default function App() {
     <ClerkProvider tokenCache={tokenCache} publishableKey={PUBLISHABLE_KEY}>
       <ClerkLoaded>
         <ThemeProvider>
-          <AppContent />
+          <QueryProvider>
+            <AppContent />
+          </QueryProvider>
         </ThemeProvider>
       </ClerkLoaded>
     </ClerkProvider>
