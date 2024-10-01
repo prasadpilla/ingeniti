@@ -8,7 +8,7 @@ export const devices = pgTable(
     id: uuid('id').primaryKey().defaultRandom(),
     userId: text('user_id').notNull(),
     name: text('name').notNull(),
-    identifier: text('identifier').notNull(),
+    identifier: text('identifier'),
     serialNumber: text('serial_number').notNull(),
     usage: text('usage').notNull(),
     type: text('type').notNull(),
@@ -19,12 +19,12 @@ export const devices = pgTable(
     brownOutFrequencyChange: numeric('brown_out_frequency_change').notNull(),
     utility: text('utility').notNull(),
     country: text('country').notNull(),
-    meterServiceID: text('meter_service_id').notNull(),
+    meterServiceId: text('meter_service_id').notNull(),
     isConnectedToPrimaryDevice: boolean('is_connected_to_primary_device').notNull().default(true),
-    utilitySmartPanel: text('utility_smart_panel').notNull(),
-    countrySmartPanel: text('country_smart_panel').notNull(),
-    meterServiceIDSmartPanel: text('meter_service_id_smart_panel').notNull(),
-    maxLoad: numeric('max_load').notNull(),
+    utilitySmartPanel: text('utility_smart_panel'),
+    countrySmartPanel: text('country_smart_panel'),
+    meterServiceIdSmartPanel: text('meter_service_id_smart_panel'),
+    maxLoad: numeric('max_load'),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at')
       .notNull()
@@ -64,11 +64,11 @@ export async function insertDevice(deviceData: {
   brownOutFrequencyChange: number;
   utility: string;
   country: string;
-  meterServiceID: string;
+  meterServiceId: string;
   isConnectedToPrimaryDevice: boolean;
   utilitySmartPanel: string;
   countrySmartPanel: string;
-  meterServiceIDSmartPanel: string;
+  meterServiceIdSmartPanel: string;
   maxLoad: number;
 }): Promise<SelectedDevice> {
   const device = await db
@@ -87,11 +87,11 @@ export async function insertDevice(deviceData: {
       brownOutFrequencyChange: deviceData.brownOutFrequencyChange,
       utility: deviceData.utility,
       country: deviceData.country,
-      meterServiceID: deviceData.meterServiceID,
+      meterServiceId: deviceData.meterServiceId,
       isConnectedToPrimaryDevice: deviceData.isConnectedToPrimaryDevice,
       utilitySmartPanel: deviceData.utilitySmartPanel,
       countrySmartPanel: deviceData.countrySmartPanel,
-      meterServiceIDSmartPanel: deviceData.meterServiceIDSmartPanel,
+      meterServiceIdSmartPanel: deviceData.meterServiceIdSmartPanel,
       maxLoad: deviceData.maxLoad,
       createdAt: new Date(),
       updatedAt: new Date(),

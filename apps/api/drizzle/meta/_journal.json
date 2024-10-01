@@ -29,6 +29,13 @@
       "when": 1727764050933,
       "tag": "0003_same_talkback",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1727783168423,
+      "tag": "0004_tan_boomer",
+      "breakpoints": true
     }
   ]
 }
