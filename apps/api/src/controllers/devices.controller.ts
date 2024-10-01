@@ -1,6 +1,7 @@
 import { WithAuthProp } from '@clerk/clerk-sdk-node';
 import { Response } from 'express';
 import { GenericError, deviceOnBoardingFormSchema } from '@ingeniti/shared';
+import { insertDevice } from '../models/devices.model';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const express = require('express');
@@ -17,7 +18,7 @@ devicesController.post(
       ...validatedBody,
     });
 
-    res.json({ success: true, id: 'asdfasdhf' });
+    res.json({ success: true, id: device.id });
   }
 );
 
