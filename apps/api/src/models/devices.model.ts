@@ -1,5 +1,5 @@
 import { and, eq, InferSelectModel } from 'drizzle-orm';
-import { pgTable, text, timestamp, uuid, numeric, boolean, index } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, uuid, boolean, index, integer } from 'drizzle-orm/pg-core';
 import { db } from '../db/client';
 
 export const devices = pgTable(
@@ -13,10 +13,10 @@ export const devices = pgTable(
     usage: text('usage').notNull(),
     type: text('type').notNull(),
     location: text('location').notNull(),
-    averageEnergyCost: numeric('average_energy_cost').notNull(),
-    minOffTime: numeric('min_off_time').notNull(),
-    brownOutVoltageChange: numeric('brown_out_voltage_change').notNull(),
-    brownOutFrequencyChange: numeric('brown_out_frequency_change').notNull(),
+    averageEnergyCost: integer('average_energy_cost').notNull(),
+    minOffTime: integer('min_off_time').notNull(),
+    brownOutVoltageChange: integer('brown_out_voltage_change').notNull(),
+    brownOutFrequencyChange: integer('brown_out_frequency_change').notNull(),
     utility: text('utility').notNull(),
     country: text('country').notNull(),
     meterServiceId: text('meter_service_id').notNull(),
@@ -24,7 +24,7 @@ export const devices = pgTable(
     utilitySmartPanel: text('utility_smart_panel'),
     countrySmartPanel: text('country_smart_panel'),
     meterServiceIdSmartPanel: text('meter_service_id_smart_panel'),
-    maxLoad: numeric('max_load'),
+    maxLoad: integer('max_load'),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at')
       .notNull()

@@ -36,6 +36,13 @@
       "when": 1727783168423,
       "tag": "0004_tan_boomer",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1727788044446,
+      "tag": "0005_smooth_ares",
+      "breakpoints": true
     }
   ]
 }
