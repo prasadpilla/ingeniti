@@ -40,26 +40,67 @@ const verificationCodeFormSchema = z.object({
   code: z.string().length(6, 'OTP must be a 6-digit number!'),
 });
 
-const deviceOnBoardingFormSchema = z.object({
-  serialNumber: z.string().min(1, 'Device Serial is required'),
-  usage: z.string().min(1, 'Device Usage is required'),
-  type: z.string().min(1, 'Device Type is required'),
-  name: z.string().min(1, 'Device Name is required'),
-  location: z.string().min(1, 'Device Location is required'),
-  averageEnergyCost: z.number().positive('Average Energy Cost must be positive'),
-  minOffTime: z.number().positive('Minimum Off-Time is required'),
-  brownOutVoltageChange: z.number().positive('Brownout Voltage Change is required'),
-  brownOutFrequencyChange: z.number().positive('Brownout Frequency Change is required'),
-  utility: z.string().min(1, 'Utility is required'),
-  country: z.string().min(1, 'Country is required'),
-  meterServiceID: z.string().min(1, 'Meter Service ID is required'),
-  isConnectedToPrimaryDevice: z.boolean(),
-  utilitySmartPanel: z.string().min(1, 'Utility is required'),
-  countrySmartPanel: z.string().min(1, 'Country is required'),
-  meterServiceIDSmartPanel: z.string().min(1, 'Meter Service ID is required'),
-  maxLoad: z.number().positive('Max Load is required'),
-  identifier: z.string().min(1, 'Device Identifier is required'),
-});
+const deviceOnBoardingFormSchema = z
+  .object({
+    serialNumber: z.string().min(1, 'Device Serial is required'),
+    usage: z.string().min(1, 'Device Usage is required'),
+    type: z.string().min(1, 'Device Type is required'),
+    name: z.string().min(1, 'Device Name is required'),
+    location: z.string().min(1, 'Device Location is required'),
+    averageEnergyCost: z.number().positive('Average Energy Cost must be positive'),
+    minOffTime: z.number().positive('Minimum Off-Time is required'),
+    brownOutVoltageChange: z.number().positive('Brownout Voltage Change is required'),
+    brownOutFrequencyChange: z.number().positive('Brownout Frequency Change is required'),
+    utility: z.string().min(1, 'Utility is required'),
+    country: z.string().min(1, 'Country is required'),
+    meterServiceID: z.string().min(1, 'Meter Service ID is required'),
+    isConnectedToPrimaryDevice: z.boolean(),
+    utilitySmartPanel: z.string().optional(),
+    countrySmartPanel: z.string().optional(),
+    meterServiceIDSmartPanel: z.string().optional(),
+    maxLoad: z.number().optional(),
+    identifier: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.isConnectedToPrimaryDevice) {
+      if (!data.utilitySmartPanel) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Utility is required',
+          path: ['utilitySmartPanel'],
+        });
+      }
+      if (!data.countrySmartPanel) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Country is required',
+          path: ['countrySmartPanel'],
+        });
+      }
+      if (!data.meterServiceIDSmartPanel) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Meter Service ID is required',
+          path: ['meterServiceIDSmartPanel'],
+        });
+      }
+      if (!data.maxLoad) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Max Load is required',
+          path: ['maxLoad'],
+        });
+      }
+    } else {
+      if (!data.identifier) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Identifier is required',
+          path: ['identifier'],
+        });
+      }
+    }
+  });
 
 export {
   signUpFormSchema,

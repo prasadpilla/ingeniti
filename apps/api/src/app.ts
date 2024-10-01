@@ -4,7 +4,7 @@ import express, { Express } from 'express';
 import 'express-async-errors';
 import helmet from 'helmet';
 import { HttpStatusCode } from '@ingeniti/shared';
-import { WEB_APP_URL } from './config';
+import { MOBILE_APP_URL, WEB_APP_URL } from './config';
 import devicesController from './controllers/devices.controller';
 import tasksController from './controllers/tasks.controller';
 import errorHandler from './middlewares/errorHandler';
@@ -15,7 +15,7 @@ const app: Express = express();
 
 // Middlewares
 app.use(express.json());
-app.use(cors({ origin: WEB_APP_URL, credentials: true }));
+app.use(cors({ origin: [WEB_APP_URL, MOBILE_APP_URL], credentials: true }));
 app.use(helmet());
 app.use(rateLimiter);
 app.use(prodRequestLogger);

@@ -1,10 +1,12 @@
+import { useAuth } from '@clerk/clerk-expo';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DeviceOnBoardingForm, deviceOnBoardingFormSchema } from '@ingeniti/shared';
-import { useState } from 'react';
+import { Device, DeviceOnBoardingForm, deviceOnBoardingFormSchema } from '@ingeniti/shared';
+import { useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { HelperText, useTheme } from 'react-native-paper';
+import { useMutation } from '@tanstack/react-query';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
@@ -21,8 +23,11 @@ import {
   smartPanelConnectionStatusOptions,
   utilityOptions,
 } from '../utils/dropdownOptions';
+import { makeApiCall } from '../utils/api';
 
 const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navigation }) => {
+  const { getToken } = useAuth();
+
   const { t } = useTranslation();
   const theme = useTheme();
   const [isDeviceDetailsOpen, setIsDeviceDetailsOpen] = useState(true);
@@ -53,17 +58,41 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
       utilitySmartPanel: '',
       countrySmartPanel: '',
       meterServiceIDSmartPanel: '',
-
-      maxLoad: 10,
+      maxLoad: 0,
       identifier: '',
     },
-    mode: 'onBlur',
+    mode: 'onChange',
+  });
+
+  const deviceFormMutation = useMutation({
+    mutationFn: async (data: DeviceOnBoardingForm) => {
+      const token = await getToken();
+      const response = await makeApiCall(token, '/devices/', 'POST', data);
+
+      if (!response.ok) {
+        throw new Error('Failed to register device');
+      }
+
+      return response.json();
+    },
+    onSuccess: (data: Device) => {
+      console.log('Device registered successfully', data);
+    },
+    onError: (error) => {
+      console.error('Failed to register device', error);
+    },
   });
 
   const onSubmit: SubmitHandler<DeviceOnBoardingForm> = (data) => {
     console.log('button clicked');
     console.log(data);
+    // deviceFormMutation.mutate(data);
+    // navigation.goBack();
   };
+
+  useEffect(() => {
+    console.log('isConnectedToPrimaryDevice', isConnectedToPrimaryDevice);
+  }, [isConnectedToPrimaryDevice]);
 
   return (
     <Background>
@@ -281,103 +310,74 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
           </FormSection>
 
           <FormSection sectionTitle="Enable Benefits via Smart Panel" isOpen={isBenefitsSmartPanelOpen}>
-            <>
-              <Controller
-                control={deviceOnBoardingForm.control}
-                name="isConnectedToPrimaryDevice"
-                render={({ field: { value, onChange }, fieldState: { error } }) => (
-                  <View style={styles.dropdownContainer}>
-                    <Dropdown
-                      options={smartPanelConnectionStatusOptions}
-                      selectedValue={value}
-                      onSelect={(value) => {
-                        if (value === false) {
-                          setIsConnectedToPrimaryDevice(false);
-                          onChange(false);
-                        } else {
-                          setIsConnectedToPrimaryDevice(true);
-                          onChange(true);
-                        }
-                      }}
-                      placeholder="Device Connection Method"
-                      hasError={!!error?.message}
-                      errorText={error?.message}
-                    />
-                  </View>
-                )}
-              />
-              {isConnectedToPrimaryDevice ? (
-                <>
-                  <Controller
-                    control={deviceOnBoardingForm.control}
-                    name="countrySmartPanel"
-                    render={({ field: { value, onChange }, fieldState: { error } }) => (
-                      <View style={styles.dropdownContainer}>
-                        <Dropdown
-                          options={countryOptions}
-                          selectedValue={value}
-                          onSelect={onChange}
-                          placeholder="Select Country"
-                          hasError={!!error?.message}
-                          errorText={error?.message}
-                        />
-                      </View>
-                    )}
+            <Controller
+              control={deviceOnBoardingForm.control}
+              name="isConnectedToPrimaryDevice"
+              render={({ field: { value, onChange }, fieldState: { error } }) => (
+                <View style={styles.dropdownContainer}>
+                  <Dropdown
+                    options={smartPanelConnectionStatusOptions}
+                    selectedValue={value}
+                    onSelect={(newValue) => {
+                      onChange(newValue);
+                      setIsConnectedToPrimaryDevice(Boolean(newValue));
+                      if (newValue) {
+                        deviceOnBoardingForm.setValue('identifier', '');
+                      } else {
+                        deviceOnBoardingForm.setValue('utilitySmartPanel', '');
+                        deviceOnBoardingForm.setValue('countrySmartPanel', '');
+                        deviceOnBoardingForm.setValue('meterServiceIDSmartPanel', '');
+                        deviceOnBoardingForm.setValue('maxLoad', 0);
+                      }
+                    }}
+                    placeholder="Device Connection Method"
+                    hasError={!!error?.message}
+                    errorText={error?.message}
                   />
-                  <Controller
-                    control={deviceOnBoardingForm.control}
-                    name="utilitySmartPanel"
-                    render={({ field: { value, onChange }, fieldState: { error } }) => (
-                      <View style={styles.dropdownContainer}>
-                        <Dropdown
-                          options={utilityOptions}
-                          selectedValue={value}
-                          onSelect={onChange}
-                          placeholder="Select Utility"
-                          hasError={!!error?.message}
-                          errorText={error?.message}
-                        />
-                      </View>
-                    )}
-                  />
-                  <Controller
-                    control={deviceOnBoardingForm.control}
-                    name="meterServiceIDSmartPanel"
-                    render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
-                      <FormInput
-                        label="Meter / Service ID"
-                        placeholder="Enter Meter / Service ID"
-                        value={value}
-                        onChangeText={onChange}
-                        onBlur={onBlur}
-                        containerStyles={styles.input}
-                        errorText={error?.message}
-                      />
-                    )}
-                  />
-                  <Controller
-                    control={deviceOnBoardingForm.control}
-                    name="maxLoad"
-                    render={({ field: { value, onChange }, fieldState: { error } }) => (
-                      <FormInput
-                        label="Max Load (kW)"
-                        placeholder="Enter Max Load"
-                        value={value.toString()}
-                        onChangeText={(text) => onChange(Number(text))}
-                        containerStyles={styles.input}
-                        errorText={error?.message}
-                      />
-                    )}
-                  />
-                </>
-              ) : (
+                </View>
+              )}
+            />
+            {isConnectedToPrimaryDevice ? (
+              <>
                 <Controller
                   control={deviceOnBoardingForm.control}
-                  name="identifier"
+                  name="countrySmartPanel"
+                  render={({ field: { value, onChange }, fieldState: { error } }) => (
+                    <View style={styles.dropdownContainer}>
+                      <Dropdown
+                        options={countryOptions}
+                        selectedValue={value ?? ''}
+                        onSelect={onChange}
+                        placeholder="Select Country"
+                        hasError={!!error?.message}
+                        errorText={error?.message}
+                      />
+                    </View>
+                  )}
+                />
+                <Controller
+                  control={deviceOnBoardingForm.control}
+                  name="utilitySmartPanel"
+                  render={({ field: { value, onChange }, fieldState: { error } }) => (
+                    <View style={styles.dropdownContainer}>
+                      <Dropdown
+                        options={utilityOptions}
+                        selectedValue={value ?? ''}
+                        onSelect={onChange}
+                        placeholder="Select Utility"
+                        hasError={!!error?.message}
+                        errorText={error?.message}
+                      />
+                    </View>
+                  )}
+                />
+                <Controller
+                  control={deviceOnBoardingForm.control}
+                  name="meterServiceIDSmartPanel"
                   render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
                     <FormInput
-                      label="Primary Device Name"
-                      placeholder="Enter Primary Device Name If Any"
+                      label="Meter / Service ID"
+                      placeholder="Enter Meter / Service ID"
                       value={value}
                       onChangeText={onChange}
                       onBlur={onBlur}
@@ -386,8 +386,38 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
                     />
                   )}
                 />
-              )}
-            </>
+                <Controller
+                  control={deviceOnBoardingForm.control}
+                  name="maxLoad"
+                  render={({ field: { value, onChange }, fieldState: { error } }) => (
+                    <FormInput
+                      label="Max Load (kW)"
+                      placeholder="Enter Max Load"
+                      value={value?.toString() ?? '0'}
+                      onChangeText={(text) => onChange(Number(text))}
+                      containerStyles={styles.input}
+                      errorText={error?.message}
+                    />
+                  )}
+                />
+              </>
+            ) : (
+              <Controller
+                control={deviceOnBoardingForm.control}
+                name="identifier"
+                render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+                  <FormInput
+                    label="Primary Device Name"
+                    placeholder="Enter Primary Device Name If Any"
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    containerStyles={styles.input}
+                    errorText={error?.message}
+                  />
+                )}
+              />
+            )}
           </FormSection>
         </View>
       </ScrollView>
@@ -397,7 +427,7 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
           mode="contained"
           onPress={deviceOnBoardingForm.handleSubmit(onSubmit)}
           style={styles.sectionButton}
-          disabled={deviceOnBoardingForm.formState.isSubmitting}
+          disabled={deviceFormMutation.isLoading}
         >
           Complete Registration
         </Button>
