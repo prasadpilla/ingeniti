@@ -12,6 +12,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Device } from '@ingeniti/shared/dist/schemas/mobile/devices.schema';
 import { useAuth } from '@clerk/clerk-expo';
 import Header from '../components/Header';
+import DeviceItem from '../components/DeviceItem';
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -34,6 +35,8 @@ const Dashboard = () => {
     onError: (error) => {
       console.error(error);
     },
+    refetchInterval: 5000,
+    refetchOnWindowFocus: false,
   });
 
   return (
@@ -56,11 +59,13 @@ const Dashboard = () => {
             <Paragraph>Loading...</Paragraph>
           </View>
         ) : devices.length > 0 ? (
-          <View>
+          <View style={styles.devicesContainer}>
             <Header>All Devices</Header>
-            {devices.map((device) => (
-              <Paragraph key={device.id}>{device.name}</Paragraph>
-            ))}
+            <View style={styles.devicesList}>
+              {devices.map((device) => (
+                <DeviceItem key={device.id} device={device} />
+              ))}
+            </View>
           </View>
         ) : (
           <View>
@@ -110,6 +115,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  devicesContainer: {
+    width: '100%',
+    padding: 20,
+  },
+  devicesList: {
+    width: '100%',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
   },
   emptyDeviceContainer: {
     justifyContent: 'center',
