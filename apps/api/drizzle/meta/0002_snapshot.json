@@ -1,0 +1,160 @@
+{
+  "id": "22503030-71db-48f7-8988-2c329eb148b0",
+  "prevId": "f8c3e3b4-c9dc-444a-81e5-ebf1f42b8d8e",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.devices": {
+      "name": "devices",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "identifier": {
+          "name": "identifier",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "serial_number": {
+          "name": "serial_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "usage": {
+          "name": "usage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "location": {
+          "name": "location",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "average_energy_cost": {
+          "name": "average_energy_cost",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "min_off_time": {
+          "name": "min_off_time",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "brown_out_voltage_change": {
+          "name": "brown_out_voltage_change",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "brown_out_frequency_change": {
+          "name": "brown_out_frequency_change",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "utility": {
+          "name": "utility",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "country": {
+          "name": "country",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "meter_service_id": {
+          "name": "meter_service_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_connected_to_primary_device": {
+          "name": "is_connected_to_primary_device",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "utility_smart_panel": {
+          "name": "utility_smart_panel",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "country_smart_panel": {
+          "name": "country_smart_panel",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "meter_service_id_smart_panel": {
+          "name": "meter_service_id_smart_panel",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "max_load": {
+          "name": "max_load",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

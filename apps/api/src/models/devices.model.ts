@@ -7,7 +7,6 @@ export const devices = pgTable('devices', {
   id: uuid('id').primaryKey().defaultRandom(),
   userId: text('user_id').notNull(),
   name: text('name').notNull(),
-  model: text('model').notNull(),
   identifier: text('identifier').notNull(),
   serialNumber: text('serial_number').notNull(),
   usage: text('usage').notNull(),
@@ -72,5 +71,5 @@ export async function insertDevice({ userId, ...data }: { userId: string } & Dev
     })
     .returning();
 
-  return device;
+  return device[0];
 }
