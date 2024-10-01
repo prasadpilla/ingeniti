@@ -5,6 +5,7 @@ import { useTheme } from 'react-native-paper';
 
 import Button from './Button';
 import Paragraph from './Paragraph';
+import FormInput from './FormInput';
 
 interface DropdownOption {
   label: string;
@@ -18,7 +19,6 @@ interface DropdownProps {
   onSelect: (value: string | boolean) => void;
   placeholder?: string;
   modalStyles?: ViewStyle;
-  pickerButtonStyles?: ViewStyle;
   modalContainerStyles?: ViewStyle;
   modalTitleStyles?: TextStyle;
   itemStyles?: ViewStyle;
@@ -32,7 +32,6 @@ const Dropdown: React.FC<DropdownProps> = ({
   onSelect,
   placeholder = 'Select an option',
   modalStyles,
-  pickerButtonStyles,
   modalContainerStyles,
   modalTitleStyles,
   itemStyles,
@@ -58,30 +57,16 @@ const Dropdown: React.FC<DropdownProps> = ({
 
   return (
     <View>
-      <TouchableOpacity
-        style={[
-          styles.pickerButtonContainer,
-          {
-            backgroundColor: theme.colors.surface,
-            borderColor: theme.colors.secondary,
-          },
-          pickerButtonStyles,
-          hasError && { borderColor: theme.colors.error, borderWidth: 2 },
-        ]}
-        onPress={() => setModalVisible(true)}
-      >
-        <View style={styles.pickerButton}>
-          <Paragraph
-            style={[
-              styles.pickerButtonText,
-              { color: theme.colors.onSurface },
-              hasError && { color: theme.colors.error },
-            ]}
-          >
-            {selectedLabel}
-          </Paragraph>
-          <MaterialIcons name="arrow-drop-down" size={20} color={theme.colors.secondary} />
-        </View>
+      <TouchableOpacity style={[styles.pickerButtonContainer]} onPress={() => setModalVisible(true)}>
+        <FormInput
+          value={selectedLabel}
+          onPressIn={() => setModalVisible(true)}
+          label={placeholder}
+          mode="outlined"
+          editable={false}
+          hasError={hasError}
+        />
+        <MaterialIcons name="arrow-drop-down" size={20} color={theme.colors.secondary} style={styles.icon} />
       </TouchableOpacity>
       {errorText && <Text style={[styles.error, { color: theme.colors.onErrorContainer }]}>{errorText}</Text>}
 
@@ -100,16 +85,12 @@ const Dropdown: React.FC<DropdownProps> = ({
 
 const styles = StyleSheet.create({
   pickerButtonContainer: {
-    borderWidth: 1,
-    borderRadius: 5,
-    height: 51,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 4.5,
-    paddingHorizontal: 8,
+    position: 'relative',
   },
   pickerButton: {
     width: '100%',
+    backgroundColor: 'red',
+    paddingVertical: 10,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -118,6 +99,12 @@ const styles = StyleSheet.create({
   pickerButtonText: {
     fontSize: 16,
     textAlign: 'left',
+  },
+  icon: {
+    position: 'absolute',
+    right: 10,
+    top: '50%',
+    transform: [{ translateY: -5 }],
   },
   modalContainer: {
     flex: 1,
