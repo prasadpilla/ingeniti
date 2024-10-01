@@ -35,11 +35,7 @@ const customProps = (req: Request, res: Response): PinoCustomProps => ({
   error: res.locals.err,
 });
 
-const customLogLevel = (
-  _req: IncomingMessage,
-  res: ServerResponse<IncomingMessage>,
-  err?: Error
-): LevelWithSilent => {
+const customLogLevel = (_req: IncomingMessage, res: ServerResponse<IncomingMessage>, err?: Error): LevelWithSilent => {
   if (err || res.statusCode >= HttpStatusCode.INTERNAL_SERVER_ERROR_500) return LogLevel.Error;
   if (res.statusCode >= HttpStatusCode.BAD_REQUEST_400) return LogLevel.Warn;
   if (res.statusCode >= HttpStatusCode.MULTIPLE_CHOICES_300) return LogLevel.Silent;
