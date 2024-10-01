@@ -1,19 +1,40 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { Appbar, Paragraph, useTheme } from 'react-native-paper';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
 import AddDevicePopover from '../components/DeviceRegistration/AddDevicePopover';
+import { makeApiCall } from '../utils/api';
+import { useQuery } from '@tanstack/react-query';
+import { Device } from '@ingeniti/shared/dist/schemas/mobile/devices.schema';
+import { useAuth } from '@clerk/clerk-expo';
+import Header from '../components/Header';
 
 const Dashboard = () => {
   const theme = useTheme();
   const navigation = useNavigation();
+  const { getToken } = useAuth();
 
   const [isDevicePopoverVisible, setIsDevicePopoverVisible] = useState(false);
-  const [devices, setDevices] = useState<[]>([]);
+  const [devices, setDevices] = useState<Device[]>([]);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['devices'],
+    queryFn: async () => {
+      const token = await getToken();
+      const response = await makeApiCall(token, '/devices', 'GET');
+      return response.json();
+    },
+    onSuccess: (data: Device[]) => {
+      setDevices(data);
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
 
   return (
     <>
@@ -29,11 +50,16 @@ const Dashboard = () => {
         />
       )}
       <Background>
-        {devices.length > 0 ? (
+        {isLoading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator animating={true} color={theme.colors.secondary} />
+            <Paragraph>Loading...</Paragraph>
+          </View>
+        ) : devices.length > 0 ? (
           <View>
-            <Text>Devices</Text>
+            <Header>All Devices</Header>
             {devices.map((device) => (
-              <Text>{device.name}</Text>
+              <Paragraph key={device.id}>{device.name}</Paragraph>
             ))}
           </View>
         ) : (
@@ -79,6 +105,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   emptyDeviceContainer: {
     justifyContent: 'center',

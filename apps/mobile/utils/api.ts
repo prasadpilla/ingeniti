@@ -4,7 +4,9 @@ export const makeApiCall = async (token: string | null, path: string, method: st
   if (token) {
     headers.append('Authorization', 'Bearer ' + token);
   }
-  return await fetch((process.env.EXPO_API_BASE_URL as string) + path, {
+
+  const url = (process.env.EXPO_PUBLIC_API_BASE_URL as string) + path;
+  return await fetch(url, {
     method,
     headers,
     body: JSON.stringify(body),

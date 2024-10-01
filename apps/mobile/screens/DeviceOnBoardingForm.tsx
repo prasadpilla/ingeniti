@@ -4,7 +4,7 @@ import { Device, DeviceOnBoardingForm, deviceOnBoardingFormSchema } from '@ingen
 import { useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { HelperText, useTheme } from 'react-native-paper';
 import { useMutation } from '@tanstack/react-query';
 
@@ -67,7 +67,7 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
   const deviceFormMutation = useMutation({
     mutationFn: async (data: DeviceOnBoardingForm) => {
       const token = await getToken();
-      const response = await makeApiCall(token, '/devices/', 'POST', data);
+      const response = await makeApiCall(token, '/devices', 'POST', data);
 
       if (!response.ok) {
         throw new Error('Failed to register device');
@@ -77,6 +77,7 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
     },
     onSuccess: (data: Device) => {
       console.log('Device registered successfully', data);
+      navigation.goBack();
     },
     onError: (error) => {
       console.error('Failed to register device', error);
@@ -84,10 +85,7 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
   });
 
   const onSubmit: SubmitHandler<DeviceOnBoardingForm> = (data) => {
-    console.log('button clicked');
-    console.log(data);
     deviceFormMutation.mutate(data);
-    navigation.goBack();
   };
 
   useEffect(() => {
@@ -427,9 +425,13 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
           mode="contained"
           onPress={deviceOnBoardingForm.handleSubmit(onSubmit)}
           style={styles.sectionButton}
-          disabled={deviceFormMutation.isLoading}
+          disabled={deviceFormMutation.isLoading || !deviceOnBoardingForm.formState.isValid}
         >
-          Complete Registration
+          {deviceFormMutation.isLoading ? (
+            <ActivityIndicator animating={true} color={theme.colors.secondary} />
+          ) : (
+            'Complete Registration'
+          )}
         </Button>
         <TouchableOpacity
           style={styles.goBackButton}
