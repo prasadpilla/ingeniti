@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { DeviceOnBoardingForm, deviceOnBoardingFormSchema } from '@ingeniti/shared';
 import { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +13,6 @@ import Dropdown from '../components/Dropdown';
 import FormInput from '../components/FormInput';
 import Header from '../components/Header';
 import Paragraph from '../components/Paragraph';
-import { DeviceOnBoardingForm, deviceOnBoardingFormSchema } from '../types/forms.schemas';
 import { DeviceOnBoardingFormProps } from '../types/navigation.types';
 import {
   countryOptions,

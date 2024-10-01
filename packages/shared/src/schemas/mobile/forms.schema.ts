@@ -40,9 +40,37 @@ const verificationCodeFormSchema = z.object({
   code: z.string().length(6, 'OTP must be a 6-digit number!'),
 });
 
-export { signUpFormSchema, loginFormEmailSchema, loginFormPhoneSchema, verificationCodeFormSchema };
+const deviceOnBoardingFormSchema = z.object({
+  serialNumber: z.string().min(1, 'Device Serial is required'),
+  usage: z.string().min(1, 'Device Usage is required'),
+  type: z.string().min(1, 'Device Type is required'),
+  name: z.string().min(1, 'Device Name is required'),
+  location: z.string().min(1, 'Device Location is required'),
+  averageEnergyCost: z.number().positive('Average Energy Cost must be positive'),
+  minOffTime: z.number().positive('Minimum Off-Time is required'),
+  brownOutVoltageChange: z.number().positive('Brownout Voltage Change is required'),
+  brownOutFrequencyChange: z.number().positive('Brownout Frequency Change is required'),
+  utility: z.string().min(1, 'Utility is required'),
+  country: z.string().min(1, 'Country is required'),
+  meterServiceID: z.string().min(1, 'Meter Service ID is required'),
+  isConnectedToPrimaryDevice: z.boolean(),
+  utilitySmartPanel: z.string().min(1, 'Utility is required'),
+  countrySmartPanel: z.string().min(1, 'Country is required'),
+  meterServiceIDSmartPanel: z.string().min(1, 'Meter Service ID is required'),
+  maxLoad: z.number().positive('Max Load is required'),
+  identifier: z.string().min(1, 'Device Identifier is required'),
+});
+
+export {
+  signUpFormSchema,
+  loginFormEmailSchema,
+  loginFormPhoneSchema,
+  verificationCodeFormSchema,
+  deviceOnBoardingFormSchema,
+};
 
 export type SignUpForm = z.infer<typeof signUpFormSchema>;
 export type LoginFormEmail = z.infer<typeof loginFormEmailSchema>;
 export type LoginFormPhone = z.infer<typeof loginFormPhoneSchema>;
 export type VerificationCodeForm = z.infer<typeof verificationCodeFormSchema>;
+export type DeviceOnBoardingForm = z.infer<typeof deviceOnBoardingFormSchema>;

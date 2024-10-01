@@ -1,6 +1,7 @@
 import { and, eq } from 'drizzle-orm';
 import { pgTable, text, timestamp, uuid, numeric, boolean } from 'drizzle-orm/pg-core';
 import { db } from '../db/client';
+import { DeviceOnBoardingForm } from '@ingeniti/shared';
 
 export const devices = pgTable('devices', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -30,6 +31,8 @@ export const devices = pgTable('devices', {
     .$onUpdate(() => new Date()),
 });
 
+export type Device = typeof devices.$inferSelect;
+
 export function getDevice(userId: string, deviceId: string) {
   return db
     .select()
@@ -41,4 +44,33 @@ export function getDevices(userId: string) {
   return db.select().from(devices).where(eq(devices.userId, userId));
 }
 
-export type Device = typeof devices.$inferSelect;
+export async function insertDevice({ userId, ...data }: { userId: string } & DeviceOnBoardingForm): Promise<Device> {
+  const device = await db
+    .insert(devices)
+    .values({
+      userId: userId,
+      name: data.name,
+      identifier: data.identifier,
+      serialNumber: data.serialNumber,
+      usage: data.usage,
+      type: data.type,
+      location: data.location,
+      averageEnergyCost: data.averageEnergyCost,
+      minOffTime: data.minOffTime,
+      brownOutVoltageChange: data.brownOutVoltageChange,
+      brownOutFrequencyChange: data.brownOutFrequencyChange,
+      utility: data.utility,
+      country: data.country,
+      meterServiceID: data.meterServiceID,
+      isConnectedToPrimaryDevice: data.isConnectedToPrimaryDevice,
+      utilitySmartPanel: data.utilitySmartPanel,
+      countrySmartPanel: data.countrySmartPanel,
+      meterServiceIDSmartPanel: data.meterServiceIDSmartPanel,
+      maxLoad: data.maxLoad,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .returning();
+
+  return device;
+}
