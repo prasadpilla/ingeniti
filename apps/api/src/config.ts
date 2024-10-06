@@ -5,7 +5,7 @@ dotenv.config();
 export const APP_PORT = Number(process.env.PORT) || 8080;
 export const TASK_WORKER_PORT = Number(process.env.TASK_WORKER_PORT) || 8082;
 export const WEB_APP_URL = process.env.WEB_APP_URL || 'http://localhost:5173';
-export const MOBILE_APP_URL = process.env.MOBILE_APP_URL || 'http://localhost:8081';
+export const MOBILE_APP_URL = process.env.MOBILE_APP_URL || 'http://localhost:8082';
 export const DB_HOST = process.env.DB_HOST;
 export const DB_PORT = Number(process.env.DB_PORT) || 5436;
 export const DB_USER = process.env.DB_USER;

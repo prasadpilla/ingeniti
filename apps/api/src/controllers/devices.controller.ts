@@ -1,7 +1,7 @@
 import { WithAuthProp } from '@clerk/clerk-sdk-node';
-import { Request, Response } from 'express';
 import { Device, GenericError, HttpStatusCode, deviceOnBoardingFormSchema } from '@ingeniti/shared';
-import { getDevices, insertDevice } from '../models/devices.model';
+import { Request, Response } from 'express';
+import { getDevices, insertDevice, updateDevice } from '../models/devices.model';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const express = require('express');
@@ -36,6 +36,8 @@ devicesController.post(
       countrySmartPanel: validatedBody.countrySmartPanel,
       meterServiceIdSmartPanel: validatedBody.meterServiceIdSmartPanel,
       maxLoad: validatedBody.maxLoad,
+      isSwitchOn: true,
+      isOnline: true,
     });
 
     res.status(HttpStatusCode.CREATED_201).json({ success: true, id: device.id });
@@ -46,6 +48,15 @@ devicesController.get('/', async (req: WithAuthProp<Request>, res: Response<Devi
   const userId = req.auth.userId as string;
   const devices = await getDevices(userId);
   res.status(HttpStatusCode.OK_200).json(devices);
+});
+
+devicesController.put('/:id', async (req: WithAuthProp<Request>, res: Response<Device | GenericError>) => {
+  const userId = req.auth.userId as string;
+  const { id } = req.params;
+  const { isSwitchOn } = req.body;
+
+  const device = await updateDevice(userId, id, { isSwitchOn });
+  res.status(HttpStatusCode.OK_200).json(device);
 });
 
 export default devicesController;

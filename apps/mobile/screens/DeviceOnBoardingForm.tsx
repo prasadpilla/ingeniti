@@ -1,21 +1,21 @@
 import { useAuth } from '@clerk/clerk-expo';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Device, DeviceOnBoardingForm, deviceOnBoardingFormSchema } from '@ingeniti/shared';
+import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { HelperText, useTheme } from 'react-native-paper';
-import { useMutation } from '@tanstack/react-query';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
 import FormSection from '../components/DeviceRegistration/FormSection';
 import Dropdown from '../components/Dropdown';
 import FormInput from '../components/FormInput';
-import Header from '../components/Header';
 import Paragraph from '../components/Paragraph';
 import { DeviceOnBoardingFormProps } from '../types/navigation.types';
+import { makeApiCall } from '../utils/api';
 import {
   countryOptions,
   deviceTypeOptions,
@@ -23,7 +23,6 @@ import {
   smartPanelConnectionStatusOptions,
   utilityOptions,
 } from '../utils/dropdownOptions';
-import { makeApiCall } from '../utils/api';
 
 const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navigation, route }) => {
   const { getToken } = useAuth();
@@ -95,8 +94,10 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
 
   return (
     <Background>
-      <Header>Add New Device</Header>
-
+      <Paragraph style={{ fontSize: 20, fontWeight: 'bold', color: 'green' }}>Device Scan is Successful</Paragraph>
+      <Paragraph style={{ fontSize: 14, fontWeight: '400', marginTop: 10 }}>
+        Please fill in the details below to complete the registration
+      </Paragraph>
       <ScrollView style={styles.scrollContainer}>
         <View style={styles.formSections}>
           <FormSection sectionTitle="Device Details" isOpen={isDeviceDetailsOpen}>
@@ -105,7 +106,7 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
               name="serialNumber"
               render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
                 <FormInput
-                  label="PR250*********"
+                  label="Serial Number"
                   placeholder="PR250*********"
                   disabled
                   value={value}
@@ -203,7 +204,7 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
             </View>
           </FormSection>
 
-          <FormSection sectionTitle="Device Protection" isOpen={isDeviceProtectionOpen}>
+          <FormSection sectionTitle="Enable Protection" isOpen={isDeviceProtectionOpen}>
             <Controller
               control={deviceOnBoardingForm.control}
               name="minOffTime"

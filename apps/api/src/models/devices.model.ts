@@ -1,5 +1,5 @@
 import { and, eq, InferSelectModel } from 'drizzle-orm';
-import { pgTable, text, timestamp, uuid, boolean, index, integer } from 'drizzle-orm/pg-core';
+import { boolean, index, integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 import { db } from '../db/client';
 
 export const devices = pgTable(
@@ -25,6 +25,8 @@ export const devices = pgTable(
     countrySmartPanel: text('country_smart_panel'),
     meterServiceIdSmartPanel: text('meter_service_id_smart_panel'),
     maxLoad: integer('max_load'),
+    isSwitchOn: boolean('is_switch_on').notNull().default(false),
+    isOnline: boolean('is_online').notNull().default(false),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at')
       .notNull()
@@ -52,6 +54,20 @@ export async function getDevice(userId: string, deviceId: string): Promise<Selec
   return device[0];
 }
 
+export async function updateDevice(
+  userId: string,
+  deviceId: string,
+  deviceData: { isSwitchOn: boolean }
+): Promise<SelectedDevice> {
+  const [device] = await db
+    .update(devices)
+    .set({ isSwitchOn: deviceData.isSwitchOn, updatedAt: new Date() })
+    .where(and(eq(devices.id, deviceId), eq(devices.userId, userId)))
+    .returning();
+
+  return device;
+}
+
 export async function insertDevice(deviceData: {
   userId: string;
   name: string;
@@ -72,6 +88,8 @@ export async function insertDevice(deviceData: {
   countrySmartPanel: string | undefined;
   meterServiceIdSmartPanel: string | undefined;
   maxLoad: number | undefined;
+  isSwitchOn: boolean;
+  isOnline: boolean;
 }): Promise<SelectedDevice> {
   const device = await db
     .insert(devices)
@@ -95,6 +113,8 @@ export async function insertDevice(deviceData: {
       countrySmartPanel: deviceData.countrySmartPanel,
       meterServiceIdSmartPanel: deviceData.meterServiceIdSmartPanel,
       maxLoad: deviceData.maxLoad,
+      isSwitchOn: deviceData.isSwitchOn,
+      isOnline: deviceData.isOnline,
       createdAt: new Date(),
       updatedAt: new Date(),
     })

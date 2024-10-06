@@ -19,7 +19,8 @@ export const deviceSchema = z.object({
   countrySmartPanel: z.string().nullable(),
   meterServiceIdSmartPanel: z.string().nullable(),
   maxLoad: z.number().nullable(),
-  identifier: z.string().nullable(),
+  isSwitchOn: z.boolean().nullable(),
+  isOnline: z.boolean().nullable(),
 });
 
 export type Device = z.infer<typeof deviceSchema>;
