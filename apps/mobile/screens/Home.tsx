@@ -92,7 +92,9 @@ const HomeScreen = ({ navigation }: HomeProps) => {
               <Title>All Devices</Title>
               <View style={styles.devicesContainer}>
                 {devices.map((device) => (
-                  <DeviceItem key={device.id} device={device} />
+                  <TouchableOpacity key={device.id} onPress={() => navigation.navigate('DeviceDetails', { device })}>
+                    <DeviceItem device={device} />
+                  </TouchableOpacity>
                 ))}
               </View>
             </View>
@@ -114,10 +116,7 @@ const HomeScreen = ({ navigation }: HomeProps) => {
                   <Button
                     mode="contained"
                     onPress={() => {
-                      navigation.navigate({
-                        name: 'DeviceOnBoardingForm',
-                        params: { refetchDevices },
-                      });
+                      navigation.navigate('DeviceOnBoardingForm', { refetchDevices });
                     }}
                   >
                     Scan QR Code

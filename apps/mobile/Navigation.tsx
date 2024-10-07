@@ -5,6 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation';
 
+import DeviceDetails from './screens/DeviceDetails';
 import DeviceOnBoardingFormScreen from './screens/DeviceOnBoardingForm';
 import ForgotPasswordScreen from './screens/ForgotPassword';
 import HomeScreen from './screens/Home';
@@ -63,8 +64,9 @@ const Navigation = ({ theme }: { theme: Theme }) => {
       >
         {isSignedIn ? (
           <>
-            <Stack.Screen name="Home" component={TabNavigation} />
+            <Stack.Screen name="MainTabs" component={TabNavigation} />
             <Stack.Screen name="DeviceOnBoardingForm" component={DeviceOnBoardingFormScreen} />
+            <Stack.Screen name="DeviceDetails" component={DeviceDetails} />
           </>
         ) : (
           <>

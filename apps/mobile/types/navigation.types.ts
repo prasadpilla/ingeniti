@@ -1,3 +1,4 @@
+import { Device } from '@ingeniti/shared/dist/schemas/mobile/devices.schema';
 import { MaterialBottomTabScreenProps } from 'react-native-paper';
 import { NativeStackScreenProps } from 'react-native-screens/lib/typescript/native-stack/types';
 
@@ -20,9 +21,13 @@ type RootStackNavigationParamList = {
     phoneNumber: string;
   };
   ForgotPassword: undefined;
+  MainTabs: undefined;
   Home: undefined;
   DeviceOnBoardingForm: {
     refetchDevices: () => void;
+  };
+  DeviceDetails: {
+    device: Device;
   };
 };
 
@@ -32,8 +37,10 @@ type VerifyLoginPhoneProps = NativeStackScreenProps<RootStackNavigationParamList
 type SignupProps = NativeStackScreenProps<RootStackNavigationParamList, 'SignUp'>;
 type VerifySignUpEmailProps = NativeStackScreenProps<RootStackNavigationParamList, 'VerifySignUpEmail'>;
 type VerifySignUpPhoneProps = NativeStackScreenProps<RootStackNavigationParamList, 'VerifySignUpPhone'>;
+type MainTabsProps = NativeStackScreenProps<RootStackNavigationParamList, 'MainTabs'>;
 type HomeProps = NativeStackScreenProps<RootStackNavigationParamList, 'Home'>;
 type DeviceOnBoardingFormProps = NativeStackScreenProps<RootStackNavigationParamList, 'DeviceOnBoardingForm'>;
+type DeviceDetailsProps = NativeStackScreenProps<RootStackNavigationParamList, 'DeviceDetails'>;
 
 // bottom tab types
 type BottomTabNavigationParamList = {
@@ -48,10 +55,12 @@ type ProfileProps = MaterialBottomTabScreenProps<BottomTabNavigationParamList, '
 
 export type {
   BottomTabNavigationParamList,
+  DeviceDetailsProps,
   DeviceOnBoardingFormProps,
   ForgotPasswordProps,
   HomeProps,
   LoginProps,
+  MainTabsProps,
   NotificationsProps,
   ProfileProps,
   RootStackNavigationParamList,
