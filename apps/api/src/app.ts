@@ -1,10 +1,10 @@
 import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
+import { HttpStatusCode } from '@ingeniti/shared';
 import cors from 'cors';
 import express, { Express } from 'express';
 import 'express-async-errors';
 import helmet from 'helmet';
-import { HttpStatusCode } from '@ingeniti/shared';
-import { MOBILE_APP_URL, WEB_APP_URL } from './config';
+import { WEB_APP_URL } from './config';
 import devicesController from './controllers/devices.controller';
 import tasksController from './controllers/tasks.controller';
 import errorHandler from './middlewares/errorHandler';
@@ -13,9 +13,19 @@ import prodRequestLogger from './middlewares/requestLogger';
 
 const app: Express = express();
 
-// Middlewares
+const corsOptions = {
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    if (!origin || origin === WEB_APP_URL) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+};
+
 app.use(express.json());
-app.use(cors({ origin: [WEB_APP_URL, MOBILE_APP_URL], credentials: true }));
+app.use(cors(corsOptions));
 app.use(helmet());
 app.use(rateLimiter);
 app.use(prodRequestLogger);
