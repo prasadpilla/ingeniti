@@ -3,7 +3,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Device } from '@ingeniti/shared';
 import { useMutation } from '@tanstack/react-query';
 import React, { useState } from 'react';
-import { StyleSheet, Switch, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Switch, TouchableOpacity, View, GestureResponderEvent } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { makeApiCall } from '../utils/api';
 import Paragraph from './Paragraph';
@@ -30,7 +30,8 @@ const DeviceItem = ({ device }: DeviceItemProps) => {
     },
   });
 
-  const handleSwitchChange = async () => {
+  const handleSwitchChange = async (event: GestureResponderEvent) => {
+    event.stopPropagation();
     await updateDeviceMutation.mutateAsync({
       id: device.id,
       isSwitchOn: !isSwitchOn,
@@ -39,7 +40,7 @@ const DeviceItem = ({ device }: DeviceItemProps) => {
   };
 
   return (
-    <TouchableOpacity style={[styles.container, { borderColor: theme.colors.outlineVariant }]}>
+    <View style={[styles.container, { borderColor: theme.colors.outlineVariant }]}>
       <View style={styles.leftContent}>
         <MaterialCommunityIcons name="air-conditioner" size={24} color={theme.colors.primary} style={styles.icon} />
         <View>
@@ -50,8 +51,10 @@ const DeviceItem = ({ device }: DeviceItemProps) => {
           </View>
         </View>
       </View>
-      <Switch value={isSwitchOn} onValueChange={handleSwitchChange} />
-    </TouchableOpacity>
+      <TouchableOpacity onPress={handleSwitchChange}>
+        <Switch value={isSwitchOn} />
+      </TouchableOpacity>
+    </View>
   );
 };
 

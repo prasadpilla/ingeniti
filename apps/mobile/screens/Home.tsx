@@ -42,6 +42,13 @@ const HomeScreen = ({ navigation }: HomeProps) => {
     }
   };
 
+  const handleDevicePress = (device: Device) => {
+    navigation.navigate({
+      name: 'DeviceDetails',
+      params: { device },
+    });
+  };
+
   useEffect(() => {
     refetchDevices();
   }, []);
@@ -80,63 +87,61 @@ const HomeScreen = ({ navigation }: HomeProps) => {
           containerStyles={styles.popoverContainer}
         />
       )}
-      <TouchableWithoutFeedback onPress={handleBackgroundPress}>
-        <Background>
-          {isLoading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator animating={true} color={theme.colors.secondary} />
-              <Paragraph>Loading...</Paragraph>
+      <Background>
+        {isLoading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator animating={true} color={theme.colors.secondary} />
+            <Paragraph>Loading...</Paragraph>
+          </View>
+        ) : devices.length > 0 ? (
+          <View style={styles.contentContainer}>
+            <Title>All Devices</Title>
+            <View style={styles.devicesContainer}>
+              {devices.map((device) => (
+                <TouchableOpacity key={device.id} onPress={() => handleDevicePress(device)}>
+                  <DeviceItem device={device} />
+                </TouchableOpacity>
+              ))}
             </View>
-          ) : devices.length > 0 ? (
-            <View style={styles.contentContainer}>
-              <Title>All Devices</Title>
-              <View style={styles.devicesContainer}>
-                {devices.map((device) => (
-                  <TouchableOpacity key={device.id} onPress={() => navigation.navigate('DeviceDetails', { device })}>
-                    <DeviceItem device={device} />
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-          ) : (
-            <View>
-              <View style={styles.emptyDeviceContainer}>
-                <MaterialCommunityIcons
-                  name="devices"
-                  size={24}
-                  color={theme.colors.secondary}
-                  style={[styles.emptyDeviceIcon, { backgroundColor: theme.colors.secondaryContainer }]}
-                />
-                <Paragraph style={styles.emptyDeviceHeading}>Lets get started</Paragraph>
-                <Paragraph style={styles.emptyDeviceSubheading}>
-                  Add your first device/sensor by scanning the QR code or entering the code manually.
-                </Paragraph>
+          </View>
+        ) : (
+          <View>
+            <View style={styles.emptyDeviceContainer}>
+              <MaterialCommunityIcons
+                name="devices"
+                size={24}
+                color={theme.colors.secondary}
+                style={[styles.emptyDeviceIcon, { backgroundColor: theme.colors.secondaryContainer }]}
+              />
+              <Paragraph style={styles.emptyDeviceHeading}>Lets get started</Paragraph>
+              <Paragraph style={styles.emptyDeviceSubheading}>
+                Add your first device/sensor by scanning the QR code or entering the code manually.
+              </Paragraph>
 
-                <View style={styles.emptyDeviceButtonContainer}>
-                  <Button
-                    mode="contained"
-                    onPress={() => {
-                      navigation.navigate('DeviceOnBoardingForm', { refetchDevices });
-                    }}
-                  >
-                    Scan QR Code
-                  </Button>
-                  <Button
-                    onPress={() => {
-                      navigation.navigate({
-                        name: 'DeviceOnBoardingForm',
-                        params: { refetchDevices },
-                      });
-                    }}
-                  >
-                    Enter Code
-                  </Button>
-                </View>
+              <View style={styles.emptyDeviceButtonContainer}>
+                <Button
+                  mode="contained"
+                  onPress={() => {
+                    navigation.navigate('DeviceOnBoardingForm', { refetchDevices });
+                  }}
+                >
+                  Scan QR Code
+                </Button>
+                <Button
+                  onPress={() => {
+                    navigation.navigate({
+                      name: 'DeviceOnBoardingForm',
+                      params: { refetchDevices },
+                    });
+                  }}
+                >
+                  Enter Code
+                </Button>
               </View>
             </View>
-          )}
-        </Background>
-      </TouchableWithoutFeedback>
+          </View>
+        )}
+      </Background>
     </>
   );
 };

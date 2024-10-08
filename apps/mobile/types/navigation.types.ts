@@ -22,7 +22,6 @@ type RootStackNavigationParamList = {
   };
   ForgotPassword: undefined;
   MainTabs: undefined;
-  Home: undefined;
   DeviceOnBoardingForm: {
     refetchDevices: () => void;
   };
@@ -37,8 +36,8 @@ type VerifyLoginPhoneProps = NativeStackScreenProps<RootStackNavigationParamList
 type SignupProps = NativeStackScreenProps<RootStackNavigationParamList, 'SignUp'>;
 type VerifySignUpEmailProps = NativeStackScreenProps<RootStackNavigationParamList, 'VerifySignUpEmail'>;
 type VerifySignUpPhoneProps = NativeStackScreenProps<RootStackNavigationParamList, 'VerifySignUpPhone'>;
+type ForgotPasswordProps = NativeStackScreenProps<RootStackNavigationParamList, 'ForgotPassword'>;
 type MainTabsProps = NativeStackScreenProps<RootStackNavigationParamList, 'MainTabs'>;
-type HomeProps = NativeStackScreenProps<RootStackNavigationParamList, 'Home'>;
 type DeviceOnBoardingFormProps = NativeStackScreenProps<RootStackNavigationParamList, 'DeviceOnBoardingForm'>;
 type DeviceDetailsProps = NativeStackScreenProps<RootStackNavigationParamList, 'DeviceDetails'>;
 
@@ -49,7 +48,7 @@ type BottomTabNavigationParamList = {
   Profile: undefined;
 };
 
-type ForgotPasswordProps = NativeStackScreenProps<RootStackNavigationParamList, 'ForgotPassword'>;
+type HomeProps = MaterialBottomTabScreenProps<BottomTabNavigationParamList, 'Home'>;
 type NotificationsProps = MaterialBottomTabScreenProps<BottomTabNavigationParamList, 'Notifications'>;
 type ProfileProps = MaterialBottomTabScreenProps<BottomTabNavigationParamList, 'Profile'>;
 
