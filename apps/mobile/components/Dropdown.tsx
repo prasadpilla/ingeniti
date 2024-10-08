@@ -1,11 +1,11 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { FlatList, Modal, StyleSheet, TextStyle, TouchableOpacity, View, ViewStyle, Text } from 'react-native';
+import { FlatList, Modal, StyleSheet, Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { useTheme } from 'react-native-paper';
 
 import Button from './Button';
-import Paragraph from './Paragraph';
 import FormInput from './FormInput';
+import Paragraph from './Paragraph';
 
 interface DropdownOption {
   label: string;

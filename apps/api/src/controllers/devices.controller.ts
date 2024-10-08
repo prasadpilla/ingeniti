@@ -59,4 +59,38 @@ devicesController.put('/:id', async (req: WithAuthProp<Request>, res: Response<D
   res.status(HttpStatusCode.OK_200).json(device);
 });
 
+devicesController.get('/form-options', async (req: WithAuthProp<Request>, res: Response) => {
+  const formOptions = {
+    deviceUsageOptions: [
+      { id: 1, label: 'Agricultural', value: 'agricultural' },
+      { id: 2, label: 'Industrial', value: 'industrial' },
+      { id: 3, label: 'Commercial', value: 'commercial' },
+      { id: 4, label: 'Residential', value: 'residential' },
+    ],
+    deviceTypeOptions: [
+      { id: 1, label: 'Pump/Motor', value: 'pump_motor' },
+      { id: 2, label: 'Meter', value: 'meter' },
+      { id: 3, label: 'Others', value: 'others' },
+    ],
+    utilityOptions: [
+      { id: 1, label: 'APSPDC', value: 'APSPDC' },
+      { id: 2, label: 'XYZ Utility', value: 'xyzUtility' },
+      { id: 3, label: 'ABC Power', value: 'abcPower' },
+      { id: 4, label: 'Global Energy', value: 'globalEnergy' },
+      { id: 5, label: 'National Grid', value: 'nationalGrid' },
+    ],
+    countryOptions: [
+      { id: 1, label: 'India', value: 'India' },
+      { id: 2, label: 'USA', value: 'USA' },
+      { id: 3, label: 'Canada', value: 'Canada' },
+    ],
+    smartPanelConnectionStatusOptions: [
+      { id: 1, label: 'Primary Device Connected to Meter', value: true },
+      { id: 2, label: 'Secondary Device Connected to Load', value: false },
+    ],
+  };
+
+  res.status(HttpStatusCode.OK_200).json(formOptions);
+});
+
 export default devicesController;

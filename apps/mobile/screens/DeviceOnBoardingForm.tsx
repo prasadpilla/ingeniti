@@ -1,7 +1,7 @@
 import { useAuth } from '@clerk/clerk-expo';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Device, DeviceOnBoardingForm, deviceOnBoardingFormSchema } from '@ingeniti/shared';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -16,13 +16,6 @@ import FormInput from '../components/FormInput';
 import Paragraph from '../components/Paragraph';
 import { DeviceOnBoardingFormProps } from '../types/navigation.types';
 import { makeApiCall } from '../utils/api';
-import {
-  countryOptions,
-  deviceTypeOptions,
-  deviceUsageOptions,
-  smartPanelConnectionStatusOptions,
-  utilityOptions,
-} from '../utils/dropdownOptions';
 
 const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navigation, route }) => {
   const { getToken } = useAuth();
@@ -34,6 +27,18 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
   const [isBenefitsUtilityOpen, setIsBenefitsUtilityOpen] = useState(false);
   const [isBenefitsSmartPanelOpen, setIsBenefitsSmartPanelOpen] = useState(false);
   const [isConnectedToPrimaryDevice, setIsConnectedToPrimaryDevice] = useState(true);
+
+  const { data: formOptions, isLoading: isLoadingFormOptions } = useQuery({
+    queryKey: ['formOptions'],
+    queryFn: async () => {
+      const token = await getToken();
+      const response = await makeApiCall(token, '/devices/form-options', 'GET');
+      if (!response.ok) {
+        throw new Error('Failed to fetch form options');
+      }
+      return response.json();
+    },
+  });
 
   const deviceOnBoardingForm = useForm<DeviceOnBoardingForm>({
     resolver: zodResolver(deviceOnBoardingFormSchema),
@@ -92,6 +97,10 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
     console.log('isConnectedToPrimaryDevice', isConnectedToPrimaryDevice);
   }, [isConnectedToPrimaryDevice]);
 
+  if (isLoadingFormOptions) {
+    return <ActivityIndicator />;
+  }
+
   return (
     <Background>
       <Paragraph style={{ fontSize: 20, fontWeight: 'bold', color: 'green' }}>Device Scan is Successful</Paragraph>
@@ -139,10 +148,10 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
               render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
                 <View style={styles.dropdownContainer}>
                   <Dropdown
-                    options={deviceUsageOptions}
+                    options={formOptions.deviceUsageOptions}
                     selectedValue={value}
                     onSelect={onChange}
-                    placeholder="Select Usage"
+                    placeholder="Usage"
                     hasError={!!error?.message}
                     errorText={error?.message}
                   />
@@ -156,10 +165,10 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
               render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
                 <View style={styles.dropdownContainer}>
                   <Dropdown
-                    options={deviceTypeOptions}
+                    options={formOptions.deviceTypeOptions}
                     selectedValue={value}
                     onSelect={onChange}
-                    placeholder="Select Type"
+                    placeholder="Type"
                     hasError={!!error?.message}
                     errorText={error?.message}
                   />
@@ -263,10 +272,10 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
               render={({ field: { value, onChange }, fieldState: { error } }) => (
                 <View style={styles.dropdownContainer}>
                   <Dropdown
-                    options={countryOptions}
+                    options={formOptions.countryOptions}
                     selectedValue={value}
                     onSelect={onChange}
-                    placeholder="Select Country"
+                    placeholder="Country"
                     hasError={!!error?.message}
                     errorText={error?.message}
                   />
@@ -279,10 +288,10 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
               render={({ field: { value, onChange }, fieldState: { error } }) => (
                 <View style={styles.dropdownContainer}>
                   <Dropdown
-                    options={utilityOptions}
+                    options={formOptions.utilityOptions}
                     selectedValue={value}
                     onSelect={onChange}
-                    placeholder="Select Utility"
+                    placeholder="Utility"
                     hasError={!!error?.message}
                     errorText={error?.message}
                   />
@@ -316,7 +325,7 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
               render={({ field: { value, onChange }, fieldState: { error } }) => (
                 <View style={styles.dropdownContainer}>
                   <Dropdown
-                    options={smartPanelConnectionStatusOptions}
+                    options={formOptions.smartPanelConnectionStatusOptions}
                     selectedValue={value}
                     onSelect={(newValue) => {
                       onChange(newValue);
@@ -345,7 +354,7 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
                   render={({ field: { value, onChange }, fieldState: { error } }) => (
                     <View style={styles.dropdownContainer}>
                       <Dropdown
-                        options={countryOptions}
+                        options={formOptions.countryOptions}
                         selectedValue={value ?? ''}
                         onSelect={onChange}
                         placeholder="Select Country"
@@ -361,7 +370,7 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
                   render={({ field: { value, onChange }, fieldState: { error } }) => (
                     <View style={styles.dropdownContainer}>
                       <Dropdown
-                        options={utilityOptions}
+                        options={formOptions.utilityOptions}
                         selectedValue={value ?? ''}
                         onSelect={onChange}
                         placeholder="Select Utility"
