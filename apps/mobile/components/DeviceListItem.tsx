@@ -1,43 +1,17 @@
-import { useAuth } from '@clerk/clerk-expo';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Device } from '@ingeniti/shared';
-import { useMutation } from '@tanstack/react-query';
-import React, { useState } from 'react';
-import { StyleSheet, Switch, TouchableOpacity, View, GestureResponderEvent } from 'react-native';
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
 import { useTheme } from 'react-native-paper';
-import { makeApiCall } from '../utils/api';
+import DeviceToggle from './DeviceToggle';
 import Paragraph from './Paragraph';
 
-interface DeviceItemProps {
+interface DeviceListItemProps {
   device: Device;
 }
 
-const DeviceItem = ({ device }: DeviceItemProps) => {
+const DeviceListItem = ({ device }: DeviceListItemProps) => {
   const theme = useTheme();
-  const { getToken } = useAuth();
-  const [isSwitchOn, setIsSwitchOn] = useState(device.isSwitchOn ?? false);
-  const updateDeviceMutation = useMutation({
-    mutationFn: async (data: { id: string; isSwitchOn: boolean }) => {
-      const token = await getToken();
-      const response = await makeApiCall(token, `/devices/${data.id}`, 'PUT', { isSwitchOn: data.isSwitchOn });
-      return response.json();
-    },
-    onSuccess: (data: Device) => {
-      setIsSwitchOn(data.isSwitchOn ?? false);
-    },
-    onError: (error) => {
-      console.error('Failed to update device:', error);
-    },
-  });
-
-  const handleSwitchChange = async (event: GestureResponderEvent) => {
-    event.stopPropagation();
-    await updateDeviceMutation.mutateAsync({
-      id: device.id,
-      isSwitchOn: !isSwitchOn,
-    });
-    setIsSwitchOn(!isSwitchOn);
-  };
 
   return (
     <View style={[styles.container, { borderColor: theme.colors.outlineVariant }]}>
@@ -51,9 +25,9 @@ const DeviceItem = ({ device }: DeviceItemProps) => {
           </View>
         </View>
       </View>
-      <TouchableOpacity onPress={handleSwitchChange}>
-        <Switch value={isSwitchOn} />
-      </TouchableOpacity>
+      <View style={styles.toggleContainer}>
+        <DeviceToggle device={device} />
+      </View>
     </View>
   );
 };
@@ -94,6 +68,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: 'gray',
   },
+  toggleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  toggleLabel: {
+    marginRight: 8,
+  },
 });
 
-export default DeviceItem;
+export default DeviceListItem;
