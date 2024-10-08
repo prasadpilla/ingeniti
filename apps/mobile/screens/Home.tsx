@@ -1,9 +1,9 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
-import { Appbar, Paragraph, Title, useTheme } from 'react-native-paper';
+import { Appbar, Menu, Paragraph, Text, Title, useTheme } from 'react-native-paper';
 
-import { useAuth } from '@clerk/clerk-expo';
+import { useAuth, useUser } from '@clerk/clerk-expo';
 import { Device } from '@ingeniti/shared/dist/schemas/mobile/devices.schema';
 import { useQuery } from '@tanstack/react-query';
 import Background from '../components/Background';
@@ -16,19 +16,21 @@ import { makeApiCall } from '../utils/api';
 const HomeScreen = ({ navigation }: HomeProps) => {
   const theme = useTheme();
   const { getToken } = useAuth();
-
+  const { user } = useUser();
   const [isDevicePopoverVisible, setIsDevicePopoverVisible] = useState(false);
-  const [devices, setDevices] = useState<Device[]>([]);
+  const [activeTab, setActiveTab] = useState<'Devices' | 'Sensors'>('Devices');
+  const [isMoreMenuVisible, setIsMoreMenuVisible] = useState(false);
 
-  const { isLoading, refetch: refetchDevices } = useQuery({
+  const {
+    isLoading,
+    data: devices = [],
+    refetch: refetchDevices,
+  } = useQuery({
     queryKey: ['devices'],
     queryFn: async () => {
       const token = await getToken();
       const response = await makeApiCall(token, '/devices', 'GET');
       return response.json();
-    },
-    onSuccess: (data: Device[]) => {
-      setDevices(data);
     },
     onError: (error) => {
       console.error(error);
@@ -49,6 +51,14 @@ const HomeScreen = ({ navigation }: HomeProps) => {
   useEffect(() => {
     refetchDevices();
   }, []);
+
+  const totalDevices = devices.length;
+  const totalSensors = devices.reduce((acc: number, device: Device) => acc + (device.isSensor ? 1 : 0), 0);
+
+  const filteredItems =
+    activeTab === 'Devices'
+      ? devices.filter((device: Device) => !device.isSensor)
+      : devices.filter((device: Device) => device.isSensor);
 
   return (
     <>
@@ -89,53 +99,104 @@ const HomeScreen = ({ navigation }: HomeProps) => {
       <Background>
         <TouchableWithoutFeedback onPress={handleBackgroundPress}>
           <View style={styles.contentWrapper}>
+            <View>
+              <Title style={styles.greeting}>Hello, {user?.firstName || 'User'}</Title>
+              <Text style={styles.deviceCount}>
+                {totalDevices} devices, {totalSensors} sensors
+              </Text>
+              <View style={styles.tabContainer}>
+                <View style={styles.tabButtons}>
+                  <TouchableOpacity
+                    style={[styles.tabButton, activeTab === 'Devices' && styles.activeTabButton]}
+                    onPress={() => setActiveTab('Devices')}
+                  >
+                    <Text style={[styles.tabButtonText, activeTab === 'Devices' && styles.activeTabButtonText]}>
+                      Devices
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.tabButton, activeTab === 'Sensors' && styles.activeTabButton]}
+                    onPress={() => setActiveTab('Sensors')}
+                  >
+                    <Text style={[styles.tabButtonText, activeTab === 'Sensors' && styles.activeTabButtonText]}>
+                      Sensors
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <Menu
+                  visible={isMoreMenuVisible}
+                  onDismiss={() => setIsMoreMenuVisible(false)}
+                  anchor={
+                    <TouchableOpacity onPress={() => setIsMoreMenuVisible(true)}>
+                      <MaterialCommunityIcons name="dots-vertical" size={24} color={theme.colors.onSurface} />
+                    </TouchableOpacity>
+                  }
+                  contentStyle={styles.menuContent}
+                >
+                  <Menu.Item
+                    onPress={() => {}}
+                    title="Monitor"
+                    leadingIcon={({ size, color }) => (
+                      <MaterialCommunityIcons name="monitor-dashboard" size={size} color={color} />
+                    )}
+                    titleStyle={styles.menuItemTitle}
+                  />
+                  <Menu.Item
+                    onPress={() => {}}
+                    title="Edit"
+                    leadingIcon={({ size, color }) => (
+                      <MaterialCommunityIcons name="pencil" size={size} color={color} />
+                    )}
+                    titleStyle={styles.menuItemTitle}
+                  />
+                </Menu>
+              </View>
+            </View>
             {isLoading ? (
               <View style={styles.loadingContainer}>
                 <ActivityIndicator animating={true} color={theme.colors.secondary} />
                 <Paragraph>Loading...</Paragraph>
               </View>
-            ) : devices.length > 0 ? (
+            ) : filteredItems.length > 0 ? (
               <View style={styles.contentContainer}>
-                <Title>All Devices</Title>
                 <View style={styles.devicesContainer}>
-                  {devices.map((device) => (
-                    <TouchableOpacity key={device.id} onPress={() => handleDevicePress(device)}>
-                      <DeviceListItem device={device} />
+                  {filteredItems.map((item: Device) => (
+                    <TouchableOpacity key={item.id} onPress={() => handleDevicePress(item)}>
+                      <DeviceListItem device={item} />
                     </TouchableOpacity>
                   ))}
                 </View>
               </View>
             ) : (
-              <View>
-                <View style={styles.emptyDeviceContainer}>
-                  <MaterialCommunityIcons
-                    name="devices"
-                    size={24}
-                    color={theme.colors.secondary}
-                    style={[styles.emptyDeviceIcon, { backgroundColor: theme.colors.secondaryContainer }]}
-                  />
-                  <Paragraph style={styles.emptyDeviceHeading}>Lets get started</Paragraph>
-                  <Paragraph style={styles.emptyDeviceSubheading}>
-                    Add your first device/sensor by scanning the QR code or entering the code manually.
-                  </Paragraph>
+              <View style={styles.emptyDeviceContainer}>
+                <MaterialCommunityIcons
+                  name={activeTab === 'Devices' ? 'power-socket-uk' : 'thermometer'}
+                  size={24}
+                  color={theme.colors.secondary}
+                  style={[styles.emptyDeviceIcon, { backgroundColor: theme.colors.secondaryContainer }]}
+                />
+                <Paragraph style={styles.emptyDeviceHeading}>Lets get started</Paragraph>
+                <Paragraph style={styles.emptyDeviceSubheading}>
+                  Add your first {activeTab === 'Devices' ? 'device' : 'sensor'} by scanning the QR code or entering the
+                  code manually.
+                </Paragraph>
 
-                  <View style={styles.emptyDeviceButtonContainer}>
-                    <Button
-                      mode="contained"
-                      onPress={() => {
-                        navigation.getParent()?.navigate('DeviceOnBoardingForm', { refetchDevices });
-                      }}
-                    >
-                      Scan QR Code
-                    </Button>
-                    <Button
-                      onPress={() => {
-                        navigation.getParent()?.navigate('DeviceOnBoardingForm', { refetchDevices });
-                      }}
-                    >
-                      Enter Code
-                    </Button>
-                  </View>
+                <View style={styles.emptyDeviceButtonContainer}>
+                  <Button
+                    mode="contained"
+                    onPress={() => {
+                      navigation.getParent()?.navigate('DeviceOnBoardingForm', { refetchDevices });
+                    }}
+                  >
+                    Scan QR Code
+                  </Button>
+                  <Button
+                    onPress={() => {
+                      navigation.getParent()?.navigate('DeviceOnBoardingForm', { refetchDevices });
+                    }}
+                  >
+                    Enter Code
+                  </Button>
                 </View>
               </View>
             )}
@@ -147,6 +208,40 @@ const HomeScreen = ({ navigation }: HomeProps) => {
 };
 
 const styles = StyleSheet.create({
+  greeting: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  deviceCount: {
+    fontSize: 16,
+    marginTop: 5,
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    marginTop: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  tabButtons: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  tabButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  activeTabButton: {
+    borderBottomWidth: 2,
+    borderBottomColor: '#000',
+  },
+  tabButtonText: {
+    fontSize: 16,
+  },
+  activeTabButtonText: {
+    fontWeight: 'bold',
+  },
   popoverContainer: {
     position: 'absolute',
     right: 20,
@@ -185,13 +280,11 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   emptyDeviceContainer: {
+    flex: 1,
+    padding: 20,
     justifyContent: 'center',
     alignItems: 'center',
     gap: 6,
-  },
-  greeting: {
-    fontSize: 24,
-    marginBottom: 20,
   },
   emptyDeviceHeading: {
     fontSize: 24,
@@ -212,6 +305,17 @@ const styles = StyleSheet.create({
   contentWrapper: {
     flex: 1,
     width: '100%',
+  },
+  menuContent: {
+    borderRadius: 12,
+    minWidth: 150,
+    elevation: 3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  menuItemTitle: {
+    fontSize: 14,
   },
 });
 

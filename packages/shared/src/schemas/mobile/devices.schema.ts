@@ -21,6 +21,7 @@ export const deviceSchema = z.object({
   maxLoad: z.number().nullable(),
   isSwitchOn: z.boolean().nullable(),
   isOnline: z.boolean().nullable(),
+  isSensor: z.boolean().nullable(),
 });
 
 export type Device = z.infer<typeof deviceSchema>;

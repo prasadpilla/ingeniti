@@ -47,7 +47,11 @@ devicesController.post(
 devicesController.get('/', async (req: WithAuthProp<Request>, res: Response<Device[]>) => {
   const userId = req.auth.userId as string;
   const devices = await getDevices(userId);
-  res.status(HttpStatusCode.OK_200).json(devices);
+  const devicesWithSensors = devices.map((device) => ({
+    ...device,
+    isSensor: false,
+  }));
+  res.status(HttpStatusCode.OK_200).json(devicesWithSensors);
 });
 
 devicesController.put('/:id', async (req: WithAuthProp<Request>, res: Response<Device | GenericError>) => {
@@ -56,7 +60,7 @@ devicesController.put('/:id', async (req: WithAuthProp<Request>, res: Response<D
   const { isSwitchOn } = req.body;
 
   const device = await updateDevice(userId, id, { isSwitchOn });
-  res.status(HttpStatusCode.OK_200).json(device);
+  res.status(HttpStatusCode.OK_200).json({ ...device, isSensor: false });
 });
 
 devicesController.get('/form-options', async (req: WithAuthProp<Request>, res: Response) => {
