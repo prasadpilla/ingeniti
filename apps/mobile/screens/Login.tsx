@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { ActivityIndicator, useTheme } from 'react-native-paper';
+import { ActivityIndicator, Appbar, useTheme } from 'react-native-paper';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
@@ -122,91 +122,73 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
   };
 
   return (
-    <Background>
-      <Header>{t('welcome_back')}</Header>
-
-      <View style={styles.usePhoneContainer}>
-        <TouchableOpacity
-          onPress={() => {
-            loginEmailForm.reset();
-            loginPhoneForm.reset();
-            setLoginError(undefined);
-            setUsePhone(!usePhone);
-          }}
-        >
-          <Paragraph style={[styles.usePhoneText, { color: theme.colors.primary }]}>
-            {!usePhone ? t('use_phone') : t('use_email')}
-          </Paragraph>
+    <>
+      <Appbar.Header
+        style={{
+          backgroundColor: theme.colors.secondaryContainer,
+          height: 60,
+          zIndex: 100,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+        }}
+      >
+        <TouchableOpacity style={{ padding: 8 }} onPress={() => navigation.goBack()}>
+          <Appbar.BackAction size={24} color={theme.colors.onSecondaryContainer} />
         </TouchableOpacity>
-      </View>
+        <Appbar.Content
+          title={t('login')}
+          titleStyle={[styles.headerTitle, { color: theme.colors.onSecondaryContainer }]}
+        />
+        <View style={{ width: 40 }} />
+      </Appbar.Header>
+      <Background>
+        <Header>{t('welcome_back')}</Header>
 
-      {!usePhone ? (
-        <>
-          <Controller
-            control={loginEmailForm.control}
-            name="emailAddress"
-            render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
-              <FormInput
-                label={t('email')}
-                returnKeyType="next"
-                value={value}
-                onChangeText={(text) => {
-                  onChange(text);
-                  if (loginError) setLoginError(undefined);
-                }}
-                onBlur={onBlur}
-                errorText={error?.message}
-                autoCapitalize="none"
-                autoComplete="email"
-                textContentType="emailAddress"
-                keyboardType="email-address"
-              />
-            )}
-          />
+        <View style={styles.usePhoneContainer}>
+          <TouchableOpacity
+            onPress={() => {
+              loginEmailForm.reset();
+              loginPhoneForm.reset();
+              setLoginError(undefined);
+              setUsePhone(!usePhone);
+            }}
+          >
+            <Paragraph style={[styles.usePhoneText, { color: theme.colors.primary }]}>
+              {!usePhone ? t('use_phone') : t('use_email')}
+            </Paragraph>
+          </TouchableOpacity>
+        </View>
 
-          <Controller
-            control={loginEmailForm.control}
-            name="password"
-            render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
-              <FormInput
-                label={t('password')}
-                returnKeyType="done"
-                value={value}
-                onChangeText={(text) => {
-                  onChange(text);
-                  if (loginError) setLoginError(undefined);
-                }}
-                onBlur={onBlur}
-                errorText={error?.message}
-                isPassword
-              />
-            )}
-          />
-
-          <View style={styles.forgotPasswordContainer}>
-            <TouchableOpacity
-              onPress={() => {
-                setLoginError(undefined);
-                loginEmailForm.reset();
-                navigation.navigate('ForgotPassword');
-              }}
-            >
-              <Paragraph style={styles.secondaryText}>{t('forgot_password')}</Paragraph>
-            </TouchableOpacity>
-          </View>
-        </>
-      ) : (
-        <View style={styles.phoneInputContainer}>
-          <View style={styles.phoneInput}>
-            <CountryCodePicker selectedCountry={selectedCountry} onSelectCountry={setSelectedCountry} />
+        {!usePhone ? (
+          <>
             <Controller
-              control={loginPhoneForm.control}
-              name="phoneNumber"
+              control={loginEmailForm.control}
+              name="emailAddress"
               render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
                 <FormInput
-                  label={t('phone_number')}
-                  placeholder="82345 54389"
-                  placeholderTextColor="#aaa"
+                  label={t('email')}
+                  returnKeyType="next"
+                  value={value}
+                  onChangeText={(text) => {
+                    onChange(text);
+                    if (loginError) setLoginError(undefined);
+                  }}
+                  onBlur={onBlur}
+                  errorText={error?.message}
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  textContentType="emailAddress"
+                  keyboardType="email-address"
+                />
+              )}
+            />
+
+            <Controller
+              control={loginEmailForm.control}
+              name="password"
+              render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+                <FormInput
+                  label={t('password')}
                   returnKeyType="done"
                   value={value}
                   onChangeText={(text) => {
@@ -214,76 +196,108 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
                     if (loginError) setLoginError(undefined);
                   }}
                   onBlur={onBlur}
-                  hasError={!!error?.message}
-                  keyboardType="phone-pad"
-                  selectionColor={theme.colors.primary}
-                  underlineColor="transparent"
-                  mode="outlined"
-                  containerStyles={styles.phoneInputField}
+                  errorText={error?.message}
+                  isPassword
                 />
               )}
             />
-          </View>
-          {loginPhoneForm.formState.errors.phoneNumber && (
-            <Paragraph style={[styles.phoneInputFieldError, { color: theme.colors.onErrorContainer }]}>
-              {loginPhoneForm.formState.errors.phoneNumber.message}
-            </Paragraph>
-          )}
-        </View>
-      )}
 
-      {loginError && (
-        <Paragraph style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>{loginError}</Paragraph>
-      )}
-
-      <Button
-        mode="contained"
-        style={{ marginTop: 28 }}
-        onPress={
-          !usePhone ? loginEmailForm.handleSubmit(onEmailSignInPress) : loginPhoneForm.handleSubmit(onPhoneSignInPress)
-        }
-        disabled={
-          (!usePhone ? loginEmailForm : loginPhoneForm).formState.isSubmitting ||
-          !(!usePhone ? loginEmailForm : loginPhoneForm).formState.isValid
-        }
-      >
-        {(!usePhone ? loginEmailForm : loginPhoneForm).formState.isSubmitting ? (
-          <ActivityIndicator animating={true} color={theme.colors.secondary} />
+            <View style={styles.forgotPasswordContainer}>
+              <TouchableOpacity
+                onPress={() => {
+                  setLoginError(undefined);
+                  loginEmailForm.reset();
+                  navigation.navigate('ForgotPassword');
+                }}
+              >
+                <Paragraph style={styles.secondaryText}>{t('forgot_password')}</Paragraph>
+              </TouchableOpacity>
+            </View>
+          </>
         ) : (
-          t('login')
+          <View style={styles.phoneInputContainer}>
+            <View style={styles.phoneInput}>
+              <CountryCodePicker selectedCountry={selectedCountry} onSelectCountry={setSelectedCountry} />
+              <Controller
+                control={loginPhoneForm.control}
+                name="phoneNumber"
+                render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+                  <FormInput
+                    label={t('phone_number')}
+                    placeholder="82345 54389"
+                    placeholderTextColor="#aaa"
+                    returnKeyType="done"
+                    value={value}
+                    onChangeText={(text) => {
+                      onChange(text);
+                      if (loginError) setLoginError(undefined);
+                    }}
+                    onBlur={onBlur}
+                    hasError={!!error?.message}
+                    keyboardType="phone-pad"
+                    selectionColor={theme.colors.primary}
+                    underlineColor="transparent"
+                    mode="outlined"
+                    containerStyles={styles.phoneInputField}
+                  />
+                )}
+              />
+            </View>
+            {loginPhoneForm.formState.errors.phoneNumber && (
+              <Paragraph style={[styles.phoneInputFieldError, { color: theme.colors.onErrorContainer }]}>
+                {loginPhoneForm.formState.errors.phoneNumber.message}
+              </Paragraph>
+            )}
+          </View>
         )}
-      </Button>
 
-      <View style={styles.signUpContainer}>
-        <Paragraph style={styles.secondaryText}>{t('dont_have_account')} </Paragraph>
-        <TouchableOpacity
-          onPress={() => {
-            setLoginError(undefined);
-            loginEmailForm.reset();
-            loginPhoneForm.reset();
-            navigation.navigate('SignUp');
-          }}
+        {loginError && (
+          <Paragraph style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>{loginError}</Paragraph>
+        )}
+
+        <Button
+          mode="contained"
+          style={{ marginTop: 28 }}
+          onPress={
+            !usePhone
+              ? loginEmailForm.handleSubmit(onEmailSignInPress)
+              : loginPhoneForm.handleSubmit(onPhoneSignInPress)
+          }
+          disabled={
+            (!usePhone ? loginEmailForm : loginPhoneForm).formState.isSubmitting ||
+            !(!usePhone ? loginEmailForm : loginPhoneForm).formState.isValid
+          }
         >
-          <Paragraph style={[styles.primaryText, { color: theme.colors.primary }]}>{t('sign_up')}</Paragraph>
-        </TouchableOpacity>
-      </View>
+          {(!usePhone ? loginEmailForm : loginPhoneForm).formState.isSubmitting ? (
+            <ActivityIndicator animating={true} color={theme.colors.secondary} />
+          ) : (
+            t('login')
+          )}
+        </Button>
 
-      <TouchableOpacity
-        style={styles.goBackButton}
-        onPress={() => {
-          setLoginError(undefined);
-          loginEmailForm.reset();
-          loginPhoneForm.reset();
-          navigation.goBack();
-        }}
-      >
-        <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>{t('go_back')}</Paragraph>
-      </TouchableOpacity>
-    </Background>
+        <View style={styles.signUpContainer}>
+          <Paragraph style={styles.secondaryText}>{t('dont_have_account')} </Paragraph>
+          <TouchableOpacity
+            onPress={() => {
+              setLoginError(undefined);
+              loginEmailForm.reset();
+              loginPhoneForm.reset();
+              navigation.navigate('SignUp');
+            }}
+          >
+            <Paragraph style={[styles.primaryText, { color: theme.colors.primary }]}>{t('sign_up')}</Paragraph>
+          </TouchableOpacity>
+        </View>
+      </Background>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
   usePhoneContainer: {
     width: '100%',
     alignItems: 'flex-end',

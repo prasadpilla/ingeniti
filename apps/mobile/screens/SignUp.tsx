@@ -6,13 +6,11 @@ import React, { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { ActivityIndicator, Checkbox, useTheme } from 'react-native-paper';
+import { ActivityIndicator, Appbar, Checkbox, useTheme } from 'react-native-paper';
 
-import Background from '../components/Background';
 import Button from '../components/Button';
 import CountryCodePicker from '../components/CountryCodePicker';
 import FormInput from '../components/FormInput';
-import Header from '../components/Header';
 import Paragraph from '../components/Paragraph';
 import { SignupProps } from '../types';
 import { countries, CountryData } from '../utils/country-data';
@@ -92,171 +90,180 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
   };
 
   return (
-    <Background>
-      <Header>{t('create_account')}</Header>
-      <Controller
-        control={signUpForm.control}
-        name="firstName"
-        render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
-          <FormInput
-            label={t('first_name')}
-            returnKeyType="next"
-            value={value}
-            onChangeText={onChange}
-            onBlur={onBlur}
-            errorText={error?.message}
-          />
-        )}
-      />
-
-      <Controller
-        control={signUpForm.control}
-        name="lastName"
-        render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
-          <FormInput
-            label={t('last_name')}
-            returnKeyType="next"
-            value={value}
-            onChangeText={onChange}
-            onBlur={onBlur}
-            errorText={error?.message}
-          />
-        )}
-      />
-
-      <Controller
-        control={signUpForm.control}
-        name="emailAddress"
-        render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
-          <FormInput
-            label={t('email')}
-            returnKeyType="next"
-            value={value}
-            onBlur={onBlur}
-            onChangeText={(text) => {
-              onChange(text);
-              if (signUpError) setSignUpError(undefined);
-            }}
-            errorText={error?.message}
-            autoCapitalize="none"
-            autoComplete="email"
-            textContentType="emailAddress"
-            keyboardType="email-address"
-          />
-        )}
-      />
-
-      <View style={styles.phoneInputContainer}>
-        <View style={styles.phoneInput}>
-          <CountryCodePicker selectedCountry={selectedCountry} onSelectCountry={setSelectedCountry} />
-          <Controller
-            control={signUpForm.control}
-            name="phoneNumber"
-            render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
-              <FormInput
-                label={t('phone_number')}
-                placeholder="82345 54389"
-                placeholderTextColor="#aaa"
-                returnKeyType="done"
-                value={value}
-                onChangeText={(text) => {
-                  onChange(text);
-                  if (signUpError) setSignUpError(undefined);
-                }}
-                onBlur={onBlur}
-                hasError={!!error?.message}
-                keyboardType="phone-pad"
-                selectionColor={theme.colors.onPrimaryContainer}
-                underlineColor="transparent"
-                mode="outlined"
-                containerStyles={styles.phoneInputField}
-              />
-            )}
-          />
-        </View>
-
-        {signUpForm.formState.errors.phoneNumber && (
-          <Paragraph style={[styles.phoneInputFieldError, { color: theme.colors.onErrorContainer }]}>
-            {signUpForm.formState.errors.phoneNumber.message}
-          </Paragraph>
-        )}
-      </View>
-
-      <Controller
-        control={signUpForm.control}
-        name="password"
-        render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
-          <FormInput
-            label={t('password')}
-            returnKeyType="done"
-            value={value}
-            onBlur={onBlur}
-            onChangeText={(text) => {
-              onChange(text);
-              if (signUpError) setSignUpError(undefined);
-            }}
-            errorText={error?.message}
-            isPassword
-          />
-        )}
-      />
-
-      <Controller
-        control={signUpForm.control}
-        name="termsAndConditions"
-        render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
-          <View style={styles.checkboxContainer}>
-            <TouchableOpacity onPress={() => onChange(!value)} style={styles.checkboxTouchable}>
-              <Checkbox
-                status={value ? 'checked' : 'unchecked'}
-                color={theme.colors.primary}
-                onPress={() => onChange(!value)}
-              />
-            </TouchableOpacity>
-            <Paragraph style={styles.checkboxText}>{t('terms_and_conditions')}</Paragraph>
-          </View>
-        )}
-      />
-
-      {signUpError && (
-        <Paragraph style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>{signUpError}</Paragraph>
-      )}
-
-      <Button
-        mode="contained"
-        onPress={signUpForm.handleSubmit(onSignUpPress)}
-        style={styles.button}
-        disabled={signUpForm.formState.isSubmitting || !signUpForm.formState.isValid}
-      >
-        {signUpForm.formState.isSubmitting ? (
-          <ActivityIndicator animating={true} color={theme.colors.secondary} />
-        ) : (
-          t('sign_up')
-        )}
-      </Button>
-      <View style={styles.row}>
-        <Paragraph style={styles.label}>{t('dont_have_account')} </Paragraph>
-        <TouchableOpacity
-          onPress={() => {
-            setSignUpError(undefined);
-            signUpForm.reset();
-            navigation.navigate('Login');
-          }}
-        >
-          <Paragraph style={[styles.link, { color: theme.colors.primary }]}>{t('login')}</Paragraph>
-        </TouchableOpacity>
-      </View>
-      <TouchableOpacity
-        style={styles.goBackButton}
-        onPress={() => {
-          setSignUpError(undefined);
-          signUpForm.reset();
-          navigation.goBack();
+    <>
+      <Appbar.Header
+        style={{
+          backgroundColor: theme.colors.secondaryContainer,
+          height: 60,
+          zIndex: 100,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
         }}
       >
-        <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>{t('go_back')}</Paragraph>
-      </TouchableOpacity>
-    </Background>
+        <TouchableOpacity style={{ padding: 8 }} onPress={() => navigation.goBack()}>
+          <Appbar.BackAction size={24} color={theme.colors.onSecondaryContainer} />
+        </TouchableOpacity>
+        <Appbar.Content
+          title={t('create_account')}
+          titleStyle={[styles.headerTitle, { color: theme.colors.onSecondaryContainer }]}
+        />
+        <View style={{ width: 40 }} />
+      </Appbar.Header>
+      <View style={{ padding: 20, flex: 1, alignItems: 'center' }}>
+        <Controller
+          control={signUpForm.control}
+          name="firstName"
+          render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+            <FormInput
+              label={t('first_name')}
+              returnKeyType="next"
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              errorText={error?.message}
+            />
+          )}
+        />
+
+        <Controller
+          control={signUpForm.control}
+          name="lastName"
+          render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+            <FormInput
+              label={t('last_name')}
+              returnKeyType="next"
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              errorText={error?.message}
+            />
+          )}
+        />
+
+        <Controller
+          control={signUpForm.control}
+          name="emailAddress"
+          render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+            <FormInput
+              label={t('email')}
+              returnKeyType="next"
+              value={value}
+              onBlur={onBlur}
+              onChangeText={(text) => {
+                onChange(text);
+                if (signUpError) setSignUpError(undefined);
+              }}
+              errorText={error?.message}
+              autoCapitalize="none"
+              autoComplete="email"
+              textContentType="emailAddress"
+              keyboardType="email-address"
+            />
+          )}
+        />
+
+        <View style={styles.phoneInputContainer}>
+          <View style={styles.phoneInput}>
+            <CountryCodePicker selectedCountry={selectedCountry} onSelectCountry={setSelectedCountry} />
+            <Controller
+              control={signUpForm.control}
+              name="phoneNumber"
+              render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+                <FormInput
+                  label={t('phone_number')}
+                  placeholder="82345 54389"
+                  placeholderTextColor="#aaa"
+                  returnKeyType="done"
+                  value={value}
+                  onChangeText={(text) => {
+                    onChange(text);
+                    if (signUpError) setSignUpError(undefined);
+                  }}
+                  onBlur={onBlur}
+                  hasError={!!error?.message}
+                  keyboardType="phone-pad"
+                  selectionColor={theme.colors.onPrimaryContainer}
+                  underlineColor="transparent"
+                  mode="outlined"
+                  containerStyles={styles.phoneInputField}
+                />
+              )}
+            />
+          </View>
+
+          {signUpForm.formState.errors.phoneNumber && (
+            <Paragraph style={[styles.phoneInputFieldError, { color: theme.colors.onErrorContainer }]}>
+              {signUpForm.formState.errors.phoneNumber.message}
+            </Paragraph>
+          )}
+        </View>
+
+        <Controller
+          control={signUpForm.control}
+          name="password"
+          render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+            <FormInput
+              label={t('password')}
+              returnKeyType="done"
+              value={value}
+              onBlur={onBlur}
+              onChangeText={(text) => {
+                onChange(text);
+                if (signUpError) setSignUpError(undefined);
+              }}
+              errorText={error?.message}
+              isPassword
+            />
+          )}
+        />
+
+        <Controller
+          control={signUpForm.control}
+          name="termsAndConditions"
+          render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+            <View style={styles.checkboxContainer}>
+              <TouchableOpacity onPress={() => onChange(!value)} style={styles.checkboxTouchable}>
+                <Checkbox
+                  status={value ? 'checked' : 'unchecked'}
+                  color={theme.colors.primary}
+                  onPress={() => onChange(!value)}
+                />
+              </TouchableOpacity>
+              <Paragraph style={styles.checkboxText}>{t('terms_and_conditions')}</Paragraph>
+            </View>
+          )}
+        />
+
+        {signUpError && (
+          <Paragraph style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>{signUpError}</Paragraph>
+        )}
+
+        <Button
+          mode="contained"
+          onPress={signUpForm.handleSubmit(onSignUpPress)}
+          style={styles.button}
+          disabled={signUpForm.formState.isSubmitting || !signUpForm.formState.isValid}
+        >
+          {signUpForm.formState.isSubmitting ? (
+            <ActivityIndicator animating={true} color={theme.colors.secondary} />
+          ) : (
+            t('sign_up')
+          )}
+        </Button>
+        <View style={styles.row}>
+          <Paragraph style={styles.label}>{t('dont_have_account')} </Paragraph>
+          <TouchableOpacity
+            onPress={() => {
+              setSignUpError(undefined);
+              signUpForm.reset();
+              navigation.navigate('Login');
+            }}
+          >
+            <Paragraph style={[styles.link, { color: theme.colors.primary }]}>{t('login')}</Paragraph>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </>
   );
 };
 
@@ -328,6 +335,10 @@ const styles = StyleSheet.create({
   checkboxText: {
     fontSize: 14,
     zIndex: 1,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
   },
 });
 
