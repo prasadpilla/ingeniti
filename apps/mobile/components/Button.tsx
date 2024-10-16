@@ -9,8 +9,8 @@ const Button: React.FC<ButtonProps> = ({ mode, style, children, ...props }) => {
 
   return (
     <PaperButton
-      style={[style, styles.button, mode === 'outlined' && { backgroundColor: theme.colors.surface }]}
-      labelStyle={styles.text}
+      style={[style, styles.button, mode === 'outlined' && { backgroundColor: theme.colors.primary }]}
+      labelStyle={[styles.text, mode === 'outlined' && { color: theme.colors.onPrimary }]}
       mode={mode}
       {...props}
     >
@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontWeight: 'bold',
-    fontSize: 15,
+    fontSize: 16,
     lineHeight: 26,
   },
 });

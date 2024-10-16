@@ -1,8 +1,9 @@
+import { Device } from '@ingeniti/shared/dist/schemas/mobile/devices.schema';
 import { MaterialBottomTabScreenProps } from 'react-native-paper';
 import { NativeStackScreenProps } from 'react-native-screens/lib/typescript/native-stack/types';
 
 type RootStackNavigationParamList = {
-  Home: undefined;
+  Welcome: undefined;
   Login: undefined;
   VerifyLoginPhone: {
     phoneNumber: string;
@@ -20,51 +21,53 @@ type RootStackNavigationParamList = {
     phoneNumber: string;
   };
   ForgotPassword: undefined;
-  DashboardHome: undefined;
+  MainTabs: undefined;
+  DeviceOnBoardingForm: {
+    refetchDevices: () => void;
+  };
+  DeviceDetails: {
+    device: Device;
+  };
+  EnergyUsageChart: undefined;
 };
 
-type HomeProps = NativeStackScreenProps<RootStackNavigationParamList, 'Home'>;
+type WelcomeProps = NativeStackScreenProps<RootStackNavigationParamList, 'Welcome'>;
 type LoginProps = NativeStackScreenProps<RootStackNavigationParamList, 'Login'>;
-type VerifyLoginPhoneProps = NativeStackScreenProps<
-  RootStackNavigationParamList,
-  'VerifyLoginPhone'
->;
+type VerifyLoginPhoneProps = NativeStackScreenProps<RootStackNavigationParamList, 'VerifyLoginPhone'>;
 type SignupProps = NativeStackScreenProps<RootStackNavigationParamList, 'SignUp'>;
-type VerifySignUpEmailProps = NativeStackScreenProps<
-  RootStackNavigationParamList,
-  'VerifySignUpEmail'
->;
-type VerifySignUpPhoneProps = NativeStackScreenProps<
-  RootStackNavigationParamList,
-  'VerifySignUpPhone'
->;
-type DashboardHomeProps = NativeStackScreenProps<RootStackNavigationParamList, 'DashboardHome'>;
-
+type VerifySignUpEmailProps = NativeStackScreenProps<RootStackNavigationParamList, 'VerifySignUpEmail'>;
+type VerifySignUpPhoneProps = NativeStackScreenProps<RootStackNavigationParamList, 'VerifySignUpPhone'>;
+type ForgotPasswordProps = NativeStackScreenProps<RootStackNavigationParamList, 'ForgotPassword'>;
+type MainTabsProps = NativeStackScreenProps<RootStackNavigationParamList, 'MainTabs'>;
+type DeviceOnBoardingFormProps = NativeStackScreenProps<RootStackNavigationParamList, 'DeviceOnBoardingForm'>;
+type DeviceDetailsProps = NativeStackScreenProps<RootStackNavigationParamList, 'DeviceDetails'>;
+type EnergyUsageChartProps = NativeStackScreenProps<RootStackNavigationParamList, 'EnergyUsageChart'>;
 // bottom tab types
 type BottomTabNavigationParamList = {
-  Dashboard: undefined;
+  Home: undefined;
+  Notifications: undefined;
   Profile: undefined;
-  Settings: undefined;
 };
 
-type ForgotPasswordProps = NativeStackScreenProps<RootStackNavigationParamList, 'ForgotPassword'>;
-
-type DashboardProps = MaterialBottomTabScreenProps<BottomTabNavigationParamList, 'Dashboard'>;
+type HomeProps = MaterialBottomTabScreenProps<BottomTabNavigationParamList, 'Home'>;
+type NotificationsProps = MaterialBottomTabScreenProps<BottomTabNavigationParamList, 'Notifications'>;
 type ProfileProps = MaterialBottomTabScreenProps<BottomTabNavigationParamList, 'Profile'>;
-type SettingsProps = MaterialBottomTabScreenProps<BottomTabNavigationParamList, 'Settings'>;
 
 export type {
   BottomTabNavigationParamList,
-  DashboardHomeProps,
-  DashboardProps,
+  DeviceDetailsProps,
+  DeviceOnBoardingFormProps,
+  EnergyUsageChartProps,
   ForgotPasswordProps,
   HomeProps,
   LoginProps,
+  MainTabsProps,
+  NotificationsProps,
   ProfileProps,
   RootStackNavigationParamList,
-  SettingsProps,
   SignupProps,
   VerifyLoginPhoneProps,
   VerifySignUpEmailProps,
-  VerifySignUpPhoneProps
+  VerifySignUpPhoneProps,
+  WelcomeProps,
 };

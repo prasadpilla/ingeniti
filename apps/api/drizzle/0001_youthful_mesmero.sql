@@ -1,0 +1,20 @@
+ALTER TABLE "devices" ALTER COLUMN "name" SET NOT NULL;--> statement-breakpoint
+ALTER TABLE "devices" ALTER COLUMN "model" SET NOT NULL;--> statement-breakpoint
+ALTER TABLE "devices" ALTER COLUMN "identifier" SET NOT NULL;--> statement-breakpoint
+ALTER TABLE "devices" ADD COLUMN "serial_number" text NOT NULL;--> statement-breakpoint
+ALTER TABLE "devices" ADD COLUMN "usage" text NOT NULL;--> statement-breakpoint
+ALTER TABLE "devices" ADD COLUMN "type" text NOT NULL;--> statement-breakpoint
+ALTER TABLE "devices" ADD COLUMN "location" text NOT NULL;--> statement-breakpoint
+ALTER TABLE "devices" ADD COLUMN "average_energy_cost" numeric NOT NULL;--> statement-breakpoint
+ALTER TABLE "devices" ADD COLUMN "min_off_time" numeric NOT NULL;--> statement-breakpoint
+ALTER TABLE "devices" ADD COLUMN "brown_out_voltage_change" numeric NOT NULL;--> statement-breakpoint
+ALTER TABLE "devices" ADD COLUMN "brown_out_frequency_change" numeric NOT NULL;--> statement-breakpoint
+ALTER TABLE "devices" ADD COLUMN "utility" text NOT NULL;--> statement-breakpoint
+ALTER TABLE "devices" ADD COLUMN "country" text NOT NULL;--> statement-breakpoint
+ALTER TABLE "devices" ADD COLUMN "meter_service_id" text NOT NULL;--> statement-breakpoint
+ALTER TABLE "devices" ADD COLUMN "is_connected_to_primary_device" boolean NOT NULL;--> statement-breakpoint
+ALTER TABLE "devices" ADD COLUMN "utility_smart_panel" text NOT NULL;--> statement-breakpoint
+ALTER TABLE "devices" ADD COLUMN "country_smart_panel" text NOT NULL;--> statement-breakpoint
+ALTER TABLE "devices" ADD COLUMN "meter_service_id_smart_panel" text NOT NULL;--> statement-breakpoint
+ALTER TABLE "devices" ADD COLUMN "max_load" numeric NOT NULL;--> statement-breakpoint
+ALTER TABLE "devices" ADD COLUMN "updated_at" timestamp DEFAULT now();

@@ -1,10 +1,10 @@
 import * as SecureStore from 'expo-secure-store';
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useColorScheme, Platform } from 'react-native';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { Platform, useColorScheme } from 'react-native';
 
-import { LightTheme, DarkTheme } from '../styles/themes';
+import { DarkTheme, LightTheme } from '../styles/themes';
 
-type ThemeContextType = {
+export type ThemeContextType = {
   appTheme: typeof LightTheme | typeof DarkTheme;
   setAppTheme: (theme: 'light' | 'dark' | 'system') => void;
   appThemeType: 'light' | 'dark' | 'system';

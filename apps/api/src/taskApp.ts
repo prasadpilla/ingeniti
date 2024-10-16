@@ -21,9 +21,7 @@ taskApp.use('/tasks', tasksController);
 taskApp.use('/devices', devicesController);
 
 taskApp.get('/', (_, res) => {
-  res
-    .status(HttpStatusCode.OK_200)
-    .send({ healthy: true, version: '0.0.1', service: 'task-worker' });
+  res.status(HttpStatusCode.OK_200).send({ healthy: true, version: '0.0.1', service: 'task-worker' });
 });
 
 // !IMPORTANT: This must be the last middleware in the stack.

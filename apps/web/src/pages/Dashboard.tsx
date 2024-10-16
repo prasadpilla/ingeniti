@@ -55,9 +55,7 @@ const Dashboard = () => {
                       if (key === 'total') return;
                       return (
                         <p key={key}>
-                          <span className="text-muted-foreground">
-                            {key[0].toUpperCase() + key.slice(1)}
-                          </span>
+                          <span className="text-muted-foreground">{key[0].toUpperCase() + key.slice(1)}</span>
                           <span className="text-sm ml-1 font-semibold">{value.value}</span>
                         </p>
                       );
@@ -68,9 +66,7 @@ const Dashboard = () => {
               {metrics.connected.value && (
                 <p className="text-2xl font-bold mt-2">
                   {metrics.connected.value > 0
-                    ? parseFloat(
-                        ((metrics.connected.value / metrics.connected.prevValue) * 100).toFixed(1)
-                      )
+                    ? parseFloat(((metrics.connected.value / metrics.connected.prevValue) * 100).toFixed(1))
                         .toString()
                         .replace(/\.0$/, '')
                     : 0}
@@ -88,11 +84,7 @@ const Dashboard = () => {
                 </p>
               </div>
               <Progress
-                value={
-                  metrics.connected.value > 0
-                    ? (metrics.connected.value / metrics.connected.prevValue) * 100
-                    : 0
-                }
+                value={metrics.connected.value > 0 ? (metrics.connected.value / metrics.connected.prevValue) * 100 : 0}
                 className="mt-2 h-2 [&>div]:bg-green-500"
               />
             </div>

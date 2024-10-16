@@ -60,7 +60,6 @@
     "zustand": "^4.5.4"
   },
   "devDependencies": {
-    "@ingeniti/eslint-config": "workspace:*",
     "eslint": "^8.34.0",
     "eslint-config-next": "^13.2.1",
     "@types/node": "^20.12.7",
@@ -77,14 +76,5 @@
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "4.9.5"
-  },
-  "eslintConfig": {
-    "extends": [
-      "@ingeniti/eslint-config"
-    ],
-    "ignorePatterns": [
-      "node_modules",
-      "public"
-    ]
   }
 }

@@ -24,13 +24,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: '100%',
+    paddingVertical: 20,
   },
   keyboardAvoidingView: {
     flex: 1,
   },
   scrollViewContent: {
     flexGrow: 1,
-    padding: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 20,
     width: '100%',
     maxWidth: 340,
     alignSelf: 'center',

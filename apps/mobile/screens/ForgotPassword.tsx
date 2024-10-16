@@ -281,7 +281,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
             navigation.navigate('Login');
           }}
         >
-          <Text style={[styles.backToLoginText, { color: theme.colors.primary }]}>{t('login')}</Text>
+          <Text style={[styles.backToLoginText, { color: theme.colors.primary }]}>{t('go_back')}</Text>
         </TouchableOpacity>
       </View>
     </Background>

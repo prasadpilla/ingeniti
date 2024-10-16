@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { View, StyleSheet, Text, ViewStyle, NativeSyntheticEvent, TextInputFocusEventData } from 'react-native';
 import { TextInput as Input, useTheme } from 'react-native-paper';
 
-import { Themes } from '../styles/themes';
-
 interface FormInputProps extends React.ComponentProps<typeof Input> {
   hasError?: boolean;
   errorText?: string;
@@ -31,6 +29,7 @@ const FormInput: React.FC<FormInputProps> = ({ errorText, hasError, isPassword, 
       <Input
         style={[{ backgroundColor: theme.colors.surface }]}
         selectionColor={theme.colors.primary}
+        placeholderTextColor={theme.colors.mutedForeground}
         underlineColor="transparent"
         mode="outlined"
         label={label}

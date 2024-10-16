@@ -75,7 +75,7 @@ const VerifySignUpEmailScreen: React.FC<VerifySignUpEmailProps> = ({ route, navi
 
   return (
     <Background>
-      <Header>{t('verify_your_phone')}</Header>
+      <Header>{t('verify_your_email')}</Header>
 
       <View>
         <Paragraph style={styles.paragraph}>{t('enter_email_verification_code')}</Paragraph>

@@ -1,41 +1,318 @@
-import i18next from 'i18next';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { Image } from 'react-native';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Image, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { Appbar, Menu, Paragraph, Text, Title, useTheme } from 'react-native-paper';
 
+import { useAuth, useUser } from '@clerk/clerk-expo';
+import { Device } from '@ingeniti/shared/dist/schemas/mobile/devices.schema';
+import { useQuery } from '@tanstack/react-query';
 import Background from '../components/Background';
 import Button from '../components/Button';
-import Header from '../components/Header';
-import LanguagePicker from '../components/LanguagePicker';
-import Paragraph from '../components/Paragraph';
+import DeviceListItem from '../components/DeviceListItem';
+import AddDevicePopover from '../components/DeviceRegistration/AddDevicePopover';
 import { HomeProps } from '../types';
+import { makeApiCall } from '../utils/api';
 
-const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
-  const { t } = useTranslation();
+const HomeScreen = ({ navigation }: HomeProps) => {
+  const theme = useTheme();
+  const { getToken } = useAuth();
+  const { user } = useUser();
+  const [isDevicePopoverVisible, setIsDevicePopoverVisible] = useState(false);
+  const [activeTab, setActiveTab] = useState<'Devices' | 'Sensors'>('Devices');
+  const [isMoreMenuVisible, setIsMoreMenuVisible] = useState(false);
 
-  const handleLanguageChange = (language: string) => {
-    i18next.changeLanguage(language);
+  const {
+    isLoading,
+    data: devices = [],
+    refetch: refetchDevices,
+  } = useQuery({
+    queryKey: ['devices'],
+    queryFn: async () => {
+      const token = await getToken();
+      const response = await makeApiCall(token, '/devices', 'GET');
+      return response.json();
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+    refetchOnWindowFocus: false,
+  });
+
+  const handleBackgroundPress = () => {
+    if (isDevicePopoverVisible) {
+      setIsDevicePopoverVisible(false);
+    }
   };
 
+  const handleDevicePress = (device: Device) => {
+    navigation.getParent()?.navigate('DeviceDetails', { device });
+  };
+
+  const handleEnergyUsagePress = () => {
+    navigation.getParent()?.navigate('EnergyUsageChart');
+  };
+
+  useEffect(() => {
+    refetchDevices();
+  }, []);
+
+  const totalDevices = devices.length;
+  const totalSensors = devices.reduce((acc: number, device: Device) => acc + (device.isSensor ? 1 : 0), 0);
+
+  const filteredItems =
+    activeTab === 'Devices'
+      ? devices.filter((device: Device) => !device.isSensor)
+      : devices.filter((device: Device) => device.isSensor);
+
   return (
-    <Background>
-      <Image
-        source={require('../assets/logo.jpeg')}
-        style={{ width: 100, height: 100, borderRadius: 10, marginBottom: 20 }}
-      />
-      <Header>
-        <Image source={require('../assets/logo-title.jpeg')} style={{ width: 200, height: 50 }} />
-      </Header>
-      <Paragraph style={{ marginTop: -20, marginBottom: 20, fontStyle: 'italic' }}>{t('tagline')}</Paragraph>
-      <Button mode="contained" onPress={() => navigation.navigate('Login')}>
-        {t('login')}
-      </Button>
-      <Button mode="outlined" onPress={() => navigation.navigate('SignUp')} style={{ marginBottom: 40 }}>
-        {t('sign_up')}
-      </Button>
-      <LanguagePicker selectedLanguage={i18next.language} onSelectLanguage={handleLanguageChange} />
-    </Background>
+    <>
+      <Appbar.Header
+        style={{
+          backgroundColor: theme.colors.secondaryContainer,
+          height: 60,
+          zIndex: 100,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+        }}
+      >
+        <TouchableOpacity style={{ padding: 8 }}>
+          <Image source={require('../assets/logo.jpeg')} style={{ width: 32, height: 32 }} />
+        </TouchableOpacity>
+        <View style={{ flexDirection: 'row' }}>
+          <Appbar.Action icon="account-plus" onPress={() => {}} />
+          <Appbar.Action
+            icon="plus-circle"
+            onPress={() => {
+              setIsDevicePopoverVisible(!isDevicePopoverVisible);
+            }}
+          />
+        </View>
+      </Appbar.Header>
+      {isDevicePopoverVisible && (
+        <AddDevicePopover
+          onScanCode={() => {
+            setIsDevicePopoverVisible(false);
+            navigation.getParent()?.navigate('DeviceOnBoardingForm', { refetchDevices });
+          }}
+          onEnterCode={() => {
+            setIsDevicePopoverVisible(false);
+          }}
+          containerStyles={styles.popoverContainer}
+        />
+      )}
+      <Background>
+        <TouchableWithoutFeedback onPress={handleBackgroundPress}>
+          <View style={styles.contentWrapper}>
+            <View>
+              <Title style={styles.greeting}>Hello, {user?.firstName || 'User'}</Title>
+              <Text style={styles.deviceCount}>
+                {totalDevices} devices, {totalSensors} sensors
+              </Text>
+              <View style={styles.tabContainer}>
+                <View style={styles.tabButtons}>
+                  <TouchableOpacity
+                    style={[styles.tabButton, activeTab === 'Devices' && styles.activeTabButton]}
+                    onPress={() => setActiveTab('Devices')}
+                  >
+                    <Text style={[styles.tabButtonText, activeTab === 'Devices' && styles.activeTabButtonText]}>
+                      Devices
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.tabButton, activeTab === 'Sensors' && styles.activeTabButton]}
+                    onPress={() => setActiveTab('Sensors')}
+                  >
+                    <Text style={[styles.tabButtonText, activeTab === 'Sensors' && styles.activeTabButtonText]}>
+                      Sensors
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <Menu
+                  visible={isMoreMenuVisible}
+                  onDismiss={() => setIsMoreMenuVisible(false)}
+                  anchor={
+                    <TouchableOpacity onPress={() => setIsMoreMenuVisible(true)}>
+                      <MaterialCommunityIcons name="dots-vertical" size={24} color={theme.colors.onSurface} />
+                    </TouchableOpacity>
+                  }
+                  contentStyle={styles.menuContent}
+                >
+                  <Menu.Item
+                    onPress={handleEnergyUsagePress}
+                    title="Monitor"
+                    leadingIcon={({ size, color }) => (
+                      <MaterialCommunityIcons name="monitor-dashboard" size={size} color={color} />
+                    )}
+                    titleStyle={styles.menuItemTitle}
+                  />
+                </Menu>
+              </View>
+            </View>
+            {isLoading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator animating={true} color={theme.colors.secondary} />
+                <Paragraph>Loading...</Paragraph>
+              </View>
+            ) : filteredItems.length > 0 ? (
+              <View style={styles.contentContainer}>
+                <View style={styles.devicesContainer}>
+                  {filteredItems.map((item: Device) => (
+                    <TouchableOpacity key={item.id} onPress={() => handleDevicePress(item)}>
+                      <DeviceListItem device={item} />
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            ) : (
+              <View style={styles.emptyDeviceContainer}>
+                <MaterialCommunityIcons
+                  name={activeTab === 'Devices' ? 'power-socket-uk' : 'thermometer'}
+                  size={24}
+                  color={theme.colors.secondary}
+                  style={[styles.emptyDeviceIcon, { backgroundColor: theme.colors.secondaryContainer }]}
+                />
+                <Paragraph style={styles.emptyDeviceHeading}>Lets get started</Paragraph>
+                <Paragraph style={styles.emptyDeviceSubheading}>
+                  Add your first {activeTab === 'Devices' ? 'device' : 'sensor'} by scanning the QR code or entering the
+                  code manually.
+                </Paragraph>
+
+                <View style={styles.emptyDeviceButtonContainer}>
+                  <Button
+                    mode="contained"
+                    onPress={() => {
+                      navigation.getParent()?.navigate('DeviceOnBoardingForm', { refetchDevices });
+                    }}
+                  >
+                    Scan QR Code
+                  </Button>
+                  <Button
+                    onPress={() => {
+                      navigation.getParent()?.navigate('DeviceOnBoardingForm', { refetchDevices });
+                    }}
+                  >
+                    Enter Code
+                  </Button>
+                </View>
+              </View>
+            )}
+          </View>
+        </TouchableWithoutFeedback>
+      </Background>
+    </>
   );
 };
+
+const styles = StyleSheet.create({
+  greeting: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  deviceCount: {
+    fontSize: 16,
+    marginTop: 5,
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    marginTop: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  tabButtons: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  tabButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  activeTabButton: {
+    borderBottomWidth: 2,
+    borderBottomColor: '#000',
+  },
+  tabButtonText: {
+    fontSize: 16,
+  },
+  activeTabButtonText: {
+    fontWeight: 'bold',
+  },
+  popoverContainer: {
+    position: 'absolute',
+    right: 20,
+    top: 90,
+    zIndex: 1000,
+  },
+  contentContainer: {
+    flex: 1,
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+  },
+  container: {
+    flex: 1,
+    padding: 10,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  devicesContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    top: 10,
+    flexWrap: 'wrap',
+    gap: 10,
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+  },
+  devicesList: {
+    width: '100%',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+  },
+  emptyDeviceContainer: {
+    flex: 1,
+    padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 6,
+  },
+  emptyDeviceHeading: {
+    fontSize: 24,
+    paddingTop: 10,
+    fontWeight: '700',
+  },
+  emptyDeviceSubheading: {
+    textAlign: 'center',
+  },
+  emptyDeviceButtonContainer: {
+    alignItems: 'center',
+    width: '60%',
+  },
+  emptyDeviceIcon: {
+    padding: 8,
+    borderRadius: 100,
+  },
+  contentWrapper: {
+    flex: 1,
+    width: '100%',
+  },
+  menuContent: {
+    borderRadius: 12,
+    minWidth: 150,
+    elevation: 3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  menuItemTitle: {
+    fontSize: 14,
+  },
+});
 
 export default HomeScreen;
