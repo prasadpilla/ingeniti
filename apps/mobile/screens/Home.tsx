@@ -48,6 +48,10 @@ const HomeScreen = ({ navigation }: HomeProps) => {
     navigation.getParent()?.navigate('DeviceDetails', { device });
   };
 
+  const handleEnergyUsagePress = () => {
+    navigation.getParent()?.navigate('EnergyUsageChart');
+  };
+
   useEffect(() => {
     refetchDevices();
   }, []);
@@ -134,18 +138,10 @@ const HomeScreen = ({ navigation }: HomeProps) => {
                   contentStyle={styles.menuContent}
                 >
                   <Menu.Item
-                    onPress={() => {}}
+                    onPress={handleEnergyUsagePress}
                     title="Monitor"
                     leadingIcon={({ size, color }) => (
                       <MaterialCommunityIcons name="monitor-dashboard" size={size} color={color} />
-                    )}
-                    titleStyle={styles.menuItemTitle}
-                  />
-                  <Menu.Item
-                    onPress={() => {}}
-                    title="Edit"
-                    leadingIcon={({ size, color }) => (
-                      <MaterialCommunityIcons name="pencil" size={size} color={color} />
                     )}
                     titleStyle={styles.menuItemTitle}
                   />

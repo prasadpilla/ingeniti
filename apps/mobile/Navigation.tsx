@@ -7,6 +7,7 @@ import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navig
 
 import DeviceDetails from './screens/DeviceDetails';
 import DeviceOnBoardingFormScreen from './screens/DeviceOnBoardingForm';
+import EnergyUsageChart from './screens/EnergyUsageChart';
 import ForgotPasswordScreen from './screens/ForgotPassword';
 import HomeScreen from './screens/Home';
 import LoginScreen from './screens/Login';
@@ -67,6 +68,7 @@ const Navigation = ({ theme }: { theme: Theme }) => {
             <Stack.Screen name="MainTabs" component={TabNavigation} />
             <Stack.Screen name="DeviceOnBoardingForm" component={DeviceOnBoardingFormScreen} />
             <Stack.Screen name="DeviceDetails" component={DeviceDetails} />
+            <Stack.Screen name="EnergyUsageChart" component={EnergyUsageChart} />
           </>
         ) : (
           <>

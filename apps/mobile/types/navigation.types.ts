@@ -28,6 +28,7 @@ type RootStackNavigationParamList = {
   DeviceDetails: {
     device: Device;
   };
+  EnergyUsageChart: undefined;
 };
 
 type WelcomeProps = NativeStackScreenProps<RootStackNavigationParamList, 'Welcome'>;
@@ -40,7 +41,7 @@ type ForgotPasswordProps = NativeStackScreenProps<RootStackNavigationParamList, 
 type MainTabsProps = NativeStackScreenProps<RootStackNavigationParamList, 'MainTabs'>;
 type DeviceOnBoardingFormProps = NativeStackScreenProps<RootStackNavigationParamList, 'DeviceOnBoardingForm'>;
 type DeviceDetailsProps = NativeStackScreenProps<RootStackNavigationParamList, 'DeviceDetails'>;
-
+type EnergyUsageChartProps = NativeStackScreenProps<RootStackNavigationParamList, 'EnergyUsageChart'>;
 // bottom tab types
 type BottomTabNavigationParamList = {
   Home: undefined;
@@ -56,6 +57,7 @@ export type {
   BottomTabNavigationParamList,
   DeviceDetailsProps,
   DeviceOnBoardingFormProps,
+  EnergyUsageChartProps,
   ForgotPasswordProps,
   HomeProps,
   LoginProps,
