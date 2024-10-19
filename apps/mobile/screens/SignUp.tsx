@@ -7,6 +7,7 @@ import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ActivityIndicator, Appbar, Checkbox, useTheme } from 'react-native-paper';
+import { Dropdown } from 'react-native-paper-dropdown';
 
 import Button from '../components/Button';
 import CountryCodePicker from '../components/CountryCodePicker';
@@ -15,12 +16,22 @@ import Paragraph from '../components/Paragraph';
 import { SignupProps } from '../types';
 import { countries, CountryData } from '../utils/country-data';
 
+const currencyOptions = [
+  { label: 'USD', value: 'USD' },
+  { label: 'EUR', value: 'EUR' },
+  { label: 'GBP', value: 'GBP' },
+  { label: 'INR', value: 'INR' },
+  { label: 'JPY', value: 'JPY' },
+  // Add more currencies as needed
+];
+
 const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const { isLoaded, signUp } = useSignUp();
   const [signUpError, setSignUpError] = useState<string | undefined>(undefined);
   const [selectedCountry, setSelectedCountry] = useState<CountryData>(countries[0]);
+  const [selectedCurrency, setSelectedCurrency] = useState<string>('INR');
 
   const signUpForm = useForm<SignUpForm>({
     resolver: zodResolver(signUpFormSchema),
@@ -71,6 +82,11 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
         emailAddress,
         phoneNumber: phone,
         password,
+        firstName,
+        lastName,
+        unsafeMetadata: {
+          currency: selectedCurrency,
+        },
       });
 
       await signUp.prepareEmailAddressVerification({
@@ -217,6 +233,15 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
           )}
         />
 
+        <View style={styles.dropdown}>
+          <Dropdown
+            label={t('Select Currency')}
+            value={selectedCurrency}
+            onSelect={(value) => setSelectedCurrency(value ?? 'INR')}
+            options={currencyOptions}
+          />
+        </View>
+
         <Controller
           control={signUpForm.control}
           name="termsAndConditions"
@@ -339,6 +364,10 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
+  },
+  dropdown: {
+    width: '100%',
+    margin: 8,
   },
 });
 
