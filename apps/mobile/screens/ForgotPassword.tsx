@@ -5,13 +5,12 @@ import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { ActivityIndicator, useTheme } from 'react-native-paper';
+import { ActivityIndicator, Appbar, useTheme } from 'react-native-paper';
 import { z } from 'zod';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
 import FormInput from '../components/FormInput';
-import Header from '../components/Header';
 import Paragraph from '../components/Paragraph';
 import { ForgotPasswordProps } from '../types';
 
@@ -142,153 +141,173 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordProps> = ({ navigation }) => 
   };
 
   return (
-    <Background>
-      <Header>{t('reset_password')}</Header>
-      {!resetSent ? (
-        <>
-          <Controller
-            control={forgotPasswordForm.control}
-            name="emailAddress"
-            render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
-              <FormInput
-                label={t('email')}
-                returnKeyType="done"
-                value={value}
-                onChangeText={(text) => {
-                  onChange(text);
-                  if (resetError) setResetError(undefined);
-                }}
-                onBlur={onBlur}
-                errorText={error?.message}
-                autoCapitalize="none"
-                autoComplete="email"
-                textContentType="emailAddress"
-                keyboardType="email-address"
-              />
-            )}
-          />
-          {resetError && <Text style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>{resetError}</Text>}
-          <Button
-            mode="contained"
-            onPress={forgotPasswordForm.handleSubmit(onResetPress)}
-            disabled={forgotPasswordForm.formState.isSubmitting || !forgotPasswordForm.formState.isValid}
-          >
-            {forgotPasswordForm.formState.isSubmitting ? (
-              <ActivityIndicator animating={true} color={theme.colors.secondary} />
-            ) : (
-              t('send_otp')
-            )}
-          </Button>
-        </>
-      ) : !otpVerified ? (
-        <>
-          <Text style={styles.centeredText}>{t('enter_email_verification_code')}</Text>
-          <Controller
-            control={verifyOTPForm.control}
-            name="otp"
-            render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
-              <FormInput
-                label="OTP"
-                returnKeyType="done"
-                value={value}
-                onChangeText={(text) => {
-                  onChange(text);
-                  if (resetError) setResetError(undefined);
-                }}
-                onBlur={onBlur}
-                errorText={error?.message}
-                keyboardType="number-pad"
-              />
-            )}
-          />
-          {resetError && <Text style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>{resetError}</Text>}
-          <Button
-            mode="contained"
-            onPress={verifyOTPForm.handleSubmit(onVerifyOTP)}
-            disabled={verifyOTPForm.formState.isSubmitting || !verifyOTPForm.formState.isValid}
-          >
-            {verifyOTPForm.formState.isSubmitting ? (
-              <ActivityIndicator animating={true} color={theme.colors.secondary} />
-            ) : (
-              t('verify_otp')
-            )}
-          </Button>
-        </>
-      ) : !verificationComplete ? (
-        <View style={styles.fullWidth}>
-          <Text style={[styles.centeredText, styles.marginBottom]}>{t('otp_verified_enter_password')}</Text>
-          <Controller
-            control={newPasswordForm.control}
-            name="password"
-            render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
-              <FormInput
-                label={t('new_password')}
-                returnKeyType="next"
-                value={value}
-                onChangeText={(text) => {
-                  onChange(text);
-                  if (resetError) setResetError(undefined);
-                }}
-                onBlur={onBlur}
-                errorText={error?.message}
-                isPassword
-              />
-            )}
-          />
-          <Controller
-            control={newPasswordForm.control}
-            name="confirmPassword"
-            render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
-              <FormInput
-                label={t('confirm_new_password')}
-                returnKeyType="done"
-                value={value}
-                onChangeText={(text) => {
-                  onChange(text);
-                  if (resetError) setResetError(undefined);
-                }}
-                onBlur={onBlur}
-                errorText={error?.message}
-                isPassword
-              />
-            )}
-          />
-          {resetError && <Text style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>{resetError}</Text>}
-          <Button
-            mode="contained"
-            onPress={newPasswordForm.handleSubmit(onNewPasswordSubmit)}
-            disabled={newPasswordForm.formState.isSubmitting || !newPasswordForm.formState.isValid}
-          >
-            {newPasswordForm.formState.isSubmitting ? (
-              <ActivityIndicator animating={true} color={theme.colors.secondary} />
-            ) : (
-              t('reset_password')
-            )}
-          </Button>
-        </View>
-      ) : (
-        <View style={styles.successContainer}>
-          <MaterialIcons name="check-circle" size={24} color="green" />
-          <Paragraph>{t('password_reset_successful')}</Paragraph>
-        </View>
-      )}
-      <View style={styles.backToLoginContainer}>
-        <TouchableOpacity
-          onPress={() => {
-            forgotPasswordForm.reset();
-            verifyOTPForm.reset();
-            newPasswordForm.reset();
-            navigation.navigate('Login');
-          }}
-        >
-          <Text style={[styles.backToLoginText, { color: theme.colors.primary }]}>{t('go_back')}</Text>
+    <>
+      <Appbar.Header
+        style={{
+          backgroundColor: theme.colors.secondaryContainer,
+          height: 60,
+          zIndex: 100,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+        }}
+      >
+        <TouchableOpacity style={{ padding: 8 }} onPress={() => navigation.goBack()}>
+          <Appbar.BackAction size={24} color={theme.colors.onSecondaryContainer} />
         </TouchableOpacity>
-      </View>
-    </Background>
+        <Appbar.Content
+          title={t('reset_password')}
+          titleStyle={[styles.headerTitle, { color: theme.colors.onSecondaryContainer }]}
+        />
+        <View style={{ width: 40 }} />
+      </Appbar.Header>
+      <Background>
+        {!resetSent ? (
+          <>
+            <Text style={[styles.descriptionText, { color: theme.colors.onBackground }]}>
+              {t('reset_password_description')}
+            </Text>
+            <Controller
+              control={forgotPasswordForm.control}
+              name="emailAddress"
+              render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+                <FormInput
+                  label={t('email')}
+                  returnKeyType="done"
+                  value={value}
+                  onChangeText={(text) => {
+                    onChange(text);
+                    if (resetError) setResetError(undefined);
+                  }}
+                  onBlur={onBlur}
+                  errorText={error?.message}
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  textContentType="emailAddress"
+                  keyboardType="email-address"
+                />
+              )}
+            />
+            {resetError && (
+              <Text style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>{resetError}</Text>
+            )}
+            <Button
+              mode="contained"
+              onPress={forgotPasswordForm.handleSubmit(onResetPress)}
+              disabled={forgotPasswordForm.formState.isSubmitting || !forgotPasswordForm.formState.isValid}
+            >
+              {forgotPasswordForm.formState.isSubmitting ? (
+                <ActivityIndicator animating={true} color={theme.colors.secondary} />
+              ) : (
+                t('send_otp')
+              )}
+            </Button>
+          </>
+        ) : !otpVerified ? (
+          <>
+            <Text style={styles.centeredText}>{t('enter_email_verification_code')}</Text>
+            <Controller
+              control={verifyOTPForm.control}
+              name="otp"
+              render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+                <FormInput
+                  label="OTP"
+                  returnKeyType="done"
+                  value={value}
+                  onChangeText={(text) => {
+                    onChange(text);
+                    if (resetError) setResetError(undefined);
+                  }}
+                  onBlur={onBlur}
+                  errorText={error?.message}
+                  keyboardType="number-pad"
+                />
+              )}
+            />
+            {resetError && (
+              <Text style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>{resetError}</Text>
+            )}
+            <Button
+              mode="contained"
+              onPress={verifyOTPForm.handleSubmit(onVerifyOTP)}
+              disabled={verifyOTPForm.formState.isSubmitting || !verifyOTPForm.formState.isValid}
+            >
+              {verifyOTPForm.formState.isSubmitting ? (
+                <ActivityIndicator animating={true} color={theme.colors.secondary} />
+              ) : (
+                t('verify_otp')
+              )}
+            </Button>
+          </>
+        ) : !verificationComplete ? (
+          <View style={styles.fullWidth}>
+            <Text style={[styles.centeredText, styles.marginBottom]}>{t('otp_verified_enter_password')}</Text>
+            <Controller
+              control={newPasswordForm.control}
+              name="password"
+              render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+                <FormInput
+                  label={t('new_password')}
+                  returnKeyType="next"
+                  value={value}
+                  onChangeText={(text) => {
+                    onChange(text);
+                    if (resetError) setResetError(undefined);
+                  }}
+                  onBlur={onBlur}
+                  errorText={error?.message}
+                  isPassword
+                />
+              )}
+            />
+            <Controller
+              control={newPasswordForm.control}
+              name="confirmPassword"
+              render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+                <FormInput
+                  label={t('confirm_new_password')}
+                  returnKeyType="done"
+                  value={value}
+                  onChangeText={(text) => {
+                    onChange(text);
+                    if (resetError) setResetError(undefined);
+                  }}
+                  onBlur={onBlur}
+                  errorText={error?.message}
+                  isPassword
+                />
+              )}
+            />
+            {resetError && (
+              <Text style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>{resetError}</Text>
+            )}
+            <Button
+              mode="contained"
+              onPress={newPasswordForm.handleSubmit(onNewPasswordSubmit)}
+              disabled={newPasswordForm.formState.isSubmitting || !newPasswordForm.formState.isValid}
+            >
+              {newPasswordForm.formState.isSubmitting ? (
+                <ActivityIndicator animating={true} color={theme.colors.secondary} />
+              ) : (
+                t('reset_password')
+              )}
+            </Button>
+          </View>
+        ) : (
+          <View style={styles.successContainer}>
+            <MaterialIcons name="check-circle" size={24} color="green" />
+            <Paragraph>{t('password_reset_successful')}</Paragraph>
+          </View>
+        )}
+      </Background>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
   centeredText: {
     textAlign: 'center',
     marginBottom: 16,
@@ -296,15 +315,6 @@ const styles = StyleSheet.create({
   errorText: {
     textAlign: 'center',
     marginVertical: 8,
-  },
-  backToLoginContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 16,
-  },
-  backToLoginText: {
-    fontSize: 16,
-    fontWeight: '600',
   },
   fullWidth: {
     width: '100%',
@@ -316,6 +326,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
+  },
+  descriptionText: {
+    textAlign: 'center',
+    marginBottom: 16,
+    fontSize: 16,
   },
 });
 
