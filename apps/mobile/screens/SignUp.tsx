@@ -22,7 +22,6 @@ const currencyOptions = [
   { label: 'GBP', value: 'GBP' },
   { label: 'INR', value: 'INR' },
   { label: 'JPY', value: 'JPY' },
-  // Add more currencies as needed
 ];
 
 const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
@@ -125,7 +124,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
         />
         <View style={{ width: 40 }} />
       </Appbar.Header>
-      <View style={{ padding: 20, flex: 1, alignItems: 'center' }}>
+      <View style={styles.container}>
         <Controller
           control={signUpForm.control}
           name="firstName"
@@ -137,6 +136,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
               onChangeText={onChange}
               onBlur={onBlur}
               errorText={error?.message}
+              containerStyles={styles.inputContainer}
             />
           )}
         />
@@ -152,6 +152,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
               onChangeText={onChange}
               onBlur={onBlur}
               errorText={error?.message}
+              containerStyles={styles.inputContainer}
             />
           )}
         />
@@ -174,13 +175,16 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
               autoComplete="email"
               textContentType="emailAddress"
               keyboardType="email-address"
+              containerStyles={styles.inputContainer}
             />
           )}
         />
 
         <View style={styles.phoneInputContainer}>
           <View style={styles.phoneInput}>
-            <CountryCodePicker selectedCountry={selectedCountry} onSelectCountry={setSelectedCountry} />
+            <View style={styles.countryCodePickerContainer}>
+              <CountryCodePicker selectedCountry={selectedCountry} onSelectCountry={setSelectedCountry} />
+            </View>
             <Controller
               control={signUpForm.control}
               name="phoneNumber"
@@ -229,6 +233,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
               }}
               errorText={error?.message}
               isPassword
+              containerStyles={styles.inputContainer}
             />
           )}
         />
@@ -245,7 +250,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
         <Controller
           control={signUpForm.control}
           name="termsAndConditions"
-          render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+          render={({ field: { value, onChange } }) => (
             <View style={styles.checkboxContainer}>
               <TouchableOpacity onPress={() => onChange(!value)} style={styles.checkboxTouchable}>
                 <Checkbox
@@ -293,43 +298,37 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  countryCodePickerContainer: {
+    marginTop: 14,
+  },
   label: {
     fontSize: 14,
   },
   button: {
-    marginTop: 24,
+    marginTop: 12,
   },
   row: {
     flexDirection: 'row',
-    marginTop: 4,
   },
   link: {
     fontWeight: 'bold',
     fontSize: 14,
   },
   inputContainer: {
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
+    marginBottom: -4,
   },
   countryCodeInput: {
     backgroundColor: '#eee',
   },
   errorText: {
     color: 'red',
-    marginTop: 8,
+    marginTop: 2,
     textAlign: 'center',
     fontSize: 14,
   },
-  goBackButton: {
-    marginTop: 24,
-  },
-  goBackText: {
-    fontWeight: '600',
-  },
   phoneInputContainer: {
     width: '100%',
+    marginBottom: -4,
   },
   phoneInput: {
     width: '100%',
@@ -339,12 +338,13 @@ const styles = StyleSheet.create({
   },
   phoneInputField: {
     flex: 1,
+    marginBottom: -4,
   },
   phoneInputFieldError: {
     color: 'red',
     textAlign: 'left',
     fontSize: 12,
-    marginTop: -8,
+    marginTop: 2,
     marginLeft: 4,
   },
   checkboxContainer: {
@@ -352,6 +352,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: -4,
   },
   checkboxTouchable: {
     padding: 8,
@@ -367,7 +368,14 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     width: '100%',
-    margin: 8,
+    marginTop: 12,
+    marginBottom: 4,
+  },
+  container: {
+    paddingHorizontal: 16,
+    flex: 1,
+    alignItems: 'center',
+    gap: 4,
   },
 });
 

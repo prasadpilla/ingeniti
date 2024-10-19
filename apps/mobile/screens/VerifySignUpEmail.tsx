@@ -2,11 +2,13 @@ import { useSignUp } from '@clerk/clerk-expo';
 import { ClerkAPIError } from '@clerk/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { VerificationCodeForm, verificationCodeFormSchema } from '@ingeniti/shared';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ActivityIndicator, useTheme } from 'react-native-paper';
+import { useNavigation } from '@react-navigation/native';
+import { Appbar } from 'react-native-paper';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
@@ -15,10 +17,11 @@ import Header from '../components/Header';
 import Paragraph from '../components/Paragraph';
 import { VerifySignUpEmailProps } from '../types';
 
-const VerifySignUpEmailScreen: React.FC<VerifySignUpEmailProps> = ({ route, navigation }) => {
+const VerifySignUpEmailScreen: React.FC<VerifySignUpEmailProps> = ({ route }) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const { isLoaded, signUp } = useSignUp();
+  const navigation = useNavigation();
 
   const { firstName, lastName, emailAddress, phoneNumber } = route.params;
 
@@ -100,78 +103,95 @@ const VerifySignUpEmailScreen: React.FC<VerifySignUpEmailProps> = ({ route, navi
   };
 
   return (
-    <Background>
-      <Header>{t('verify_your_email')}</Header>
-
-      <View>
-        <Paragraph style={styles.paragraph}>{t('enter_email_verification_code')}</Paragraph>
-        <View style={styles.credentialContainer}>
-          <Paragraph style={styles.credential}>{emailAddress}</Paragraph>
-        </View>
-      </View>
-
-      <Controller
-        control={verificationCodeForm.control}
-        name="code"
-        render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
-          <FormInput
-            label={t('verify_otp')}
-            returnKeyType="done"
-            value={value}
-            onChangeText={(text) => {
-              onChange(text);
-              if (verificationError) setVerificationError(undefined);
-            }}
-            onBlur={onBlur}
-            keyboardType="number-pad"
-            errorText={error?.message}
-          />
-        )}
-      />
-
-      <View style={styles.resendButton}>
-        <Paragraph style={styles.paragraph}>{t('Did not recieve the code yet?')}</Paragraph>
-        <TouchableOpacity onPress={onResendOTP} disabled={resendLoading || cooldown > 0}>
-          {resendLoading ? (
-            <ActivityIndicator animating={true} color={theme.colors.secondary} />
-          ) : (
-            <Paragraph
-              style={[styles.resendText, cooldown > 0 ? styles.cooldownText : { color: theme.colors.primary }]}
-            >
-              {cooldown > 0 ? `${t('Resend otp')} (${cooldown}s)` : t('Resend')}
-            </Paragraph>
-          )}
-        </TouchableOpacity>
-      </View>
-
-      {verificationError && (
-        <Paragraph style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>{verificationError}</Paragraph>
-      )}
-
-      <Button
-        mode="contained"
-        onPress={verificationCodeForm.handleSubmit(onPressVerify)}
-        style={styles.button}
-        disabled={verificationCodeForm.formState.isSubmitting || !verificationCodeForm.formState.isValid}
-      >
-        {verificationCodeForm.formState.isSubmitting ? (
-          <ActivityIndicator animating={true} color={theme.colors.secondary} />
-        ) : (
-          t('verify_otp')
-        )}
-      </Button>
-
-      <TouchableOpacity
-        style={styles.goBackButton}
-        onPress={() => {
-          setVerificationError(undefined);
-          verificationCodeForm.reset();
-          navigation.goBack();
+    <>
+      <Appbar.Header
+        style={{
+          backgroundColor: theme.colors.secondaryContainer,
+          height: 60,
+          zIndex: 100,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
         }}
       >
-        <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>{t('go_back')}</Paragraph>
-      </TouchableOpacity>
-    </Background>
+        <TouchableOpacity style={{ padding: 8 }} onPress={() => navigation.goBack()}>
+          <Appbar.BackAction size={24} />
+        </TouchableOpacity>
+        <Appbar.Content title={t('verify_your_email')} titleStyle={styles.headerTitle} />
+        <View style={{ width: 40 }} />
+      </Appbar.Header>
+      <Background>
+        <Header>{t('verify_your_email')}</Header>
+
+        <View>
+          <Paragraph style={styles.paragraph}>{t('enter_email_verification_code')}</Paragraph>
+          <View style={styles.credentialContainer}>
+            <Paragraph style={styles.credential}>{emailAddress}</Paragraph>
+          </View>
+        </View>
+
+        <Controller
+          control={verificationCodeForm.control}
+          name="code"
+          render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+            <FormInput
+              label={t('verify_otp')}
+              returnKeyType="done"
+              value={value}
+              onChangeText={(text) => {
+                onChange(text);
+                if (verificationError) setVerificationError(undefined);
+              }}
+              onBlur={onBlur}
+              keyboardType="number-pad"
+              errorText={error?.message}
+            />
+          )}
+        />
+
+        <View style={styles.resendButton}>
+          <Paragraph style={styles.paragraph}>{t('Did not recieve the code yet?')}</Paragraph>
+          <TouchableOpacity onPress={onResendOTP} disabled={resendLoading || cooldown > 0}>
+            {resendLoading ? (
+              <ActivityIndicator animating={true} color={theme.colors.secondary} />
+            ) : (
+              <Paragraph
+                style={[styles.resendText, cooldown > 0 ? styles.cooldownText : { color: theme.colors.primary }]}
+              >
+                {cooldown > 0 ? `${t('Resend otp')} (${cooldown}s)` : t('Resend')}
+              </Paragraph>
+            )}
+          </TouchableOpacity>
+        </View>
+
+        {verificationError && (
+          <Paragraph style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>{verificationError}</Paragraph>
+        )}
+
+        <Button
+          mode="contained"
+          onPress={verificationCodeForm.handleSubmit(onPressVerify)}
+          style={styles.button}
+          disabled={verificationCodeForm.formState.isSubmitting || !verificationCodeForm.formState.isValid}
+        >
+          {verificationCodeForm.formState.isSubmitting ? (
+            <ActivityIndicator animating={true} color={theme.colors.secondary} />
+          ) : (
+            t('verify_otp')
+          )}
+        </Button>
+
+        <TouchableOpacity
+          style={styles.goBackButton}
+          onPress={() => {
+            setVerificationError(undefined);
+            verificationCodeForm.reset();
+            navigation.goBack();
+          }}
+        >
+          <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>{t('go_back')}</Paragraph>
+        </TouchableOpacity>
+      </Background>
+    </>
   );
 };
 
@@ -221,6 +241,10 @@ const styles = StyleSheet.create({
   },
   cooldownText: {
     color: 'gray',
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
   },
 });
 

@@ -8,6 +8,7 @@ import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ActivityIndicator, useTheme } from 'react-native-paper';
+import { Appbar } from 'react-native-paper';
 
 import Background from '../components/Background';
 import Button from '../components/Button';
@@ -69,54 +70,71 @@ const VerifyLoginPhoneScreen: React.FC<VerifyLoginPhoneProps> = ({ route }) => {
   };
 
   return (
-    <Background>
-      <Header>{t('verify_your_phone')}</Header>
-      <View>
-        <Paragraph style={styles.paragraph}>{t('enter_verification_code')}</Paragraph>
-        <View style={styles.credentialContainer}>
-          <Paragraph style={styles.credential}>{phoneNumber}</Paragraph>
-        </View>
-      </View>
-      <Controller
-        control={verificationCodeForm.control}
-        name="code"
-        render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
-          <FormInput
-            label={t('verification_code')}
-            returnKeyType="done"
-            value={value}
-            onChangeText={onChange}
-            onBlur={onBlur}
-            errorText={error?.message}
-          />
-        )}
-      />
-      {verificationError && (
-        <Paragraph style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>{verificationError}</Paragraph>
-      )}
-      <Button
-        mode="contained"
-        onPress={verificationCodeForm.handleSubmit(onPressVerify)}
-        style={styles.button}
-        disabled={verificationCodeForm.formState.isSubmitting || !verificationCodeForm.formState.isValid}
-      >
-        {verificationCodeForm.formState.isSubmitting ? (
-          <ActivityIndicator animating={true} color={theme.colors.secondary} />
-        ) : (
-          t('verify')
-        )}
-      </Button>
-      <TouchableOpacity
-        style={styles.goBackButton}
-        onPress={() => {
-          setVerificationError(undefined);
-          verificationCodeForm.reset();
-          navigation.goBack();
+    <>
+      <Appbar.Header
+        style={{
+          backgroundColor: theme.colors.secondaryContainer,
+          height: 60,
+          zIndex: 100,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
         }}
       >
-        <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>{t('go_back')}</Paragraph>
-      </TouchableOpacity>
-    </Background>
+        <TouchableOpacity style={{ padding: 8 }} onPress={() => navigation.goBack()}>
+          <Appbar.BackAction size={24} />
+        </TouchableOpacity>
+        <Appbar.Content title={t('verify_your_phone')} titleStyle={styles.headerTitle} />
+        <View style={{ width: 40 }} />
+      </Appbar.Header>
+      <Background>
+        <Header>{t('verify_your_phone')}</Header>
+        <View>
+          <Paragraph style={styles.paragraph}>{t('enter_phone_verification_code')}</Paragraph>
+          <View style={styles.credentialContainer}>
+            <Paragraph style={styles.credential}>{phoneNumber}</Paragraph>
+          </View>
+        </View>
+        <Controller
+          control={verificationCodeForm.control}
+          name="code"
+          render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+            <FormInput
+              label={t('verification_code')}
+              returnKeyType="done"
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+              errorText={error?.message}
+            />
+          )}
+        />
+        {verificationError && (
+          <Paragraph style={[styles.errorText, { color: theme.colors.onErrorContainer }]}>{verificationError}</Paragraph>
+        )}
+        <Button
+          mode="contained"
+          onPress={verificationCodeForm.handleSubmit(onPressVerify)}
+          style={styles.button}
+          disabled={verificationCodeForm.formState.isSubmitting || !verificationCodeForm.formState.isValid}
+        >
+          {verificationCodeForm.formState.isSubmitting ? (
+            <ActivityIndicator animating={true} color={theme.colors.secondary} />
+          ) : (
+            t('verify')
+          )}
+        </Button>
+        <TouchableOpacity
+          style={styles.goBackButton}
+          onPress={() => {
+            setVerificationError(undefined);
+            verificationCodeForm.reset();
+            navigation.goBack();
+          }}
+        >
+          <Paragraph style={[styles.goBackText, { color: theme.colors.primary }]}>{t('go_back')}</Paragraph>
+        </TouchableOpacity>
+      </Background>
+    </>
   );
 };
 
@@ -149,6 +167,10 @@ const styles = StyleSheet.create({
   goBackText: {
     fontSize: 16,
     fontWeight: '600',
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
   },
 });
 
