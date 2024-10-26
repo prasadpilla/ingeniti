@@ -1,43 +1,97 @@
 import dayjs from 'dayjs';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dimensions, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { BarChart } from 'react-native-chart-kit';
 import MultiSelect from 'react-native-multiple-select';
 import { Appbar, useTheme } from 'react-native-paper';
 import DateTimePicker from 'react-native-ui-datepicker';
 import { EnergyUsageChartProps } from '../types';
+import { makeApiCall } from '../utils/api';
+import { useAuth } from '@clerk/clerk-expo';
 
 const screenWidth = Dimensions.get('window').width;
 
-const deviceItems = [
-  { id: '1', name: 'Device A' },
-  { id: '2', name: 'Device B' },
-  { id: '3', name: 'Device C' },
-  { id: '4', name: 'Device D' },
-];
+export interface ChartProps extends EnergyUsageChartProps {
+  userId: string;
+}
 
-const EnergyUsageChart = ({ navigation }: EnergyUsageChartProps) => {
+const EnergyUsageChart = ({ navigation, userId }: ChartProps) => {
   const theme = useTheme();
   const [startDate, setStartDate] = useState(dayjs('2023-01-01'));
   const [endDate, setEndDate] = useState(dayjs('2023-12-31'));
-  const [selectedDevices, setSelectedDevices] = useState([]);
+  const [selectedDevices, setSelectedDevices] = useState<string[]>([]);
+  const [deviceItems, setDeviceItems] = useState([]);
+  const [energyData, setEnergyData] = useState<any[]>([]);
   const [startDatePickerVisible, setStartDatePickerVisible] = useState(false);
   const [endDatePickerVisible, setEndDatePickerVisible] = useState(false);
+  const { getToken } = useAuth();
 
-  const data = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-    datasets: [
-      {
-        data: [20, 45, 28, 80, 99, 43, 50, 75, 30, 60, 55, 40],
-        color: (opacity = 1) => `rgba(255, 0, 0, ${opacity})`,
-      },
-      {
-        data: [30, 25, 40, 60, 70, 50, 65, 80, 35, 55, 45, 70],
-        color: (opacity = 1) => `rgba(0, 0, 255, ${opacity})`,
-      },
-    ],
-    legend: ['Red Device', 'Blue Device'],
+  useEffect(() => {
+    const fetchDevices = async () => {
+      try {
+        const token = await getToken();
+        const response = await makeApiCall(token, '/devices', 'GET');
+        if (!response.ok) {
+          throw new Error('Failed to fetch devices');
+        }
+        const devices = await response.json();
+        const formattedDevices = devices.map((device) => ({
+          id: device.id,
+          name: device.name,
+          isSensor: device.isSensor,
+        }));
+        setDeviceItems(formattedDevices);
+      } catch (error) {
+        console.error('Error fetching devices:', error);
+      }
+    };
+
+    fetchDevices();
+  }, [userId]);
+
+  useEffect(() => {
+    const fetchEnergyData = async () => {
+      if (selectedDevices.length === 0) return;
+
+      try {
+        const token = await getToken();
+        const response = await makeApiCall(token, `/device-energy`, 'POST', {
+          deviceIds: selectedDevices,
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString(),
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch energy data');
+        }
+        const data = await response.json();
+        setEnergyData(data);
+      } catch (error) {
+        console.error('Error fetching energy data:', error);
+      }
+    };
+
+    fetchEnergyData();
+  }, [selectedDevices, startDate, endDate]);
+
+  const processDataForChart = () => {
+    const monthlyData = Array(12).fill(0);
+    energyData.forEach((entry) => {
+      const month = dayjs(entry.createdAt).month();
+      monthlyData[month] += entry.energy;
+    });
+    return {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      datasets: [
+        {
+          data: monthlyData,
+          color: (opacity = 1) => `rgba(255, 0, 0, ${opacity})`,
+        },
+      ],
+      legend: ['Energy Usage'],
+    };
   };
+
+  const data = processDataForChart();
 
   const chartConfig = {
     backgroundGradientFrom: theme.colors.background,
@@ -77,7 +131,6 @@ const EnergyUsageChart = ({ navigation }: EnergyUsageChartProps) => {
             selectedItems={selectedDevices}
             selectText="Select Devices"
             searchInputPlaceholderText="Search Devices..."
-            onChangeInput={(text: string) => console.log(text)}
             tagRemoveIconColor={theme.colors.primary}
             tagBorderColor={theme.colors.primary}
             tagTextColor={theme.colors.primary}
@@ -143,7 +196,7 @@ const EnergyUsageChart = ({ navigation }: EnergyUsageChartProps) => {
         <Appbar.Content
           title="Energy Usage Chart"
           titleStyle={[styles.headerTitle, { color: theme.colors.onSecondaryContainer }]}
-        ></Appbar.Content>
+        />
         <View style={{ width: 40 }} />
       </Appbar.Header>
       <View style={[styles.container, { backgroundColor: theme.colors.background }]}>

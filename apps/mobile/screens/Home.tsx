@@ -49,7 +49,7 @@ const HomeScreen = ({ navigation }: HomeProps) => {
   };
 
   const handleEnergyUsagePress = () => {
-    navigation.getParent()?.navigate('EnergyUsageChart');
+    navigation.getParent()?.navigate('EnergyUsageChart', { userId: user?.id });
   };
 
   useEffect(() => {

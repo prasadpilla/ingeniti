@@ -2,6 +2,7 @@ import { WithAuthProp } from '@clerk/clerk-sdk-node';
 import { Device, GenericError, HttpStatusCode, deviceOnBoardingFormSchema } from '@ingeniti/shared';
 import { Request, Response } from 'express';
 import { getDevices, insertDevice, updateDevice } from '../models/devices.model';
+import { getDeviceEnergy } from '../models/deviceEnergy.model';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const express = require('express');
@@ -52,6 +53,30 @@ devicesController.get('/', async (req: WithAuthProp<Request>, res: Response<Devi
     isSensor: false,
   }));
   res.status(HttpStatusCode.OK_200).json(devicesWithSensors);
+});
+
+devicesController.post('/device-energy', async (req: WithAuthProp<Request>, res: Response<Device[] | GenericError>) => {
+  const userId = req.auth.userId as string;
+  const { deviceIds, startDate, endDate } = req.body;
+
+  try {
+    const energyData = await Promise.all(deviceIds.map((deviceId: string) => getDeviceEnergy(deviceId, userId)));
+
+    const flattenedEnergyData = energyData.flat();
+
+    const filteredEnergyData = flattenedEnergyData.filter((entry) => {
+      const createdAt = new Date(entry.createdAt);
+      return createdAt >= new Date(startDate) && createdAt <= new Date(endDate);
+    });
+
+    res.status(HttpStatusCode.OK_200).json(filteredEnergyData);
+  } catch (error) {
+    console.error('Error fetching device energy data:', error);
+    res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
+      success: false,
+      error: 'Failed to fetch energy data',
+    } as { success: boolean; error: string });
+  }
 });
 
 devicesController.put('/:id', async (req: WithAuthProp<Request>, res: Response<Device | GenericError>) => {
