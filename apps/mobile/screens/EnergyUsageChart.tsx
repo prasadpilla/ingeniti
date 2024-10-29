@@ -17,8 +17,8 @@ export interface ChartProps extends EnergyUsageChartProps {
 
 const EnergyUsageChart = ({ navigation, userId }: ChartProps) => {
   const theme = useTheme();
-  const [startDate, setStartDate] = useState(dayjs('2023-01-01'));
-  const [endDate, setEndDate] = useState(dayjs('2023-12-31'));
+  const [startDate, setStartDate] = useState(dayjs('2024-10-29'));
+  const [endDate, setEndDate] = useState(dayjs('2024-10-31'));
   const [selectedDevices, setSelectedDevices] = useState<string[]>([]);
   const [deviceItems, setDeviceItems] = useState([]);
   const [energyData, setEnergyData] = useState<any[]>([]);
@@ -49,24 +49,43 @@ const EnergyUsageChart = ({ navigation, userId }: ChartProps) => {
     fetchDevices();
   }, [userId]);
 
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     const fetchEnergyData = async () => {
-      if (selectedDevices.length === 0) return;
+      if (selectedDevices.length === 0 || !startDate.isValid() || !endDate.isValid()) return;
+      setLoading(true);
+
+      const diffInDays = endDate.diff(startDate, 'day');
+
+      let interval;
+      if (diffInDays <= 7) {
+        interval = '1h';
+      } else if (diffInDays <= 31) {
+        interval = '1d';
+      } else {
+        interval = '1M';
+      }
 
       try {
         const token = await getToken();
-        const response = await makeApiCall(token, `/device-energy`, 'POST', {
-          deviceIds: selectedDevices,
-          startDate: startDate.toISOString(),
-          endDate: endDate.toISOString(),
-        });
-        if (!response.ok) {
-          throw new Error('Failed to fetch energy data');
-        }
+        const adjustedEndDate = endDate.endOf('day').toISOString();
+        const response = await makeApiCall(
+          token,
+          `/devices/device-energy?deviceIds=${selectedDevices.join(',')}&startDate=${startDate.toISOString()}&endDate=${adjustedEndDate}&interval=${interval}`,
+          'GET'
+        );
+
         const data = await response.json();
-        setEnergyData(data);
+        if (Array.isArray(data.data)) {
+          setEnergyData(data.data);
+        } else {
+          setEnergyData([]);
+        }
       } catch (error) {
         console.error('Error fetching energy data:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -74,16 +93,24 @@ const EnergyUsageChart = ({ navigation, userId }: ChartProps) => {
   }, [selectedDevices, startDate, endDate]);
 
   const processDataForChart = () => {
-    const monthlyData = Array(12).fill(0);
+    const chartData: { [key: string]: number } = {};
+
     energyData.forEach((entry) => {
-      const month = dayjs(entry.createdAt).month();
-      monthlyData[month] += entry.energy;
+      const diffInDays = endDate.diff(startDate, 'day');
+      const dateKey = dayjs(entry.createdAt).format(
+        diffInDays <= 2 ? 'HH:mm' : diffInDays <= 7 ? 'DD HH:mm' : diffInDays <= 31 ? 'DD-MM' : 'MM-YYYY'
+      );
+      if (!chartData[dateKey]) {
+        chartData[dateKey] = 0;
+      }
+      chartData[dateKey] += entry.energy;
     });
+
     return {
-      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      labels: Object.keys(chartData),
       datasets: [
         {
-          data: monthlyData,
+          data: Object.values(chartData) as number[],
           color: (opacity = 1) => `rgba(255, 0, 0, ${opacity})`,
         },
       ],
@@ -165,7 +192,7 @@ const EnergyUsageChart = ({ navigation, userId }: ChartProps) => {
             width={Math.max(screenWidth - 20, data.labels.length * 60)}
             height={220}
             chartConfig={chartConfig}
-            verticalLabelRotation={30}
+            verticalLabelRotation={endDate.diff(startDate, 'day') <= 7 ? 45 : 30}
             fromZero
             showBarTops={false}
             style={styles.chartStyle}

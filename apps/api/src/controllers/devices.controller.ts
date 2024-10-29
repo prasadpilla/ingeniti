@@ -2,7 +2,7 @@ import { WithAuthProp } from '@clerk/clerk-sdk-node';
 import { Device, GenericError, HttpStatusCode, deviceOnBoardingFormSchema } from '@ingeniti/shared';
 import { Request, Response } from 'express';
 import { getDevices, insertDevice, updateDevice } from '../models/devices.model';
-import { getDeviceEnergy } from '../models/deviceEnergy.model';
+import { getDeviceEnergy, insertDeviceEnergy, SelectedDeviceEnergy } from '../models/deviceEnergy.model';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const express = require('express');
@@ -55,29 +55,50 @@ devicesController.get('/', async (req: WithAuthProp<Request>, res: Response<Devi
   res.status(HttpStatusCode.OK_200).json(devicesWithSensors);
 });
 
-devicesController.post('/device-energy', async (req: WithAuthProp<Request>, res: Response<Device[] | GenericError>) => {
-  const userId = req.auth.userId as string;
-  const { deviceIds, startDate, endDate } = req.body;
+devicesController.get(
+  '/device-energy',
+  async (
+    req: WithAuthProp<Request>,
+    res: Response<{ success: boolean; data?: SelectedDeviceEnergy[] } | GenericError>
+  ) => {
+    const userId = req.auth.userId as string;
+    const { deviceIds, startDate, endDate } = req.query;
 
-  try {
-    const energyData = await Promise.all(deviceIds.map((deviceId: string) => getDeviceEnergy(deviceId, userId)));
+    // Ensure that the required parameters are provided and of the correct type
+    if (!deviceIds || !startDate || !endDate) {
+      return res.status(HttpStatusCode.BAD_REQUEST_400).json({
+        success: false,
+        error: 'deviceIds, startDate, and endDate are required',
+      });
+    }
 
-    const flattenedEnergyData = energyData.flat();
+    // Ensure deviceIds is an array of strings or convert it
+    let deviceIdsArray: string[];
+    if (typeof deviceIds === 'string') {
+      deviceIdsArray = deviceIds.split(',');
+    } else if (Array.isArray(deviceIds)) {
+      deviceIdsArray = deviceIds as string[];
+    } else {
+      return res.status(HttpStatusCode.BAD_REQUEST_400).json({
+        success: false,
+        error: 'deviceIds must be a string or an array of strings',
+      });
+    }
 
-    const filteredEnergyData = flattenedEnergyData.filter((entry) => {
-      const createdAt = new Date(entry.createdAt);
-      return createdAt >= new Date(startDate) && createdAt <= new Date(endDate);
-    });
+    try {
+      // Fetch energy data for the devices
+      const energyData = await getDeviceEnergy(deviceIdsArray, userId, startDate as string, endDate as string);
 
-    res.status(HttpStatusCode.OK_200).json(filteredEnergyData);
-  } catch (error) {
-    console.error('Error fetching device energy data:', error);
-    res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
-      success: false,
-      error: 'Failed to fetch energy data',
-    } as { success: boolean; error: string });
+      return res.status(HttpStatusCode.OK_200).json({ success: true, data: energyData });
+    } catch (error) {
+      console.error('Error fetching device energy data:', error);
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
+        success: false,
+        error: 'Failed to fetch energy data',
+      });
+    }
   }
-});
+);
 
 devicesController.put('/:id', async (req: WithAuthProp<Request>, res: Response<Device | GenericError>) => {
   const userId = req.auth.userId as string;
@@ -120,6 +141,39 @@ devicesController.get('/form-options', async (req: WithAuthProp<Request>, res: R
   };
 
   res.status(HttpStatusCode.OK_200).json(formOptions);
+});
+
+devicesController.get('/add-random-entries', async (req: WithAuthProp<Request>, res: Response) => {
+  const deviceId = 'bffc73fa-e21b-454e-922f-a31aca521365';
+  const userId = req.auth.userId as string;
+  const entries = [];
+
+  for (let i = 0; i < 10; i++) {
+    const energyValue = Math.floor(Math.random() * 100);
+    const createdAt = new Date(Date.now() + i * 5 * 60 * 1000 + Math.random() * 1000);
+
+    entries.push({
+      deviceId,
+      userId,
+      energy: energyValue,
+      createdAt,
+    });
+  }
+
+  try {
+    for (const entry of entries) {
+      await insertDeviceEnergy({
+        deviceId: entry.deviceId,
+        userId: entry.userId,
+        energy: entry.energy,
+      });
+    }
+
+    res.status(201).json({ success: true, message: 'Random entries added successfully' });
+  } catch (error) {
+    console.error('Error adding random entries:', error);
+    res.status(500).json({ success: false, error: 'Failed to add random entries' });
+  }
 });
 
 export default devicesController;
