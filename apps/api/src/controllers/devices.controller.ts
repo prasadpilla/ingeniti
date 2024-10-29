@@ -149,37 +149,37 @@ devicesController.get('/form-options', async (req: WithAuthProp<Request>, res: R
   res.status(HttpStatusCode.OK_200).json(formOptions);
 });
 
-devicesController.get('/add-random-entries', async (req: WithAuthProp<Request>, res: Response) => {
-  const deviceId = 'bffc73fa-e21b-454e-922f-a31aca521365';
-  const userId = req.auth.userId as string;
-  const entries = [];
+// devicesController.get('/add-random-entries', async (req: WithAuthProp<Request>, res: Response) => {
+//   const deviceId = 'bffc73fa-e21b-454e-922f-a31aca521365';
+//   const userId = req.auth.userId as string;
+//   const entries = [];
 
-  for (let i = 0; i < 10; i++) {
-    const energyValue = Math.floor(Math.random() * 100);
-    const createdAt = new Date(Date.now() + i * 5 * 60 * 1000 + Math.random() * 1000);
+//   for (let i = 0; i < 10; i++) {
+//     const energyValue = Math.floor(Math.random() * 100);
+//     const createdAt = new Date(Date.now() + i * 5 * 60 * 1000 + Math.random() * 1000);
 
-    entries.push({
-      deviceId,
-      userId,
-      energy: energyValue,
-      createdAt,
-    });
-  }
+//     entries.push({
+//       deviceId,
+//       userId,
+//       energy: energyValue,
+//       createdAt,
+//     });
+//   }
 
-  try {
-    for (const entry of entries) {
-      await insertDeviceEnergy({
-        deviceId: entry.deviceId,
-        userId: entry.userId,
-        energy: entry.energy,
-      });
-    }
+//   try {
+//     for (const entry of entries) {
+//       await insertDeviceEnergy({
+//         deviceId: entry.deviceId,
+//         userId: entry.userId,
+//         energy: entry.energy,
+//       });
+//     }
 
-    res.status(201).json({ success: true, message: 'Random entries added successfully' });
-  } catch (error) {
-    console.error('Error adding random entries:', error);
-    res.status(500).json({ success: false, error: 'Failed to add random entries' });
-  }
-});
+//     res.status(201).json({ success: true, message: 'Random entries added successfully' });
+//   } catch (error) {
+//     console.error('Error adding random entries:', error);
+//     res.status(500).json({ success: false, error: 'Failed to add random entries' });
+//   }
+// });
 
 export default devicesController;
