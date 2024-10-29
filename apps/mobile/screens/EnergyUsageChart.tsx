@@ -297,8 +297,9 @@ const styles = StyleSheet.create({
   },
   chartStyle: {
     borderRadius: 16,
-    paddingLeft: 20,
-    paddingRight: 20,
+    paddingLeft: 36,
+    paddingRight: 36,
+    paddingBottom: 26,
   },
   datePickerOverlay: {
     position: 'absolute',

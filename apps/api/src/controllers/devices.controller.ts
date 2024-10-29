@@ -64,7 +64,6 @@ devicesController.get(
     const userId = req.auth.userId as string;
     const { deviceIds, startDate, endDate } = req.query;
 
-    // Ensure that the required parameters are provided and of the correct type
     if (!deviceIds || !startDate || !endDate) {
       return res.status(HttpStatusCode.BAD_REQUEST_400).json({
         success: false,
@@ -72,10 +71,9 @@ devicesController.get(
       });
     }
 
-    // Ensure deviceIds is an array of strings or convert it
     let deviceIdsArray: string[];
     if (typeof deviceIds === 'string') {
-      deviceIdsArray = deviceIds.split(',');
+      deviceIdsArray = deviceIds.split(',').filter((id) => id);
     } else if (Array.isArray(deviceIds)) {
       deviceIdsArray = deviceIds as string[];
     } else {
@@ -85,9 +83,17 @@ devicesController.get(
       });
     }
 
+    const start = new Date(startDate as string);
+    const end = new Date(endDate as string);
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return res.status(HttpStatusCode.BAD_REQUEST_400).json({
+        success: false,
+        error: 'startDate and endDate must be valid dates',
+      });
+    }
+
     try {
-      // Fetch energy data for the devices
-      const energyData = await getDeviceEnergy(deviceIdsArray, userId, startDate as string, endDate as string);
+      const energyData = await getDeviceEnergy(deviceIdsArray, userId, start.toISOString(), end.toISOString());
 
       return res.status(HttpStatusCode.OK_200).json({ success: true, data: energyData });
     } catch (error) {
