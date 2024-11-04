@@ -84,7 +84,10 @@ const VerifySignUpEmailScreen: React.FC<VerifySignUpEmailProps> = ({ route, navi
   };
 
   const onResendOTP = async () => {
-    if (!isLoaded || cooldown > 0) return;
+    if (!isLoaded || !signUp || cooldown > 0) {
+      setVerificationError(t('session_expired_or_otp_in_progress'));
+      return;
+    }
 
     setResendLoading(true);
     try {

@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingLeft: 36,
     paddingRight: 36,
-    paddingBottom: 26,
+    paddingBottom: 36,
   },
   datePickerOverlay: {
     position: 'absolute',
