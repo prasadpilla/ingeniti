@@ -1,6 +1,14 @@
 import { WithAuthProp } from '@clerk/clerk-sdk-node';
-import { Device, GenericError, HttpStatusCode, deviceOnBoardingFormSchema } from '@ingeniti/shared';
+import {
+  Device,
+  deviceOnBoardingFormSchema,
+  EnergyData,
+  EnergyResponse,
+  GenericError,
+  HttpStatusCode,
+} from '@ingeniti/shared';
 import { Request, Response } from 'express';
+import { getDeviceEnergy } from '../models/deviceEnergy.model';
 import { getDevices, insertDevice, updateDevice } from '../models/devices.model';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -53,6 +61,123 @@ devicesController.get('/', async (req: WithAuthProp<Request>, res: Response<Devi
   }));
   res.status(HttpStatusCode.OK_200).json(devicesWithSensors);
 });
+
+devicesController.get(
+  '/device-energy',
+  async (req: WithAuthProp<Request>, res: Response<EnergyResponse | GenericError>) => {
+    const userId = req.auth.userId as string;
+    const { deviceIds, startDate, endDate } = req.query;
+
+    if (!deviceIds || !startDate || !endDate) {
+      return res.status(HttpStatusCode.BAD_REQUEST_400).json({
+        success: false,
+        error: 'deviceIds, startDate, and endDate are required',
+      });
+    }
+
+    let deviceIdsArray: string[];
+    if (typeof deviceIds === 'string') {
+      deviceIdsArray = deviceIds.split(',').filter((id) => id);
+    } else if (Array.isArray(deviceIds)) {
+      deviceIdsArray = deviceIds as string[];
+    } else {
+      return res.status(HttpStatusCode.BAD_REQUEST_400).json({
+        success: false,
+        error: 'deviceIds must be a string or an array of strings',
+      });
+    }
+
+    const start = new Date(startDate as string);
+    const end = new Date(endDate as string);
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return res.status(HttpStatusCode.BAD_REQUEST_400).json({
+        success: false,
+        error: 'startDate and endDate must be valid dates',
+      });
+    }
+
+    try {
+      const rawEnergyData = await getDeviceEnergy(deviceIdsArray, userId, start.toISOString(), end.toISOString());
+      const devices = await getDevices(userId);
+      const deviceMap = new Map(devices.map((device) => [device.id, device.name]));
+
+      // Calculate time difference in days
+      const diffInDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+
+      // Determine interval
+      const interval =
+        diffInDays <= 2 ? 'hourly' : diffInDays <= 31 ? 'daily' : diffInDays <= 90 ? 'weekly' : 'monthly';
+
+      // Get time key based on interval
+      const getTimeKey = (date: Date) => {
+        switch (interval) {
+          case 'hourly':
+            return date.toISOString().slice(0, 13) + ':00:00.000Z';
+          case 'daily':
+            return date.toISOString().slice(0, 10) + 'T00:00:00.000Z';
+          case 'weekly': {
+            const weekNumber = Math.ceil(
+              (date.getDate() + new Date(date.getFullYear(), date.getMonth(), 1).getDay()) / 7
+            );
+            const yearStart = new Date(date.getFullYear(), 0, 1);
+            const weekStart = new Date(yearStart.getTime() + (weekNumber - 1) * 7 * 24 * 60 * 60 * 1000);
+            return weekStart.toISOString();
+          }
+          case 'monthly':
+            return date.toISOString().slice(0, 7) + '-01T00:00:00.000Z';
+          default:
+            return date.toISOString().slice(0, 10) + 'T00:00:00.000Z';
+        }
+      };
+
+      // Aggregate data based on interval and device
+      const aggregatedData = rawEnergyData.reduce((acc: EnergyData[], curr) => {
+        const date = new Date(curr.timestamp);
+        const timeKey = getTimeKey(date);
+
+        const existingEntry = acc.find(
+          (item) => getTimeKey(new Date(item.timestamp)) === timeKey && item.deviceId === curr.deviceId
+        );
+
+        if (existingEntry) {
+          existingEntry.energy += curr.energy;
+        } else {
+          acc.push({
+            id: '',
+            userId: '',
+            deviceId: curr.deviceId,
+            deviceName: deviceMap.get(curr.deviceId) || 'Unknown Device',
+            energy: curr.energy,
+            timestamp: new Date(timeKey).toISOString(),
+          });
+        }
+
+        return acc;
+      }, []);
+
+      // Sort by date and then by deviceId
+      aggregatedData.sort((a, b) => {
+        const dateCompare = new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+        if (dateCompare === 0) {
+          return a.deviceId.localeCompare(b.deviceId);
+        }
+        return dateCompare;
+      });
+
+      return res.status(HttpStatusCode.OK_200).json({
+        success: true,
+        data: aggregatedData,
+        interval,
+      });
+    } catch (error) {
+      console.error('Error fetching device energy data:', error);
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
+        success: false,
+        error: 'Failed to fetch energy data',
+      });
+    }
+  }
+);
 
 devicesController.put('/:id', async (req: WithAuthProp<Request>, res: Response<Device | GenericError>) => {
   const userId = req.auth.userId as string;

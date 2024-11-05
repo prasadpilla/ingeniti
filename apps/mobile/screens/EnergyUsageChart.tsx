@@ -1,43 +1,144 @@
+import { useAuth } from '@clerk/clerk-expo';
+import { Device, EnergyData, EnergyResponse } from '@ingeniti/shared';
+import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
 import { Dimensions, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { BarChart } from 'react-native-chart-kit';
+import { LineChart } from 'react-native-chart-kit';
 import MultiSelect from 'react-native-multiple-select';
 import { Appbar, useTheme } from 'react-native-paper';
 import DateTimePicker from 'react-native-ui-datepicker';
 import { EnergyUsageChartProps } from '../types';
+import { makeApiCall } from '../utils/api';
 
 const screenWidth = Dimensions.get('window').width;
 
-const deviceItems = [
-  { id: '1', name: 'Device A' },
-  { id: '2', name: 'Device B' },
-  { id: '3', name: 'Device C' },
-  { id: '4', name: 'Device D' },
-];
+export interface ChartProps extends EnergyUsageChartProps {
+  userId: string;
+}
 
-const EnergyUsageChart = ({ navigation }: EnergyUsageChartProps) => {
+const EnergyUsageChart = ({ navigation, userId }: ChartProps) => {
   const theme = useTheme();
-  const [startDate, setStartDate] = useState(dayjs('2023-01-01'));
-  const [endDate, setEndDate] = useState(dayjs('2023-12-31'));
-  const [selectedDevices, setSelectedDevices] = useState([]);
+  const [startDate, setStartDate] = useState(dayjs().subtract(7, 'day'));
+  const [endDate, setEndDate] = useState(dayjs());
+  const [selectedDevices, setSelectedDevices] = useState<string[]>([]);
   const [startDatePickerVisible, setStartDatePickerVisible] = useState(false);
   const [endDatePickerVisible, setEndDatePickerVisible] = useState(false);
+  const { getToken } = useAuth();
 
-  const data = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-    datasets: [
-      {
-        data: [20, 45, 28, 80, 99, 43, 50, 75, 30, 60, 55, 40],
-        color: (opacity = 1) => `rgba(255, 0, 0, ${opacity})`,
-      },
-      {
-        data: [30, 25, 40, 60, 70, 50, 65, 80, 35, 55, 45, 70],
-        color: (opacity = 1) => `rgba(0, 0, 255, ${opacity})`,
-      },
-    ],
-    legend: ['Red Device', 'Blue Device'],
+  const { data: devices = [], isLoading: isLoadingDevices } = useQuery<Device[]>({
+    queryKey: ['devices', userId],
+    queryFn: async () => {
+      const token = await getToken();
+      const response = await makeApiCall(token, '/devices', 'GET');
+      if (!response.ok) {
+        throw new Error('Failed to fetch devices');
+      }
+      const data = await response.json();
+      return data;
+    },
+  });
+
+  const { data: energyResponse, isLoading: isLoadingEnergyData } = useQuery<EnergyResponse>({
+    queryKey: ['energyData', selectedDevices, startDate.toISOString(), endDate.toISOString()],
+    queryFn: async () => {
+      const token = await getToken();
+      const adjustedEndDate = endDate.endOf('day').toISOString();
+      const response = await makeApiCall(
+        token,
+        `/devices/device-energy?deviceIds=${selectedDevices.join(',')}&startDate=${startDate.toISOString()}&endDate=${adjustedEndDate}`,
+        'GET'
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch energy data');
+      }
+      const data = await response.json();
+      console.log(data);
+      return data;
+    },
+    enabled: selectedDevices.length > 0 && startDate.isValid() && endDate.isValid(),
+  });
+
+  const energyData = energyResponse?.data ?? [];
+
+  const processDataForChart = () => {
+    if (!energyData.length) {
+      return {
+        labels: [],
+        datasets: [],
+        legend: [],
+      };
+    }
+
+    const chartData: { [key: string]: { [deviceId: string]: number } } = {};
+    const colors = [
+      { line: '#FF6384', gradient: ['rgba(255,99,132,0.3)', 'rgba(255,99,132,0.0)'] },
+      { line: '#36A2EB', gradient: ['rgba(54,162,235,0.3)', 'rgba(54,162,235,0.0)'] },
+      { line: '#FFCE56', gradient: ['rgba(255,206,86,0.3)', 'rgba(255,206,86,0.0)'] },
+      { line: '#4BC0C0', gradient: ['rgba(75,192,192,0.3)', 'rgba(75,192,192,0.0)'] },
+      { line: '#9966FF', gradient: ['rgba(153,102,255,0.3)', 'rgba(153,102,255,0.0)'] },
+      { line: '#FF9F40', gradient: ['rgba(255,159,64,0.3)', 'rgba(255,159,64,0.0)'] },
+    ];
+
+    // First pass: collect all unique dates
+    energyData.forEach((entry: EnergyData) => {
+      const date = dayjs(entry.timestamp);
+      const interval = energyResponse?.interval || 'daily';
+      let dateKey = '';
+
+      switch (interval) {
+        case 'hourly':
+          dateKey = date.format('HH:00');
+          break;
+        case 'daily':
+          dateKey = date.format('DD/MM');
+          break;
+        case 'weekly':
+          dateKey = `W${date.format('w')}`;
+          break;
+        case 'monthly':
+          dateKey = date.format('MMM');
+          break;
+        default:
+          dateKey = date.format('DD/MM');
+      }
+
+      if (!chartData[dateKey]) {
+        chartData[dateKey] = {};
+      }
+
+      if (!chartData[dateKey][entry.deviceId]) {
+        chartData[dateKey][entry.deviceId] = 0;
+      }
+      chartData[dateKey][entry.deviceId] += entry.energy;
+    });
+
+    const labels = Object.keys(chartData);
+    const datasets = selectedDevices.map((deviceId, index) => ({
+      data: labels.map((label) => chartData[label][deviceId] || 0),
+      color: (opacity = 1) => colors[index % colors.length].line,
+      strokeWidth: 2,
+      withDots: true,
+      withShadow: false,
+      withScrollableDot: false,
+      withGradient: true,
+      gradient: colors[index % colors.length].gradient,
+    }));
+
+    const legend = selectedDevices.map((deviceId, index) => {
+      const device = devices.find((d) => d.id === deviceId);
+      return device?.name || 'Unknown Device';
+    });
+
+    return {
+      labels,
+      datasets,
+      legend,
+    };
   };
+
+  const data = processDataForChart();
 
   const chartConfig = {
     backgroundGradientFrom: theme.colors.background,
@@ -48,8 +149,19 @@ const EnergyUsageChart = ({ navigation }: EnergyUsageChartProps) => {
     barPercentage: 0.5,
     groupSpacing: 0.4,
     propsForBackgroundLines: {
-      x: 40,
+      strokeWidth: 1,
+      stroke: theme.dark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
     },
+    propsForLabels: {
+      fontSize: 12,
+    },
+    propsForDots: {
+      r: '4',
+      strokeWidth: '2',
+    },
+    fillShadowGradientFrom: theme.dark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+    fillShadowGradientTo: theme.dark ? 'rgba(255, 255, 255, 0.0)' : 'rgba(0, 0, 0, 0.0)',
+    useShadowColorFromDataset: true,
   };
 
   const renderItem = () => (
@@ -71,13 +183,12 @@ const EnergyUsageChart = ({ navigation }: EnergyUsageChartProps) => {
         </View>
         <View style={styles.multiSelectContainer}>
           <MultiSelect
-            items={deviceItems}
+            items={devices}
             uniqueKey="id"
-            onSelectedItemsChange={(selected: any) => setSelectedDevices(selected)}
+            onSelectedItemsChange={setSelectedDevices}
             selectedItems={selectedDevices}
-            selectText="Select Devices"
+            selectText={isLoadingDevices ? 'Loading devices...' : 'Select Devices'}
             searchInputPlaceholderText="Search Devices..."
-            onChangeInput={(text: string) => console.log(text)}
             tagRemoveIconColor={theme.colors.primary}
             tagBorderColor={theme.colors.primary}
             tagTextColor={theme.colors.primary}
@@ -87,7 +198,7 @@ const EnergyUsageChart = ({ navigation }: EnergyUsageChartProps) => {
             displayKey="name"
             searchInputStyle={{ color: theme.colors.onBackground }}
             submitButtonColor={theme.colors.primary}
-            submitButtonText="Submit"
+            submitButtonText="Select"
             styleTextDropdown={{ color: theme.colors.onBackground }}
             styleTextDropdownSelected={{ color: theme.colors.onBackground }}
             styleIndicator={{ backgroundColor: theme.colors.primary }}
@@ -107,20 +218,44 @@ const EnergyUsageChart = ({ navigation }: EnergyUsageChartProps) => {
       <View>
         <Text style={[styles.chartTitle, { color: theme.colors.onBackground }]}>Energy Usage</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <BarChart
-            data={data}
-            width={Math.max(screenWidth - 20, data.labels.length * 60)}
-            height={220}
-            chartConfig={chartConfig}
-            verticalLabelRotation={30}
-            fromZero
-            showBarTops={false}
-            style={styles.chartStyle}
-            yAxisLabel=""
-            yAxisSuffix=""
-            withInnerLines={true}
-            segments={5}
-          />
+          {selectedDevices.length === 0 ? (
+            <View style={styles.loadingContainer}>
+              <Text style={{ color: theme.colors.onBackground }}>Please select devices to view data</Text>
+            </View>
+          ) : isLoadingEnergyData ? (
+            <View style={styles.loadingContainer}>
+              <Text style={{ color: theme.colors.onBackground }}>Loading...</Text>
+            </View>
+          ) : data.labels.length === 0 ? (
+            <View style={styles.loadingContainer}>
+              <Text style={{ color: theme.colors.onBackground }}>No data available for selected period</Text>
+            </View>
+          ) : (
+            <LineChart
+              data={data}
+              width={Math.max(screenWidth - 20, data.labels.length * 100)}
+              height={300}
+              chartConfig={{
+                ...chartConfig,
+                barPercentage: 0.8,
+                propsForBackgroundLines: {
+                  strokeWidth: 1,
+                  stroke: theme.dark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+                },
+                propsForLabels: {
+                  fontSize: 10,
+                },
+              }}
+              verticalLabelRotation={45}
+              fromZero
+              style={styles.chartStyle}
+              yAxisLabel=""
+              yAxisSuffix=" kWh"
+              withInnerLines={true}
+              segments={5}
+              bezier
+            />
+          )}
         </ScrollView>
       </View>
     </>
@@ -143,7 +278,7 @@ const EnergyUsageChart = ({ navigation }: EnergyUsageChartProps) => {
         <Appbar.Content
           title="Energy Usage Chart"
           titleStyle={[styles.headerTitle, { color: theme.colors.onSecondaryContainer }]}
-        ></Appbar.Content>
+        />
         <View style={{ width: 40 }} />
       </Appbar.Header>
       <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
@@ -182,11 +317,11 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    paddingTop: 20,
+    paddingTop: 0,
   },
   filtersContainer: {
-    padding: 10,
-    marginBottom: 20,
+    padding: 5,
+    marginBottom: 10,
   },
   datePickersRow: {
     flexDirection: 'row',
@@ -217,8 +352,10 @@ const styles = StyleSheet.create({
   },
   chartStyle: {
     borderRadius: 16,
-    paddingLeft: 20,
-    paddingRight: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+    marginLeft: 0,
+    marginBottom: 36,
   },
   datePickerOverlay: {
     position: 'absolute',
@@ -234,6 +371,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 10,
     padding: 20,
+  },
+  loadingContainer: {
+    width: screenWidth - 20,
+    height: 300,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
