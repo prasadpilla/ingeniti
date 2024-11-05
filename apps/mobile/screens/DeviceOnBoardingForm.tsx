@@ -145,7 +145,7 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
             <Controller
               control={deviceOnBoardingForm.control}
               name="usage"
-              render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+              render={({ field: { value, onChange }, fieldState: { error } }) => (
                 <View style={styles.dropdownContainer}>
                   <Dropdown
                     options={formOptions.deviceUsageOptions}
@@ -162,7 +162,7 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
             <Controller
               control={deviceOnBoardingForm.control}
               name="type"
-              render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+              render={({ field: { value, onChange }, fieldState: { error } }) => (
                 <View style={styles.dropdownContainer}>
                   <Dropdown
                     options={formOptions.deviceTypeOptions}

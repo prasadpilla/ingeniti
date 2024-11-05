@@ -1,8 +1,7 @@
+import { and, eq, gte, inArray, InferSelectModel, lte } from 'drizzle-orm';
 import { integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 import { db } from '../db/client';
-import { and, eq, gte, lte, inArray } from 'drizzle-orm';
 import { devices } from './devices.model';
-import { InferSelectModel } from 'drizzle-orm';
 
 export const deviceEnergy = pgTable('device_energy', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -11,11 +10,7 @@ export const deviceEnergy = pgTable('device_energy', {
     .references(() => devices.id),
   userId: text('user_id').notNull(),
   energy: integer('energy_kwh').notNull(),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at')
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => new Date()),
+  timestamp: timestamp('timestamp').notNull().defaultNow(),
 });
 
 export type SelectedDeviceEnergy = InferSelectModel<typeof deviceEnergy>;
@@ -24,6 +19,7 @@ export async function insertDeviceEnergy(deviceEnergyData: {
   deviceId: string;
   userId: string;
   energy: number;
+  timestamp: Date;
 }): Promise<SelectedDeviceEnergy> {
   const energyRecord = await db
     .insert(deviceEnergy)
@@ -31,8 +27,7 @@ export async function insertDeviceEnergy(deviceEnergyData: {
       deviceId: deviceEnergyData.deviceId,
       userId: deviceEnergyData.userId,
       energy: deviceEnergyData.energy,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      timestamp: deviceEnergyData.timestamp,
     })
     .returning();
 
@@ -49,8 +44,7 @@ export async function getDeviceEnergy(
     .select({
       id: deviceEnergy.id,
       userId: deviceEnergy.userId,
-      createdAt: deviceEnergy.createdAt,
-      updatedAt: deviceEnergy.updatedAt,
+      timestamp: deviceEnergy.timestamp,
       deviceId: deviceEnergy.deviceId,
       energy: deviceEnergy.energy,
     })
@@ -60,8 +54,8 @@ export async function getDeviceEnergy(
       and(
         eq(deviceEnergy.userId, userId),
         inArray(deviceEnergy.deviceId, deviceIds),
-        gte(deviceEnergy.createdAt, new Date(startDate)),
-        lte(deviceEnergy.createdAt, new Date(endDate))
+        gte(deviceEnergy.timestamp, new Date(startDate)),
+        lte(deviceEnergy.timestamp, new Date(endDate))
       )
     );
 }
