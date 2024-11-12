@@ -1,4 +1,5 @@
 import { useAuth } from '@clerk/clerk-expo';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Device, EnergyData, EnergyResponse } from '@ingeniti/shared';
 import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
@@ -116,7 +117,7 @@ const EnergyUsageChart = ({ navigation, userId }: ChartProps) => {
     const labels = Object.keys(chartData);
     const datasets = selectedDevices.map((deviceId, index) => ({
       data: labels.map((label) => chartData[label][deviceId] || 0),
-      color: (opacity = 1) => colors[index % colors.length].line,
+      color: () => colors[index % colors.length].line,
       strokeWidth: 2,
       withDots: true,
       withShadow: false,
@@ -125,7 +126,7 @@ const EnergyUsageChart = ({ navigation, userId }: ChartProps) => {
       gradient: colors[index % colors.length].gradient,
     }));
 
-    const legend = selectedDevices.map((deviceId, index) => {
+    const legend = selectedDevices.map((deviceId) => {
       const device = devices.find((d) => d.id === deviceId);
       return device?.name || 'Unknown Device';
     });
@@ -172,7 +173,7 @@ const EnergyUsageChart = ({ navigation, userId }: ChartProps) => {
             <View key={deviceId} style={styles.selectedDeviceTag}>
               <Text style={styles.selectedDeviceText}>{device?.name || 'Unknown Device'}</Text>
               <TouchableOpacity onPress={() => setSelectedDevices(selectedDevices.filter((id) => id !== deviceId))}>
-                <Text style={styles.removeTagText}>x</Text>
+                <Text style={styles.removeTagText}>×</Text>
               </TouchableOpacity>
             </View>
           );
@@ -183,21 +184,25 @@ const EnergyUsageChart = ({ navigation, userId }: ChartProps) => {
 
   const renderItem = () => (
     <>
-      <View style={styles.filtersContainer}>
+      <View style={[styles.filtersContainer, { backgroundColor: theme.colors.surface }]}>
         <View style={styles.datePickersRow}>
-          <View style={styles.datePickerContainer}>
-            <Text style={[styles.label, { color: theme.colors.onBackground }]}>Start Date:</Text>
-            <TouchableOpacity onPress={() => setStartDatePickerVisible(!startDatePickerVisible)}>
-              <Text style={{ color: theme.colors.primary }}>{startDate.format('YYYY-MM-DD')}</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.endDateTouchable}>
-            <Text style={[styles.label, { color: theme.colors.onBackground }]}>End Date:</Text>
-            <TouchableOpacity onPress={() => setEndDatePickerVisible(!endDatePickerVisible)}>
-              <Text style={{ color: theme.colors.primary, textAlign: 'right' }}>{endDate.format('YYYY-MM-DD')}</Text>{' '}
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={styles.datePickerButton}
+            onPress={() => setStartDatePickerVisible(!startDatePickerVisible)}
+          >
+            <Text style={styles.dateLabel}>Start Date</Text>
+            <Text style={[styles.dateValue, { color: theme.colors.primary }]}>{startDate.format('YYYY-MM-DD')}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.datePickerButton}
+            onPress={() => setEndDatePickerVisible(!endDatePickerVisible)}
+          >
+            <Text style={styles.dateLabel}>End Date</Text>
+            <Text style={[styles.dateValue, { color: theme.colors.primary }]}>{endDate.format('YYYY-MM-DD')}</Text>
+          </TouchableOpacity>
         </View>
+
         <View style={styles.multiSelectContainer}>
           <MultiSelect
             items={devices}
@@ -216,26 +221,39 @@ const EnergyUsageChart = ({ navigation, userId }: ChartProps) => {
             searchInputStyle={{
               color: theme.colors.onBackground,
               flex: 1,
-              textAlign: 'center',
-              width: '100%', // Ensure full width
+              textAlign: 'left',
+              width: '100%',
+              paddingTop: 4,
+              paddingBottom: 4,
             }}
             submitButtonColor={theme.colors.primary}
             submitButtonText="Select"
             styleTextDropdown={{
-              color: theme.colors.onBackground,
-              textAlign: 'center',
+              color: theme.colors.onSurfaceVariant,
+              fontSize: 16,
             }}
             styleTextDropdownSelected={{
-              color: theme.colors.onBackground,
-              fontSize: 14,
-              textAlign: 'center',
+              color: theme.colors.onSurfaceVariant,
+              fontSize: 16,
+              fontWeight: '500',
             }}
             styleIndicator={{
-              backgroundColor: theme.colors.primary,
-              borderColor: theme.colors.primary,
+              backgroundColor: 'transparent',
+              alignSelf: 'center',
+              marginTop: 0,
+              position: 'absolute',
+              right: 12,
+              top: '50%',
+              transform: [{ translateY: -12 }],
             }}
             styleItemsContainer={{
               backgroundColor: theme.colors.background,
+              marginTop: 4,
+              marginBottom: 8,
+              borderRadius: 8,
+              borderColor: theme.colors.outline,
+              borderWidth: 1,
+              padding: 4,
             }}
             styleMainWrapper={{
               backgroundColor: theme.colors.background,
@@ -243,50 +261,75 @@ const EnergyUsageChart = ({ navigation, userId }: ChartProps) => {
             }}
             styleInputGroup={{
               backgroundColor: theme.colors.background,
-              flexDirection: 'row',
-              alignItems: 'center',
-              flex: 1,
-              width: '100%', // Ensure full width
+              paddingHorizontal: 4,
             }}
             styleSelectorContainer={{
               backgroundColor: theme.colors.background,
               flex: 1,
-              width: '100%', // Ensure full width
+              width: '100%',
             }}
             styleRowList={{
               backgroundColor: theme.colors.background,
               justifyContent: 'center',
             }}
             styleDropdownMenuSubsection={{
-              backgroundColor: theme.colors.background,
+              backgroundColor: theme.colors.surface,
               borderColor: theme.colors.outline,
+              borderRadius: 8,
+              paddingLeft: 16,
+              paddingRight: 8,
+              paddingVertical: 2,
+              minHeight: 40,
+              alignItems: 'center',
+              borderWidth: 1,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
             }}
-            hideTags
             textInputProps={{
               style: {
                 color: theme.colors.onBackground,
-                backgroundColor: theme.colors.surface,
-                textAlign: 'center',
+                backgroundColor: 'transparent',
+                textAlign: 'left',
                 width: '100%',
+                height: 40,
               },
+              placeholderTextColor: theme.colors.onSurfaceVariant,
             }}
+            hideTags
           />
           {renderSelectedDevices()}
         </View>
       </View>
       <View>
-        <Text style={[styles.chartTitle, { color: theme.colors.onBackground }]}>Energy Usage</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {selectedDevices.length === 0 ? (
             <View style={styles.loadingContainer}>
+              <MaterialCommunityIcons
+                name="package-variant-closed"
+                size={48}
+                color={theme.colors.secondaryContainer}
+                style={{ marginBottom: 12 }}
+              />
               <Text style={{ color: theme.colors.onBackground }}>Please select devices to view data</Text>
             </View>
           ) : isLoadingEnergyData ? (
             <View style={styles.loadingContainer}>
+              <MaterialCommunityIcons
+                name="loading"
+                size={48}
+                color={theme.colors.primary}
+                style={{ marginBottom: 12 }}
+              />
               <Text style={{ color: theme.colors.onBackground }}>Loading...</Text>
             </View>
           ) : data.labels.length === 0 ? (
             <View style={styles.loadingContainer}>
+              <MaterialCommunityIcons
+                name="package-variant-closed"
+                size={48}
+                color={theme.colors.secondaryContainer}
+                style={{ marginBottom: 12 }}
+              />
               <Text style={{ color: theme.colors.onBackground }}>No data available for selected period</Text>
             </View>
           ) : (
@@ -322,23 +365,9 @@ const EnergyUsageChart = ({ navigation, userId }: ChartProps) => {
 
   return (
     <>
-      <Appbar.Header
-        style={{
-          backgroundColor: theme.colors.secondaryContainer,
-          height: 60,
-          zIndex: 100,
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-        }}
-      >
-        <TouchableOpacity style={{ padding: 8 }} onPress={() => navigation.goBack()}>
-          <Appbar.BackAction size={24} color={theme.colors.onSecondaryContainer} />
-        </TouchableOpacity>
-        <Appbar.Content
-          title="Energy Usage Chart"
-          titleStyle={[styles.headerTitle, { color: theme.colors.onSecondaryContainer }]}
-        />
-        <View style={{ width: 40 }} />
+      <Appbar.Header style={[styles.header, { backgroundColor: theme.colors.surface }]}>
+        <Appbar.BackAction onPress={() => navigation.goBack()} />
+        <Appbar.Content title="Energy Usage" titleStyle={[styles.headerTitle, { color: theme.colors.onSurface }]} />
       </Appbar.Header>
       <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
         <FlatList data={[{ key: 'chart' }]} renderItem={renderItem} keyExtractor={(item) => item.key} />
@@ -385,45 +414,67 @@ const EnergyUsageChart = ({ navigation, userId }: ChartProps) => {
 };
 
 const styles = StyleSheet.create({
+  header: {
+    elevation: 0,
+    height: 56,
+  },
   headerTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
-  },
-  container: {
-    flex: 1,
-    paddingTop: 0,
+    fontWeight: '600',
   },
   filtersContainer: {
-    padding: 5,
-    marginBottom: 10,
+    padding: 12,
+    marginHorizontal: 16,
+    marginTop: 8,
+    borderRadius: 12,
+    elevation: 2,
   },
   datePickersRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 10,
-    gap: 10,
+    marginBottom: 16,
+    gap: 12,
   },
-  endDateTouchable: {
+  datePickerButton: {
     flex: 1,
-    marginRight: 10,
-    alignItems: 'flex-end',
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: 'rgba(0,0,0,0.05)',
   },
-  datePickerContainer: {
-    flex: 1,
-    marginRight: 10,
+  dateLabel: {
+    fontSize: 12,
+    marginBottom: 4,
+    opacity: 0.7,
   },
-  datePickerText: {
-    fontSize: 14,
-  },
-  datePickerSelectedText: {
-    fontWeight: 'bold',
-  },
-  label: {
-    marginBottom: 5,
+  dateValue: {
     fontSize: 16,
+    fontWeight: '500',
   },
-  multiSelectContainer: {
-    marginTop: 10,
+  selectedDeviceTag: {
+    backgroundColor: 'rgba(74, 157, 178, 0.1)',
+    borderRadius: 8,
+    borderColor: '#4A9DB2',
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    margin: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  selectedDeviceText: {
+    fontSize: 12,
+    color: '#4A9DB2',
+    marginRight: 8,
+  },
+  removeTagText: {
+    color: '#4A9DB2',
+    opacity: 0.6,
+    fontSize: 16,
+    marginTop: -2,
+  },
+  container: {
+    flex: 1,
+    paddingTop: 0,
   },
   chartTitle: {
     textAlign: 'center',
@@ -464,28 +515,15 @@ const styles = StyleSheet.create({
     marginTop: 10,
     textAlignVertical: 'center',
   },
-  selectedDeviceTag: {
-    color: '#4A9DB2',
-    backgroundColor: 'rgba(0, 0, 0, 0.0)',
-    borderRadius: 15,
-    borderColor: '#4A9DB2',
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    margin: 5,
-    flexDirection: 'row',
-    alignItems: 'center',
-    textAlignVertical: 'center',
-  },
-  selectedDeviceText: {
-    fontSize: 12,
-    color: '#4A9DB2', //
-    marginRight: 5,
-  },
-  removeTagText: {
-    color: 'red',
-    fontWeight: 'bold',
+  datePickerText: {
     fontSize: 14,
+  },
+  datePickerSelectedText: {
+    fontWeight: '600',
+  },
+  multiSelectContainer: {
+    flex: 1,
+    marginTop: 2,
   },
 });
 
