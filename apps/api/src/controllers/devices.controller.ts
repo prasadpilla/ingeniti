@@ -10,6 +10,7 @@ import {
 import { Request, Response } from 'express';
 import { getDeviceEnergy } from '../models/deviceEnergy.model';
 import { getDevices, insertDevice, updateDevice } from '../models/devices.model';
+import { RequestHelper } from '../services/tuyaConnector';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const express = require('express');
@@ -186,6 +187,173 @@ devicesController.put('/:id', async (req: WithAuthProp<Request>, res: Response<D
 
   const device = await updateDevice(userId, id, { isSwitchOn });
   res.status(HttpStatusCode.OK_200).json({ ...device, isSensor: false });
+});
+
+devicesController.get('/get-device-info/:deviceId', async (req: WithAuthProp<Request>, res: Response) => {
+  const deviceId = req.params.deviceId;
+
+  const clientId = process.env.TUYA_CLIENT_ID;
+  const secret = process.env.TUYA_SECRET;
+
+  if (!clientId || !secret) {
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
+      success: false,
+      error: 'Client ID and Secret must be defined',
+    });
+  }
+
+  const requestHelper = new RequestHelper(clientId, secret);
+
+  try {
+    // Obtain the auth token
+    const authToken = await requestHelper.getAuthToken();
+    if (!authToken) {
+      return res.status(HttpStatusCode.UNAUTHORIZED_401).json({
+        success: false,
+        error: 'Failed to obtain auth token',
+      });
+    }
+
+    const deviceInfo = await requestHelper.getDeviceInfo(deviceId);
+    if (!deviceInfo) {
+      return res.status(HttpStatusCode.NOT_FOUND_404).json({
+        success: false,
+        error: 'Device not found',
+      });
+    }
+
+    return res.status(HttpStatusCode.OK_200).json({
+      success: true,
+      data: deviceInfo,
+    });
+  } catch (error) {
+    console.error('Error fetching device info from Tuya:', error);
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
+      success: false,
+      error: 'Failed to fetch device info',
+    });
+  }
+});
+
+devicesController.get('/get-device-state/:deviceId', async (req: WithAuthProp<Request>, res: Response) => {
+  const deviceId = req.params.deviceId;
+
+  const clientId = process.env.TUYA_CLIENT_ID;
+  const secret = process.env.TUYA_SECRET;
+
+  if (!clientId || !secret) {
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
+      success: false,
+      error: 'Client ID and Secret must be defined',
+    });
+  }
+
+  const requestHelper = new RequestHelper(clientId, secret);
+
+  try {
+    const deviceState = await requestHelper.getDeviceState(deviceId);
+    if (deviceState === undefined) {
+      return res.status(HttpStatusCode.NOT_FOUND_404).json({
+        success: false,
+        error: 'Device state not found',
+      });
+    }
+
+    return res.status(HttpStatusCode.OK_200).json({
+      success: true,
+      state: deviceState,
+    });
+  } catch (error) {
+    console.error('Error fetching device state from Tuya:', error);
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
+      success: false,
+      error: 'Failed to fetch device state',
+    });
+  }
+});
+
+devicesController.post('/freeze-device/:deviceId', async (req: WithAuthProp<Request>, res: Response) => {
+  const deviceId = req.params.deviceId;
+  const { state } = req.body;
+
+  const clientId = process.env.TUYA_CLIENT_ID;
+  const secret = process.env.TUYA_SECRET;
+
+  if (!clientId || !secret) {
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
+      success: false,
+      error: 'Client ID and Secret must be defined',
+    });
+  }
+
+  const requestHelper = new RequestHelper(clientId, secret);
+
+  try {
+    const result = await requestHelper.freezeDevice(deviceId, state);
+    if (result === undefined) {
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
+        success: false,
+        error: 'Failed to freeze/unfreeze device',
+      });
+    }
+
+    return res.status(HttpStatusCode.OK_200).json({
+      success: true,
+      result,
+    });
+  } catch (error) {
+    console.error('Error freezing/unfreezing device:', error);
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
+      success: false,
+      error: 'Failed to freeze/unfreeze device',
+    });
+  }
+});
+
+devicesController.get('/energy-consumption-ranking', async (req: WithAuthProp<Request>, res: Response) => {
+  const { energyType, energyAction, statisticsType, startTime, endTime, limit, containChilds } = req.query;
+
+  const clientId = process.env.TUYA_CLIENT_ID;
+  const secret = process.env.TUYA_SECRET;
+
+  if (!clientId || !secret) {
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
+      success: false,
+      error: 'Client ID and Secret must be defined',
+    });
+  }
+
+  const requestHelper = new RequestHelper(clientId, secret);
+
+  try {
+    const energyData = await requestHelper.getDeviceEnergy(
+      energyType as string,
+      energyAction as string,
+      statisticsType as string,
+      startTime as string,
+      endTime as string,
+      Number(limit) || 10,
+      containChilds === 'true'
+    );
+
+    if (energyData === undefined) {
+      return res.status(HttpStatusCode.NOT_FOUND_404).json({
+        success: false,
+        error: 'Energy consumption data not found',
+      });
+    }
+
+    return res.status(HttpStatusCode.OK_200).json({
+      success: true,
+      data: energyData.result,
+    });
+  } catch (error) {
+    console.error('Error fetching energy consumption ranking:', error);
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
+      success: false,
+      error: 'Failed to fetch energy consumption ranking',
+    });
+  }
 });
 
 devicesController.get('/form-options', async (req: WithAuthProp<Request>, res: Response) => {
