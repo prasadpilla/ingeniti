@@ -4,6 +4,7 @@ import { Device, EnergyData, EnergyResponse } from '@ingeniti/shared';
 import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Dimensions, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import MultiSelect from 'react-native-multiple-select';
@@ -26,6 +27,7 @@ const EnergyUsageChart = ({ navigation, userId }: ChartProps) => {
   const [startDatePickerVisible, setStartDatePickerVisible] = useState(false);
   const [endDatePickerVisible, setEndDatePickerVisible] = useState(false);
   const { getToken } = useAuth();
+  const { t } = useTranslation();
 
   const { data: devices = [], isLoading: isLoadingDevices } = useQuery<Device[]>({
     queryKey: ['devices', userId],
@@ -190,7 +192,7 @@ const EnergyUsageChart = ({ navigation, userId }: ChartProps) => {
             style={styles.datePickerButton}
             onPress={() => setStartDatePickerVisible(!startDatePickerVisible)}
           >
-            <Text style={styles.dateLabel}>Start Date</Text>
+            <Text style={styles.dateLabel}>{t('start_date')}</Text>
             <Text style={[styles.dateValue, { color: theme.colors.primary }]}>{startDate.format('YYYY-MM-DD')}</Text>
           </TouchableOpacity>
 
@@ -198,7 +200,7 @@ const EnergyUsageChart = ({ navigation, userId }: ChartProps) => {
             style={styles.datePickerButton}
             onPress={() => setEndDatePickerVisible(!endDatePickerVisible)}
           >
-            <Text style={styles.dateLabel}>End Date</Text>
+            <Text style={styles.dateLabel}>{t('end_date')}</Text>
             <Text style={[styles.dateValue, { color: theme.colors.primary }]}>{endDate.format('YYYY-MM-DD')}</Text>
           </TouchableOpacity>
         </View>
@@ -209,8 +211,8 @@ const EnergyUsageChart = ({ navigation, userId }: ChartProps) => {
             uniqueKey="id"
             onSelectedItemsChange={setSelectedDevices}
             selectedItems={selectedDevices}
-            selectText={isLoadingDevices ? 'Loading devices...' : 'Select Devices'}
-            searchInputPlaceholderText="Search Devices..."
+            selectText={isLoadingDevices ? t('loading_devices') : t('select_devices')}
+            searchInputPlaceholderText={t('search_devices')}
             tagRemoveIconColor={theme.colors.primary}
             tagBorderColor={theme.colors.primary}
             tagTextColor={theme.colors.primary}
@@ -310,7 +312,7 @@ const EnergyUsageChart = ({ navigation, userId }: ChartProps) => {
                 color={theme.colors.secondaryContainer}
                 style={{ marginBottom: 12 }}
               />
-              <Text style={{ color: theme.colors.onBackground }}>Please select devices to view data</Text>
+              <Text style={{ color: theme.colors.onBackground }}>{t('select_devices_to_view')}</Text>
             </View>
           ) : isLoadingEnergyData ? (
             <View style={styles.loadingContainer}>
@@ -320,7 +322,7 @@ const EnergyUsageChart = ({ navigation, userId }: ChartProps) => {
                 color={theme.colors.primary}
                 style={{ marginBottom: 12 }}
               />
-              <Text style={{ color: theme.colors.onBackground }}>Loading...</Text>
+              <Text style={{ color: theme.colors.onBackground }}>{t('loading')}</Text>
             </View>
           ) : data.labels.length === 0 ? (
             <View style={styles.loadingContainer}>
@@ -330,7 +332,7 @@ const EnergyUsageChart = ({ navigation, userId }: ChartProps) => {
                 color={theme.colors.secondaryContainer}
                 style={{ marginBottom: 12 }}
               />
-              <Text style={{ color: theme.colors.onBackground }}>No data available for selected period</Text>
+              <Text style={{ color: theme.colors.onBackground }}>{t('no_data_available')}</Text>
             </View>
           ) : (
             <LineChart
@@ -367,7 +369,10 @@ const EnergyUsageChart = ({ navigation, userId }: ChartProps) => {
     <>
       <Appbar.Header style={[styles.header, { backgroundColor: theme.colors.surface }]}>
         <Appbar.BackAction onPress={() => navigation.goBack()} />
-        <Appbar.Content title="Energy Usage" titleStyle={[styles.headerTitle, { color: theme.colors.onSurface }]} />
+        <Appbar.Content
+          title={t('energy_usage')}
+          titleStyle={[styles.headerTitle, { color: theme.colors.onSurface }]}
+        />
       </Appbar.Header>
       <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
         <FlatList data={[{ key: 'chart' }]} renderItem={renderItem} keyExtractor={(item) => item.key} />

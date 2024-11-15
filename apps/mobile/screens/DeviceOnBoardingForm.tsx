@@ -103,19 +103,17 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
 
   return (
     <Background>
-      <Paragraph style={{ fontSize: 20, fontWeight: 'bold', color: 'green' }}>Device Scan is Successful</Paragraph>
-      <Paragraph style={{ fontSize: 14, fontWeight: '400', marginTop: 10 }}>
-        Please fill in the details below to complete the registration
-      </Paragraph>
+      <Paragraph style={{ fontSize: 20, fontWeight: 'bold', color: 'green' }}>{t('device_scan_successful')}</Paragraph>
+      <Paragraph style={{ fontSize: 14, fontWeight: '400', marginTop: 10 }}>{t('fill_details_registration')}</Paragraph>
       <ScrollView style={styles.scrollContainer}>
         <View style={styles.formSections}>
-          <FormSection sectionTitle="Device Details" isOpen={isDeviceDetailsOpen}>
+          <FormSection sectionTitle={t('device_details')} isOpen={isDeviceDetailsOpen}>
             <Controller
               control={deviceOnBoardingForm.control}
               name="serialNumber"
               render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
                 <FormInput
-                  label="Serial Number"
+                  label={t('serial_number')}
                   placeholder="PR250*********"
                   disabled
                   value={value}
@@ -213,7 +211,7 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
             </View>
           </FormSection>
 
-          <FormSection sectionTitle="Enable Protection" isOpen={isDeviceProtectionOpen}>
+          <FormSection sectionTitle={t('enable_protection')} isOpen={isDeviceProtectionOpen}>
             <Controller
               control={deviceOnBoardingForm.control}
               name="minOffTime"
@@ -230,7 +228,7 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
                 />
               )}
             />
-            <Paragraph style={styles.advancedSettingsLabel}>Advanced Settings</Paragraph>
+            <Paragraph style={styles.advancedSettingsLabel}>{t('advanced_settings')}</Paragraph>
             <Controller
               control={deviceOnBoardingForm.control}
               name="brownOutVoltageChange"
@@ -265,7 +263,7 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
             />
           </FormSection>
 
-          <FormSection sectionTitle="Enable Benefits via Utility" isOpen={isBenefitsUtilityOpen}>
+          <FormSection sectionTitle={t('enable_benefits_utility')} isOpen={isBenefitsUtilityOpen}>
             <Controller
               control={deviceOnBoardingForm.control}
               name="country"
@@ -312,7 +310,7 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
                     containerStyles={styles.input}
                     errorText={error?.message}
                   />
-                  <HelperText type="info">Enter correctly to get benefits</HelperText>
+                  <HelperText type="info">{t('enter_correctly_benefits')}</HelperText>
                 </>
               )}
             />
@@ -441,7 +439,7 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
           {deviceFormMutation.isLoading ? (
             <ActivityIndicator animating={true} color={theme.colors.secondary} />
           ) : (
-            'Complete Registration'
+            t('complete_registration')
           )}
         </Button>
         <TouchableOpacity
