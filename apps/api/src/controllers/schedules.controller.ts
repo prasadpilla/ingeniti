@@ -1,9 +1,8 @@
 import { WithAuthProp } from '@clerk/clerk-sdk-node';
 import { Request, Response } from 'express';
-import { getSchedules, insertSchedule, getSchedule } from '../models/schedules.model';
+import { getSchedules, insertSchedule, getSchedule, deleteSchedule, updateSchedule } from '../models/schedules.model';
 import { HttpStatusCode } from '@ingeniti/shared';
-import { getDevices } from '../models/devices.model'; // Import the getDevices function
-
+import { getDevices } from '../models/devices.model';
 interface Auth {
   userId: string;
 }
@@ -13,7 +12,7 @@ type AuthRequest = Request & WithAuthProp<Auth>;
 interface Schedule {
   id: string;
   userId: string;
-  name: string; // Include name in the Schedule interface
+  name: string;
   startTime: Date;
   endTime: Date;
   deviceIds: string[];
@@ -41,6 +40,7 @@ type SchedulesResponse = {
 const express = require('express');
 const schedulesController = express.Router();
 
+// Create a new schedule
 schedulesController.post('/', async (req: AuthRequest, res: Response<CreateScheduleResponse>) => {
   try {
     const { name, startTime, endTime, deviceIds } = req.body;
@@ -77,6 +77,7 @@ schedulesController.post('/', async (req: AuthRequest, res: Response<CreateSched
   }
 });
 
+// Get all schedules for the authenticated user
 schedulesController.get('/', async (req: AuthRequest, res: Response<SchedulesResponse>) => {
   try {
     const userId = req.auth.userId;
@@ -109,6 +110,7 @@ schedulesController.get('/', async (req: AuthRequest, res: Response<SchedulesRes
   }
 });
 
+// Get a specific schedule by ID
 schedulesController.get('/:id', async (req: AuthRequest, res: Response<ScheduleResponse>) => {
   try {
     const userId = req.auth.userId;
@@ -136,6 +138,76 @@ schedulesController.get('/:id', async (req: AuthRequest, res: Response<ScheduleR
     return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
       success: false,
       error: 'Failed to fetch schedule',
+    });
+  }
+});
+
+schedulesController.put('/:id', async (req: AuthRequest, res: Response<ScheduleResponse>) => {
+  try {
+    const userId = req.auth.userId;
+
+    if (!userId) {
+      return res.status(HttpStatusCode.UNAUTHORIZED_401).json({ success: false, error: 'User ID is required' });
+    }
+
+    const { id } = req.params;
+    const { name, startTime, endTime, deviceIds } = req.body;
+
+    const updatedSchedule = await updateSchedule({
+      id,
+      userId,
+      name,
+      startTime: new Date(startTime as string),
+      endTime: new Date(endTime),
+      deviceIds: deviceIds || [],
+    });
+
+    if (!updatedSchedule) {
+      return res.status(HttpStatusCode.NOT_FOUND_404).json({
+        success: false,
+        error: 'Schedule not found or could not be updated',
+      });
+    }
+
+    return res.status(HttpStatusCode.OK_200).json({
+      success: true,
+      schedule: updatedSchedule,
+    });
+  } catch (error) {
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
+      success: false,
+      error: 'Failed to update schedule',
+    });
+  }
+});
+
+schedulesController.delete('/:id', async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.auth.userId;
+
+    if (!userId) {
+      return res.status(HttpStatusCode.UNAUTHORIZED_401).json({ success: false, error: 'User ID is required' });
+    }
+
+    const { id } = req.params;
+
+    const deleted = await deleteSchedule(userId, id);
+
+    if (!deleted) {
+      return res.status(HttpStatusCode.NOT_FOUND_404).json({
+        success: false,
+        error: 'Schedule not found or could not be deleted',
+      });
+    }
+
+    return res.status(HttpStatusCode.OK_200).json({
+      success: true,
+      message: 'Schedule deleted successfully',
+    });
+  } catch (error) {
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
+      success: false,
+      error: 'Failed to delete schedule',
     });
   }
 });

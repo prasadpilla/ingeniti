@@ -3,12 +3,12 @@
 import { DataTable } from '@/components/DataTable/DataTable';
 import { makeApiCall } from '@/utils/api';
 import { useAuth } from '@clerk/clerk-react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { HttpStatusCode } from '@ingeniti/shared';
-import { Button } from '@/shadcn/ui/button';
-import { Spinner } from '@phosphor-icons/react';
+import { Button } from '@/shadcn/ui/button'; // You can replace this with your button implementation
 import ScheduleForm from '@/components/ScheduleForm';
 import React, { useState } from 'react';
+import { List } from '@phosphor-icons/react';
 
 // Define the type for a schedule
 interface Schedule {
@@ -22,6 +22,9 @@ interface Schedule {
 const ScheduleDetailsPage: React.FC = () => {
   const { getToken } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null);
+  const [dropdownOpen, setDropdownOpen] = useState<string | null>(null); // Track which dropdown is open
+  const queryClient = useQueryClient();
 
   const {
     data: scheduleData = [], // Default to an empty array
@@ -50,31 +53,86 @@ const ScheduleDetailsPage: React.FC = () => {
     return data.schedules; // Return the schedules array
   });
 
-  if (isScheduleLoading) {
-    return (
-      <div className="w-full h-full p-5 flex items-center justify-center text-primary">
-        <Spinner className="animate-spin size-6" />
-      </div>
-    );
-  }
+  const deleteScheduleMutation = useMutation(
+    async (scheduleId: string) => {
+      const token = await getToken();
+      const res = await makeApiCall(token, `/schedules/${scheduleId}`, 'DELETE');
+      if (res.status !== HttpStatusCode.OK_200) {
+        throw new Error('Failed to delete schedule');
+      }
+      return res.json();
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['schedules']);
+      },
+    }
+  );
+
+  const handleDelete = (scheduleId: string) => {
+    deleteScheduleMutation.mutate(scheduleId);
+  };
+
+  const handleEdit = (row) => {
+    setSelectedSchedule({
+      ...row.original,
+      userId: 'currentUserId', // Replace with actual user ID
+      selectedDevices: row.original.deviceIds, // Ensure selectedDevices is set
+    });
+    setIsModalOpen(true);
+  };
 
   const scheduleColumns = [
     {
-      accessorKey: 'name', // Changed to show the name of the schedule
+      accessorKey: 'name',
       header: 'Schedule Name',
     },
     {
-      accessorKey: 'startTime', // Added start time column
+      accessorKey: 'startTime',
       header: 'Start Time',
     },
     {
-      accessorKey: 'endTime', // Added end time column
+      accessorKey: 'endTime',
       header: 'End Time',
     },
     {
-      accessorKey: 'deviceIds', // Added devices column
+      accessorKey: 'deviceIds',
       header: 'Devices',
-      cell: ({ row }) => row.original.deviceIds.join(', '), // Join device names for display
+      cell: ({ row }) => row.original.deviceIds.join(', '),
+    },
+    {
+      accessorKey: 'actions',
+      header: 'Actions',
+      cell: ({ row }) => (
+        <div className="relative inline-block text-left">
+          <Button
+            variant="outline"
+            className="p-1"
+            onClick={() => setDropdownOpen(dropdownOpen === row.original.id ? null : row.original.id)}
+          >
+            <List className="h-5 w-5" aria-hidden="true" />
+          </Button>
+          {dropdownOpen === row.original.id && (
+            <div className="absolute right-0 z-10 mt-2 w-40 bg-white border border-gray-300 rounded-md shadow-lg">
+              <button
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                onClick={() => handleEdit(row)}
+              >
+                Edit
+              </button>
+              <button
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                onClick={() => {
+                  handleDelete(row.original.id);
+                  setDropdownOpen(null);
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          )}
+        </div>
+      ),
     },
   ];
 
@@ -83,7 +141,7 @@ const ScheduleDetailsPage: React.FC = () => {
   return (
     <div>
       <div className="w-full flex justify-between">
-        <h2 className="text-2xl font-bold">Schedule Details</h2>
+        <h2 className="text-2xl font-bold">Schedule Lists</h2>
         <Button onClick={() => setIsModalOpen(true)}>Add Schedule</Button> {/* Open the modal */}
       </div>
       {error ? (
@@ -98,6 +156,7 @@ const ScheduleDetailsPage: React.FC = () => {
         <DataTable
           columns={scheduleColumns}
           data={scheduleData.map((schedule) => ({
+            id: schedule.id,
             name: schedule.name,
             startTime: new Date(schedule.startTime).toLocaleString(),
             endTime: new Date(schedule.endTime).toLocaleString(),
@@ -107,7 +166,14 @@ const ScheduleDetailsPage: React.FC = () => {
           error={error as string}
         />
       )}
-      <ScheduleForm isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <ScheduleForm
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedSchedule(null);
+        }}
+        schedule={selectedSchedule || { userId: '', selectedDevices: [] }}
+      />
     </div>
   );
 };

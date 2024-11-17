@@ -13,6 +13,15 @@ import { Label } from '@/shadcn/ui/label';
 import { z } from 'zod';
 import CustomDropdown from './CustomDropdown';
 
+export interface Schedule {
+  id: string;
+  userId: string;
+  name: string;
+  startTime: string;
+  endTime: string;
+  selectedDevices: string[];
+}
+
 export interface Device {
   id: string;
   userId: string;
@@ -40,21 +49,20 @@ export interface Device {
   updatedAt: Date;
 }
 
-export interface ScheduleForm {
-  name: string; // Added name field
-  startTime: string;
-  endTime: string;
-  selectedDevices: string[];
+interface ScheduleFormProps {
+  onClose: () => void;
+  isOpen: boolean;
+  schedule?: Schedule | null;
 }
 
-export const scheduleFormSchema = z.object({
+const scheduleFormSchema = z.object({
   name: z.string().nonempty('Name is required'), // Validation for name
   startTime: z.string().nonempty('Start time is required'),
   endTime: z.string().nonempty('End time is required'),
   selectedDevices: z.array(z.string()).min(1, 'At least one device must be selected'),
 });
 
-const ScheduleForm: React.FC<{ onClose: () => void; isOpen: boolean }> = ({ onClose, isOpen }) => {
+const ScheduleForm: React.FC<ScheduleFormProps> = ({ onClose, isOpen, schedule }) => {
   const { getToken } = useAuth();
   const queryClient = useQueryClient();
   const [devices, setDevices] = useState<Device[]>([]);
@@ -65,9 +73,9 @@ const ScheduleForm: React.FC<{ onClose: () => void; isOpen: boolean }> = ({ onCl
   const form = useForm<z.infer<typeof scheduleFormSchema>>({
     resolver: zodResolver(scheduleFormSchema),
     defaultValues: {
-      name: '',
-      startTime: '',
-      endTime: '',
+      name: schedule?.name || '',
+      startTime: schedule?.startTime || '',
+      endTime: schedule?.endTime || '',
       selectedDevices: [],
     },
   });
@@ -86,6 +94,13 @@ const ScheduleForm: React.FC<{ onClose: () => void; isOpen: boolean }> = ({ onCl
     fetchDevices();
   }, [getToken]);
 
+  useEffect(() => {
+    if (schedule) {
+      setSelectedDeviceIds(schedule.selectedDevices); // Set selected devices if editing
+      form.setValue('selectedDevices', schedule.selectedDevices); // Set form value for selected devices
+    }
+  }, [schedule, form]);
+
   const handleDeviceToggle = (deviceId: string) => {
     setSelectedDeviceIds((prev) => {
       const newSelectedIds = prev.includes(deviceId) ? prev.filter((id) => id !== deviceId) : [...prev, deviceId];
@@ -98,12 +113,17 @@ const ScheduleForm: React.FC<{ onClose: () => void; isOpen: boolean }> = ({ onCl
   const { mutate, isLoading } = useMutation(
     async (data: z.infer<typeof scheduleFormSchema>) => {
       const token = await getToken();
-      const response = await makeApiCall(token, '/schedules', 'POST', {
-        name: data.name,
-        startTime: data.startTime,
-        endTime: data.endTime,
-        deviceIds: selectedDeviceIds,
-      });
+      const response = await makeApiCall(
+        token,
+        schedule ? `/schedules/${schedule.id}` : '/schedules',
+        schedule ? 'PUT' : 'POST',
+        {
+          name: data.name,
+          startTime: data.startTime,
+          endTime: data.endTime,
+          deviceIds: selectedDeviceIds,
+        }
+      );
       if (response.status !== 200 && response.status !== 201) {
         const errorData = await response.json();
         throw new Error(String(errorData.message));
@@ -138,7 +158,7 @@ const ScheduleForm: React.FC<{ onClose: () => void; isOpen: boolean }> = ({ onCl
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px] w-full">
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold">Create Schedule</h2>
+          <h2 className="text-lg font-semibold">{schedule ? 'Edit Schedule' : 'Create Schedule'}</h2>
           <Form {...form}>
             <form onSubmit={onSubmit} className="space-y-4">
               <FormField
@@ -245,7 +265,7 @@ const ScheduleForm: React.FC<{ onClose: () => void; isOpen: boolean }> = ({ onCl
                   Cancel
                 </Button>
                 <Button className="px-12" type="submit" disabled={isLoading}>
-                  {isLoading ? 'Saving...' : 'Create Schedule'}
+                  {isLoading ? 'Saving...' : schedule ? 'Update Schedule' : 'Create Schedule'}
                 </Button>
               </div>
             </form>

@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
-import { RequestHelper } from '../services/tuyaConnector'; // Import the RequestHelper
-import { getSchedules } from '../models/schedules.model';
+import { RequestHelper } from '../services/tuyaConnector';
 import { addMinutes, isBefore, isEqual } from 'date-fns';
-import { WithAuthProp } from '@clerk/clerk-sdk-node';
+import { getAllSchedules } from '../models/schedules.model';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const express = require('express');
@@ -21,11 +20,11 @@ tasksController.get('/', async (req: Request, res: Response) => {
   res.json({ message: 'Task executed successfully' });
 });
 
-tasksController.post('/checkSchedule', async (req: WithAuthProp<Request>, res: Response) => {
-  const userId = req.auth.userId as string;
+tasksController.post('/checkSchedule', async (req: Request, res: Response) => {
   const now = new Date();
   const twoMinutesFromNow = addMinutes(now, 2);
-  const schedules = await getSchedules(userId);
+
+  const schedules = await getAllSchedules();
 
   for (const schedule of schedules) {
     const { startTime, endTime, deviceIds } = schedule;
