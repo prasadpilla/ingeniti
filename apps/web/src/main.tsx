@@ -16,6 +16,7 @@ import AuthGuard from './providers/AuthGuard';
 import QueryProvider from './providers/QueryProvider';
 import { ThemeProvider, useTheme } from './providers/ThemeProvider';
 import { TooltipProvider } from './shadcn/ui/tooltip';
+import ScheduleDetailsPage from './pages/ScheduleList';
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 if (!PUBLISHABLE_KEY) {
@@ -54,6 +55,7 @@ const App = () => {
                   <Route element={<AuthGuard />}>
                     <Route element={<AppLayout />}>
                       <Route path="/" element={<Dashboard />} />
+                      <Route path="/schedules" element={<ScheduleDetailsPage />} />
                     </Route>
                     <Route element={<FullScreenAppLayout />}></Route>
                   </Route>

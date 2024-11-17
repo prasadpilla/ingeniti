@@ -37,6 +37,15 @@ interface FreezeResponse {
   tid: string;
 }
 
+interface RequestHeaders {
+  t: string;
+  sign_method: string;
+  client_id: string;
+  sign: string;
+  access_token?: string;
+  [key: string]: string | undefined;
+}
+
 interface EnergyConsumptionResponse {
   result: Array<{
     device_id: string;

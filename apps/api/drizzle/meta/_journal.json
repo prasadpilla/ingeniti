@@ -64,6 +64,20 @@
       "when": 1730825980095,
       "tag": "0008_clammy_impossible_man",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1731853458332,
+      "tag": "0009_handy_titania",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1731854075096,
+      "tag": "0010_amazing_bug",
+      "breakpoints": true
     }
   ]
 }
