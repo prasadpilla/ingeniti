@@ -14,7 +14,7 @@ interface RequestHeaders {
   client_id: string;
   sign: string;
   access_token?: string;
-  path: string; // Added this line
+  path: string;
 }
 
 interface ApiResponse<T> {
@@ -61,6 +61,8 @@ export class TuyaConnector {
     const stringToSign = [method, contentHash, '', url].join('\n');
     const signStr = this.config.accessKey + this.token + t + stringToSign;
 
+    console.log('Request Sign:', { t, url, signStr });
+
     return {
       ...headers,
       t,
@@ -87,23 +89,35 @@ export class TuyaConnector {
       sign: await this.encryptStr(signStr, this.config.secretKey),
     };
 
+    console.log('Token Request Headers:', headers);
+
     const { data: login } = await this.httpClient.get<ApiResponse<{ access_token: string }>>(
       '/v1.0/token?grant_type=1',
       { headers }
     );
+
+    console.log('Token Response:', login);
 
     if (!login || !login.success) {
       throw Error(`fetch failed: ${login.msg}`);
     }
 
     this.token = login.result.access_token;
+    console.log('Fetched Token:', this.token);
   }
 
   async getDeviceInfo(deviceId: string) {
+    if (!this.token) {
+      console.log('Token is not set, fetching token...');
+      await this.getToken();
+    }
+
     const query = {};
     const method = 'GET';
     const url = `/v2.0/cloud/thing/${deviceId}`;
     const reqHeaders = await this.getRequestSign(url, method, {}, query);
+    console.log('Device Info Request Headers:', reqHeaders);
+
     const { data } = await this.httpClient.request({
       method,
       data: {},
@@ -113,6 +127,9 @@ export class TuyaConnector {
       } as { [key: string]: string | undefined },
       url: reqHeaders.path,
     });
+
+    console.log('Device Info Response:', data);
+
     if (!data || !data.success) {
       throw Error(`request api failed: ${data.msg}`);
     }
@@ -121,10 +138,16 @@ export class TuyaConnector {
   }
 
   async getDeviceState(deviceId: string) {
+    if (!this.token) {
+      console.log('Token is not set, fetching token...');
+      await this.getToken();
+    }
+
     const query = {};
     const method = 'GET';
     const url = `/v2.0/cloud/thing/${deviceId}/state`;
     const reqHeaders = await this.getRequestSign(url, method, {}, query);
+    console.log('Device State Request Headers:', reqHeaders);
 
     const { data } = await this.httpClient.request({
       method,
@@ -135,6 +158,8 @@ export class TuyaConnector {
       } as { [key: string]: string | undefined },
       url: reqHeaders.path,
     });
+
+    console.log('Device State Response:', data);
 
     if (!data || !data.success) {
       throw Error(`request api failed: ${data.msg}`);
@@ -148,6 +173,12 @@ export class TuyaConnector {
     const url = `/v2.0/cloud/thing/${deviceId}/freeze`;
     const body = { state };
     const reqHeaders = await this.getRequestSign(url, method, {}, {}, body);
+    console.log('Freeze Device Request Headers:', reqHeaders);
+
+    if (!this.token) {
+      console.log('Token is not set, fetching token...');
+      await this.getToken();
+    }
 
     const { data } = await this.httpClient.request({
       method,
@@ -158,6 +189,8 @@ export class TuyaConnector {
       } as { [key: string]: string | undefined },
       url: reqHeaders.path,
     });
+
+    console.log('Freeze Device Response:', data);
 
     if (!data || !data.success) {
       throw Error(`request api failed: ${data.msg}`);
@@ -177,6 +210,10 @@ export class TuyaConnector {
   ) {
     const method = 'GET';
     const url = `/v1.0/iot-03/energy/${energyType}/space/statistics/devices-top`;
+    if (!this.token) {
+      console.log('Token is not set, fetching token...');
+      await this.getToken();
+    }
     const query = {
       energy_action: energyAction,
       statistics_type: statisticsType,
@@ -187,6 +224,7 @@ export class TuyaConnector {
     };
 
     const reqHeaders = await this.getRequestSign(url, method, {}, query);
+    console.log('Device Energy Request Headers:', reqHeaders);
 
     const { data } = await this.httpClient.request({
       method,
@@ -197,6 +235,8 @@ export class TuyaConnector {
       } as { [key: string]: string | undefined },
       url: reqHeaders.path,
     });
+
+    console.log('Device Energy Response:', data);
 
     if (!data || !data.success) {
       throw Error(`request api failed: ${data.msg}`);

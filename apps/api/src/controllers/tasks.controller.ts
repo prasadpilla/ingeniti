@@ -46,6 +46,7 @@ tasksController.post('/checkSchedule', async (req: Request, res: Response) => {
       for (const deviceId of deviceIds) {
         const device = await getDevice(schedule.userId, deviceId);
         if (device && device.tuyaDeviceId) {
+          console.log(`Freezing device: Local ID = ${deviceId}, Tuya ID = ${device.tuyaDeviceId}`);
           await tuyaConnector.freezeDevice(device.tuyaDeviceId, 1);
           console.log('Device Freezing:', device.tuyaDeviceId);
         } else {
@@ -58,6 +59,7 @@ tasksController.post('/checkSchedule', async (req: Request, res: Response) => {
       for (const deviceId of deviceIds) {
         const device = await getDevice(schedule.userId, deviceId);
         if (device && device.tuyaDeviceId) {
+          console.log(`Unfreezing device: Local ID = ${deviceId}, Tuya ID = ${device.tuyaDeviceId}`);
           await tuyaConnector.freezeDevice(device.tuyaDeviceId, 0);
           console.log('Device Unfreezed:', device.tuyaDeviceId);
         } else {
