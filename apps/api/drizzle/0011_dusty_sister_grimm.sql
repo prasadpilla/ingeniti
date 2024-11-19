@@ -1,0 +1,1 @@
+ALTER TABLE "devices" ADD COLUMN "tuya_device_id" text;

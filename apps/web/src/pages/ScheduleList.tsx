@@ -8,7 +8,7 @@ import { HttpStatusCode } from '@ingeniti/shared';
 import { Button } from '@/shadcn/ui/button'; // You can replace this with your button implementation
 import ScheduleForm from '@/components/ScheduleForm';
 import React, { useState } from 'react';
-import { List } from '@phosphor-icons/react';
+import { Trash } from '@phosphor-icons/react'; // Import the Trash icon
 
 // Define the type for a schedule
 interface Schedule {
@@ -23,7 +23,6 @@ const ScheduleDetailsPage: React.FC = () => {
   const { getToken } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null);
-  const [dropdownOpen, setDropdownOpen] = useState<string | null>(null); // Track which dropdown is open
   const queryClient = useQueryClient();
 
   const {
@@ -73,15 +72,6 @@ const ScheduleDetailsPage: React.FC = () => {
     deleteScheduleMutation.mutate(scheduleId);
   };
 
-  const handleEdit = (row) => {
-    setSelectedSchedule({
-      ...row.original,
-      userId: 'currentUserId', // Replace with actual user ID
-      selectedDevices: row.original.deviceIds, // Ensure selectedDevices is set
-    });
-    setIsModalOpen(true);
-  };
-
   const scheduleColumns = [
     {
       accessorKey: 'name',
@@ -104,33 +94,14 @@ const ScheduleDetailsPage: React.FC = () => {
       accessorKey: 'actions',
       header: 'Actions',
       cell: ({ row }) => (
-        <div className="relative inline-block text-left">
+        <div className="flex items-center">
           <Button
             variant="outline"
             className="p-1"
-            onClick={() => setDropdownOpen(dropdownOpen === row.original.id ? null : row.original.id)}
+            onClick={() => handleDelete(row.original.id)} // Call delete directly
           >
-            <List className="h-5 w-5" aria-hidden="true" />
+            <Trash className="h-5 w-5" aria-hidden="true" />
           </Button>
-          {dropdownOpen === row.original.id && (
-            <div className="absolute right-0 z-10 mt-2 w-40 bg-white border border-gray-300 rounded-md shadow-lg">
-              <button
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                onClick={() => handleEdit(row)}
-              >
-                Edit
-              </button>
-              <button
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                onClick={() => {
-                  handleDelete(row.original.id);
-                  setDropdownOpen(null);
-                }}
-              >
-                Delete
-              </button>
-            </div>
-          )}
         </div>
       ),
     },
@@ -172,7 +143,6 @@ const ScheduleDetailsPage: React.FC = () => {
           setIsModalOpen(false);
           setSelectedSchedule(null);
         }}
-        schedule={selectedSchedule || { userId: '', selectedDevices: [] }}
       />
     </div>
   );

@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
-import { RequestHelper } from '../services/tuyaConnector';
+import { TuyaConnector } from '../services/tuyaConnector';
 import { addMinutes, isBefore, isEqual } from 'date-fns';
 import { getAllSchedules } from '../models/schedules.model';
+import { getDevice } from '../models/devices.model'; // Import the getDevice function
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const express = require('express');
@@ -14,7 +15,12 @@ if (!clientId || !secret) {
   throw new Error('Tuya credentials expected');
 }
 
-const requestHelper = new RequestHelper(clientId, secret);
+// Initialize TuyaConnector with configuration
+const tuyaConnector = new TuyaConnector({
+  accessKey: clientId,
+  secretKey: secret,
+  baseUrl: 'https://openapi.tuyain.com',
+});
 
 tasksController.get('/', async (req: Request, res: Response) => {
   res.json({ message: 'Task executed successfully' });
@@ -38,15 +44,25 @@ tasksController.post('/checkSchedule', async (req: Request, res: Response) => {
 
     if (isBefore(now, startDateTime) && isBefore(startDateTime, twoMinutesFromNow)) {
       for (const deviceId of deviceIds) {
-        await requestHelper.freezeDevice(deviceId, 1);
-        console.log('Device Freezing:', deviceId);
+        const device = await getDevice(schedule.userId, deviceId);
+        if (device && device.tuyaDeviceId) {
+          await tuyaConnector.freezeDevice(device.tuyaDeviceId, 1);
+          console.log('Device Freezing:', device.tuyaDeviceId);
+        } else {
+          console.log('No Tuya device ID found for device:', deviceId);
+        }
       }
     }
 
     if (isEqual(twoMinutesFromNow, endDateTime)) {
       for (const deviceId of deviceIds) {
-        await requestHelper.freezeDevice(deviceId, 0);
-        console.log('Device Unfreezed:', deviceId);
+        const device = await getDevice(schedule.userId, deviceId);
+        if (device && device.tuyaDeviceId) {
+          await tuyaConnector.freezeDevice(device.tuyaDeviceId, 0);
+          console.log('Device Unfreezed:', device.tuyaDeviceId);
+        } else {
+          console.log('No Tuya device ID found for device:', deviceId);
+        }
       }
     }
   }

@@ -32,6 +32,7 @@ export const devices = pgTable(
       .notNull()
       .defaultNow()
       .$onUpdate(() => new Date()),
+    tuyaDeviceId: text('tuya_device_id'),
   },
   (table) => ({
     userIdIndex: index('user_id_idx').on(table.userId),
@@ -57,11 +58,15 @@ export async function getDevice(userId: string, deviceId: string): Promise<Selec
 export async function updateDevice(
   userId: string,
   deviceId: string,
-  deviceData: { isSwitchOn: boolean }
+  deviceData: { isSwitchOn: boolean; tuyaDeviceId?: string }
 ): Promise<SelectedDevice> {
   const [device] = await db
     .update(devices)
-    .set({ isSwitchOn: deviceData.isSwitchOn, updatedAt: new Date() })
+    .set({
+      isSwitchOn: deviceData.isSwitchOn,
+      updatedAt: new Date(),
+      tuyaDeviceId: deviceData.tuyaDeviceId,
+    })
     .where(and(eq(devices.id, deviceId), eq(devices.userId, userId)))
     .returning();
 
@@ -90,6 +95,7 @@ export async function insertDevice(deviceData: {
   maxLoad: number | undefined;
   isSwitchOn: boolean;
   isOnline: boolean;
+  tuyaDeviceId?: string;
 }): Promise<SelectedDevice> {
   const device = await db
     .insert(devices)
@@ -117,6 +123,7 @@ export async function insertDevice(deviceData: {
       isOnline: deviceData.isOnline,
       createdAt: new Date(),
       updatedAt: new Date(),
+      tuyaDeviceId: deviceData.tuyaDeviceId,
     })
     .returning();
 

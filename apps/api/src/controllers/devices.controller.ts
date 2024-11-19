@@ -9,12 +9,20 @@ import {
 } from '@ingeniti/shared';
 import { Request, Response } from 'express';
 import { getDeviceEnergy } from '../models/deviceEnergy.model';
-import { getDevices, insertDevice, updateDevice } from '../models/devices.model';
-import { RequestHelper } from '../services/tuyaConnector';
+import { getDevice, getDevices, insertDevice, updateDevice } from '../models/devices.model';
+import { TuyaConnector } from '../services/tuyaConnector'; // Import TuyaConnector
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const express = require('express');
 const devicesController = express.Router();
+
+// Initialize TuyaConnector with configuration
+const tuyaConfig = {
+  accessKey: process.env.TUYA_CLIENT_ID || '',
+  secretKey: process.env.TUYA_SECRET || '',
+  baseUrl: 'https://openapi.tuyain.com',
+};
+const tuyaConnector = new TuyaConnector(tuyaConfig);
 
 devicesController.post(
   '/',
@@ -192,36 +200,16 @@ devicesController.put('/:id', async (req: WithAuthProp<Request>, res: Response<D
 devicesController.get('/get-device-info/:deviceId', async (req: WithAuthProp<Request>, res: Response) => {
   const deviceId = req.params.deviceId;
 
-  const clientId = process.env.TUYA_CLIENT_ID;
-  const secret = process.env.TUYA_SECRET;
-
-  if (!clientId || !secret) {
-    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
-      success: false,
-      error: 'Client ID and Secret must be defined',
-    });
-  }
-
-  const requestHelper = new RequestHelper(clientId, secret);
-
   try {
-    // Obtain the auth token
-    const authToken = await requestHelper.getAuthToken();
-    if (!authToken) {
-      return res.status(HttpStatusCode.UNAUTHORIZED_401).json({
-        success: false,
-        error: 'Failed to obtain auth token',
-      });
-    }
-
-    const deviceInfo = await requestHelper.getDeviceInfo(deviceId);
-    if (!deviceInfo) {
+    const device = await getDevice(req.auth.userId as string, deviceId);
+    if (!device || !device.tuyaDeviceId) {
       return res.status(HttpStatusCode.NOT_FOUND_404).json({
         success: false,
-        error: 'Device not found',
+        error: 'Device not found or Tuya device ID is missing',
       });
     }
 
+    const deviceInfo = await tuyaConnector.getDeviceInfo(device.tuyaDeviceId);
     return res.status(HttpStatusCode.OK_200).json({
       success: true,
       data: deviceInfo,
@@ -238,27 +226,16 @@ devicesController.get('/get-device-info/:deviceId', async (req: WithAuthProp<Req
 devicesController.get('/get-device-state/:deviceId', async (req: WithAuthProp<Request>, res: Response) => {
   const deviceId = req.params.deviceId;
 
-  const clientId = process.env.TUYA_CLIENT_ID;
-  const secret = process.env.TUYA_SECRET;
-
-  if (!clientId || !secret) {
-    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
-      success: false,
-      error: 'Client ID and Secret must be defined',
-    });
-  }
-
-  const requestHelper = new RequestHelper(clientId, secret);
-
   try {
-    const deviceState = await requestHelper.getDeviceState(deviceId);
-    if (deviceState === undefined) {
+    const device = await getDevice(req.auth.userId as string, deviceId);
+    if (!device || !device.tuyaDeviceId) {
       return res.status(HttpStatusCode.NOT_FOUND_404).json({
         success: false,
-        error: 'Device state not found',
+        error: 'Device not found or Tuya device ID is missing',
       });
     }
 
+    const deviceState = await tuyaConnector.getDeviceState(device.tuyaDeviceId);
     return res.status(HttpStatusCode.OK_200).json({
       success: true,
       state: deviceState,
@@ -276,27 +253,16 @@ devicesController.post('/freeze-device/:deviceId', async (req: WithAuthProp<Requ
   const deviceId = req.params.deviceId;
   const { state } = req.body;
 
-  const clientId = process.env.TUYA_CLIENT_ID;
-  const secret = process.env.TUYA_SECRET;
-
-  if (!clientId || !secret) {
-    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
-      success: false,
-      error: 'Client ID and Secret must be defined',
-    });
-  }
-
-  const requestHelper = new RequestHelper(clientId, secret);
-
   try {
-    const result = await requestHelper.freezeDevice(deviceId, state);
-    if (result === undefined) {
-      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
+    const device = await getDevice(req.auth.userId as string, deviceId);
+    if (!device || !device.tuyaDeviceId) {
+      return res.status(HttpStatusCode.NOT_FOUND_404).json({
         success: false,
-        error: 'Failed to freeze/unfreeze device',
+        error: 'Device not found or Tuya device ID is missing',
       });
     }
 
+    const result = await tuyaConnector.freezeDevice(device.tuyaDeviceId, state);
     return res.status(HttpStatusCode.OK_200).json({
       success: true,
       result,
@@ -313,20 +279,8 @@ devicesController.post('/freeze-device/:deviceId', async (req: WithAuthProp<Requ
 devicesController.get('/energy-consumption-ranking', async (req: WithAuthProp<Request>, res: Response) => {
   const { energyType, energyAction, statisticsType, startTime, endTime, limit, containChilds } = req.query;
 
-  const clientId = process.env.TUYA_CLIENT_ID;
-  const secret = process.env.TUYA_SECRET;
-
-  if (!clientId || !secret) {
-    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
-      success: false,
-      error: 'Client ID and Secret must be defined',
-    });
-  }
-
-  const requestHelper = new RequestHelper(clientId, secret);
-
   try {
-    const energyData = await requestHelper.getDeviceEnergy(
+    const energyData = await tuyaConnector.getDeviceEnergy(
       energyType as string,
       energyAction as string,
       statisticsType as string,
@@ -335,13 +289,6 @@ devicesController.get('/energy-consumption-ranking', async (req: WithAuthProp<Re
       Number(limit) || 10,
       containChilds === 'true'
     );
-
-    if (energyData === undefined) {
-      return res.status(HttpStatusCode.NOT_FOUND_404).json({
-        success: false,
-        error: 'Energy consumption data not found',
-      });
-    }
 
     return res.status(HttpStatusCode.OK_200).json({
       success: true,
