@@ -7,7 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { HttpStatusCode } from '@ingeniti/shared';
 import { Button } from '@/shadcn/ui/button'; // You can replace this with your button implementation
 import ScheduleForm from '@/components/ScheduleForm';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Trash } from '@phosphor-icons/react'; // Import the Trash icon
 
 // Define the type for a schedule
@@ -24,6 +24,30 @@ const ScheduleDetailsPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null);
   const queryClient = useQueryClient();
+
+  const fetchDeviceInfo = async (deviceId: string) => {
+    try {
+      const token = await getToken();
+      const response = await makeApiCall(token, `/devices/freeze-device/${deviceId}`, 'POST', {
+        state: 1,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch device info');
+      }
+
+      const data = await response.json();
+      console.log('Device Info:', data); // Log the result
+    } catch (error) {
+      console.error('Error', error);
+    }
+  };
+
+  // Example usage of fetchDeviceInfo
+  useEffect(() => {
+    const deviceId = 'bffc73fa-e21b-454e-922f-a31aca521365'; // Replace with the actual device ID you want to fetch
+    fetchDeviceInfo(deviceId);
+  }, []);
 
   const {
     data: scheduleData = [], // Default to an empty array

@@ -169,20 +169,24 @@ export class TuyaConnector {
   }
 
   async freezeDevice(deviceId: string, state: number) {
-    const method = 'POST';
-    const url = `/v2.0/cloud/thing/${deviceId}/freeze`;
-    const body = { state };
-    const reqHeaders = await this.getRequestSign(url, method, {}, {}, body);
-    console.log('Freeze Device Request Headers:', reqHeaders);
-
     if (!this.token) {
       console.log('Token is not set, fetching token...');
       await this.getToken();
     }
 
+    const method = 'POST';
+    const url = `/v2.0/cloud/thing/${deviceId}/freeze`;
+    const body = { state };
+
+    console.log('Current Token:', this.token);
+    console.log('Freeze Request Body:', body);
+
+    const reqHeaders = await this.getRequestSign(url, method, {}, {}, body);
+    console.log('Freeze Device Request Headers:', reqHeaders);
+
     const { data } = await this.httpClient.request({
       method,
-      data: {},
+      data: body, // Ensure the body is sent correctly
       params: {},
       headers: {
         ...reqHeaders,
@@ -198,7 +202,6 @@ export class TuyaConnector {
 
     return data;
   }
-
   async getDeviceEnergy(
     energyType: string,
     energyAction: string,
