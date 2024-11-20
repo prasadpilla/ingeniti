@@ -129,3 +129,7 @@ export async function insertDevice(deviceData: {
 
   return device[0];
 }
+
+export async function getAllDevices(): Promise<SelectedDevice[]> {
+  return db.select().from(devices);
+}

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { TuyaConnector } from '../services/tuyaConnector';
 import { addMinutes, isBefore, isEqual } from 'date-fns';
 import { getAllSchedules } from '../models/schedules.model';
-import { getDevice } from '../models/devices.model'; // Import the getDevice function
+import { getAllDevices, getDevice } from '../models/devices.model'; // Import the getDevice and getDevices functions
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const express = require('express');
@@ -70,6 +70,67 @@ tasksController.post('/checkSchedule', async (req: Request, res: Response) => {
   }
 
   res.json({ success: true });
+});
+
+tasksController.get('/totalEnergyConsumption', async (req: Request, res: Response) => {
+  const now = new Date();
+  const endTime = now.toISOString();
+  const startTime = new Date(now.getTime() - 60 * 60 * 1000).toISOString();
+
+  if (!startTime || !endTime) {
+    return res.status(400).json({
+      success: false,
+      error: 'startTime and endTime are required',
+    });
+  }
+
+  try {
+    const devices = await getAllDevices();
+    const deviceIds = devices.map((device) => device.tuyaDeviceId).filter((id): id is string => id !== null);
+
+    if (deviceIds.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'No devices found in the database',
+      });
+    }
+
+    const energyConsumptionPromises = deviceIds.map(async (deviceId) => {
+      try {
+        const energyData = await tuyaConnector.deviceEnergyStats(
+          deviceId,
+          'ele_usage',
+          'hour',
+          startTime as string,
+          endTime as string
+        );
+
+        return {
+          deviceId,
+          totalEnergy: energyData.result.total,
+        };
+      } catch (error) {
+        console.error(`Error fetching energy data for device ${deviceId}:`, error);
+        return {
+          deviceId,
+          totalEnergy: 0,
+        };
+      }
+    });
+
+    const energyConsumptionResults = await Promise.all(energyConsumptionPromises);
+
+    res.json({
+      success: true,
+      data: energyConsumptionResults,
+    });
+  } catch (error) {
+    console.error('Error fetching total energy consumption:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch total energy consumption',
+    });
+  }
 });
 
 export default tasksController;

@@ -247,4 +247,97 @@ export class TuyaConnector {
 
     return data;
   }
+
+  async deviceEnergyStats(
+    deviceId: string,
+    indicatorCode: string,
+    dateType: string,
+    beginDate: string,
+    endDate: string,
+    aggregationType?: string
+  ): Promise<ApiResponse<any>> {
+    const method = 'POST';
+    const url = '/v1.0/m/energy/statistics/device/datadate';
+    if (!this.token) {
+      console.log('Token is not set, fetching token...');
+      await this.getToken();
+    }
+
+    const body = {
+      dev_id: deviceId,
+      indicator_code: indicatorCode,
+      date_type: dateType,
+      begin_date: beginDate,
+      end_date: endDate,
+      aggregation_type: aggregationType,
+    };
+
+    const reqHeaders = await this.getRequestSign(url, method, {}, {}, body);
+    console.log('Device Energy Stats Request Headers:', reqHeaders);
+
+    const { data } = await this.httpClient.request({
+      method,
+      data: body,
+      params: {},
+      headers: {
+        ...reqHeaders,
+      } as { [key: string]: string | undefined },
+      url: reqHeaders.path,
+    });
+
+    console.log('Device Energy Stats Response:', data);
+
+    if (!data || !data.success) {
+      throw Error(`request api failed: ${data.msg}`);
+    }
+
+    return data;
+  }
+
+  async totalEnergyStats(
+    energyType: string,
+    energyAction: string,
+    statisticsType: string,
+    startTime: string,
+    endTime: string,
+    deviceIds: string[],
+    containChilds: boolean = true
+  ): Promise<ApiResponse<number>> {
+    const method = 'GET';
+    const url = `/v1.0/iot-03/energy/${energyType}/device/nodes/statistics-sum`;
+    if (!this.token) {
+      console.log('Token is not set, fetching token...');
+      await this.getToken();
+    }
+
+    const query = {
+      energy_action: energyAction,
+      statistics_type: statisticsType,
+      start_time: startTime,
+      end_time: endTime,
+      contain_childs: containChilds,
+      device_ids: deviceIds.join(','), // Join device IDs into a comma-separated string
+    };
+
+    const reqHeaders = await this.getRequestSign(url, method, {}, query);
+    console.log('Total Energy Stats Request Headers:', reqHeaders);
+
+    const { data } = await this.httpClient.request({
+      method,
+      data: {},
+      params: query,
+      headers: {
+        ...reqHeaders,
+      } as { [key: string]: string | undefined },
+      url: reqHeaders.path,
+    });
+
+    console.log('Total Energy Stats Response:', data);
+
+    if (!data || !data.success) {
+      throw Error(`request api failed: ${data.msg}`);
+    }
+
+    return data;
+  }
 }
