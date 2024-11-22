@@ -2,7 +2,7 @@ import { useSignUp } from '@clerk/clerk-expo';
 import { ClerkAPIError } from '@clerk/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { SignUpForm, signUpFormSchema } from '@ingeniti/shared';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
@@ -31,6 +31,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
   const [signUpError, setSignUpError] = useState<string | undefined>(undefined);
   const [selectedCountry, setSelectedCountry] = useState<CountryData>(countries[0]);
   const [selectedCurrency, setSelectedCurrency] = useState<string>('INR');
+  const [isButtonEnabled, setIsButtonEnabled] = useState(false);
 
   const signUpForm = useForm<SignUpForm>({
     resolver: zodResolver(signUpFormSchema),
@@ -42,7 +43,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
       password: '',
       termsAndConditions: false,
     },
-    mode: 'onBlur',
+    mode: 'onChange',
   });
 
   const handleSignUpErrors = (errors: ClerkAPIError[]) => {
@@ -76,6 +77,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
 
     const { firstName, lastName, emailAddress, password } = data;
     const phone = `${selectedCountry.code}${data.phoneNumber}`;
+
     try {
       await signUp.create({
         emailAddress,
@@ -99,10 +101,33 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
         lastName,
       });
     } catch (err: unknown) {
-      handleSignUpErrors(err.errors);
-      console.error(JSON.stringify(err, null, 2));
+      if (err) {
+        handleSignUpErrors([err]);
+      } else {
+        setSignUpError(t('unexpected_error'));
+      }
     }
   };
+
+  useEffect(() => {
+    const checkFormValidity = () => {
+      const { firstName, lastName, emailAddress, phoneNumber, password, termsAndConditions } = signUpForm.getValues();
+
+      const isValid =
+        firstName.trim() !== '' &&
+        lastName.trim() !== '' &&
+        emailAddress.trim() !== '' &&
+        phoneNumber.trim() !== '' &&
+        password.trim() !== '' &&
+        termsAndConditions === true &&
+        Object.keys(signUpForm.formState.errors).length === 0;
+
+      setIsButtonEnabled(isValid);
+    };
+
+    const subscription = signUpForm.watch(checkFormValidity);
+    return () => subscription.unsubscribe();
+  }, [signUpForm]);
 
   return (
     <>
@@ -242,7 +267,9 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
           <Dropdown
             label={t('Select Currency')}
             value={selectedCurrency}
-            onSelect={(value) => setSelectedCurrency(value ?? 'INR')}
+            onSelect={(value) => {
+              setSelectedCurrency(value ?? 'INR');
+            }}
             options={currencyOptions}
           />
         </View>
@@ -272,7 +299,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
           mode="contained"
           onPress={signUpForm.handleSubmit(onSignUpPress)}
           style={styles.button}
-          disabled={signUpForm.formState.isSubmitting || !signUpForm.formState.isValid}
+          disabled={!isButtonEnabled || signUpForm.formState.isSubmitting}
         >
           {signUpForm.formState.isSubmitting ? (
             <ActivityIndicator animating={true} color={theme.colors.secondary} />
