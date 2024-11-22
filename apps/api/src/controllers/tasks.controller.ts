@@ -1,26 +1,12 @@
-import { Request, Response } from 'express';
-import { TuyaConnector } from '../services/tuyaConnector';
 import { addMinutes, isBefore, isEqual } from 'date-fns';
-import { getAllSchedules } from '../models/schedules.model';
+import { Request, Response } from 'express';
+import { tuyaConnector } from '../config';
 import { getAllDevices, getDevice } from '../models/devices.model'; // Import the getDevice and getDevices functions
+import { getAllSchedules } from '../models/schedules.model';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const express = require('express');
 const tasksController = express.Router();
-
-const clientId = process.env.TUYA_CLIENT_ID;
-const secret = process.env.TUYA_SECRET;
-
-if (!clientId || !secret) {
-  throw new Error('Tuya credentials expected');
-}
-
-// Initialize TuyaConnector with configuration
-const tuyaConnector = new TuyaConnector({
-  accessKey: clientId,
-  secretKey: secret,
-  baseUrl: 'https://openapi.tuyain.com',
-});
 
 tasksController.get('/', async (req: Request, res: Response) => {
   res.json({ message: 'Task executed successfully' });
@@ -46,9 +32,8 @@ tasksController.post('/checkSchedule', async (req: Request, res: Response) => {
       for (const deviceId of deviceIds) {
         const device = await getDevice(schedule.userId, deviceId);
         if (device && device.tuyaDeviceId) {
-          console.log(`Freezing device: Local ID = ${deviceId}, Tuya ID = ${device.tuyaDeviceId}`);
-          await tuyaConnector.freezeDevice(device.tuyaDeviceId, 1);
-          console.log('Device Freezing:', device.tuyaDeviceId);
+          await tuyaConnector.controlDevice(device.tuyaDeviceId, true);
+          console.log('Device Turned On:', device.tuyaDeviceId);
         } else {
           console.log('No Tuya device ID found for device:', deviceId);
         }
@@ -59,9 +44,8 @@ tasksController.post('/checkSchedule', async (req: Request, res: Response) => {
       for (const deviceId of deviceIds) {
         const device = await getDevice(schedule.userId, deviceId);
         if (device && device.tuyaDeviceId) {
-          console.log(`Unfreezing device: Local ID = ${deviceId}, Tuya ID = ${device.tuyaDeviceId}`);
-          await tuyaConnector.freezeDevice(device.tuyaDeviceId, 0);
-          console.log('Device Unfreezed:', device.tuyaDeviceId);
+          await tuyaConnector.controlDevice(device.tuyaDeviceId, false);
+          console.log('Device Turned Off:', device.tuyaDeviceId);
         } else {
           console.log('No Tuya device ID found for device:', deviceId);
         }

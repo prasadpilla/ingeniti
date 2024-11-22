@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import { TuyaConnector } from './services/tuyaConnector';
 
 dotenv.config();
 
@@ -19,3 +20,11 @@ export const GCP_PROJECT_ID = process.env.GCP_PROJECT_ID;
 export const GCP_LOCATION = process.env.GCP_LOCATION;
 export const GCP_TASK_QUEUE_ID = process.env.GCP_TASK_QUEUE_ID;
 export const IS_LIVE_PREVIEW_ENABLED = process.env.IS_LIVE_PREVIEW_ENABLED === 'true';
+
+// Initialize TuyaConnector with configuration
+const tuyaConfig = {
+  accessKey: process.env.TUYA_CLIENT_ID || '',
+  secretKey: process.env.TUYA_SECRET || '',
+  baseUrl: 'https://openapi.tuyain.com',
+};
+export const tuyaConnector = new TuyaConnector(tuyaConfig);

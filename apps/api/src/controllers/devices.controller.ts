@@ -8,21 +8,13 @@ import {
   HttpStatusCode,
 } from '@ingeniti/shared';
 import { Request, Response } from 'express';
+import { tuyaConnector } from '../config';
 import { getDeviceEnergy } from '../models/deviceEnergy.model';
 import { getDevice, getDevices, insertDevice, updateDevice } from '../models/devices.model';
-import { TuyaConnector } from '../services/tuyaConnector'; // Import TuyaConnector
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const express = require('express');
 const devicesController = express.Router();
-
-// Initialize TuyaConnector with configuration
-const tuyaConfig = {
-  accessKey: process.env.TUYA_CLIENT_ID || '',
-  secretKey: process.env.TUYA_SECRET || '',
-  baseUrl: 'https://openapi.tuyain.com',
-};
-const tuyaConnector = new TuyaConnector(tuyaConfig);
 
 devicesController.post(
   '/',
@@ -223,7 +215,7 @@ devicesController.get('/get-device-info/:deviceId', async (req: WithAuthProp<Req
   }
 });
 
-devicesController.get('/get-device-state/:deviceId', async (req: WithAuthProp<Request>, res: Response) => {
+devicesController.get('/get-status/:deviceId', async (req: WithAuthProp<Request>, res: Response) => {
   const deviceId = req.params.deviceId;
 
   try {
@@ -235,10 +227,10 @@ devicesController.get('/get-device-state/:deviceId', async (req: WithAuthProp<Re
       });
     }
 
-    const deviceState = await tuyaConnector.getDeviceState(device.tuyaDeviceId);
+    const deviceStatus = await tuyaConnector.getDeviceStatus(device.tuyaDeviceId);
     return res.status(HttpStatusCode.OK_200).json({
       success: true,
-      state: deviceState,
+      status: deviceStatus.result[0].switch_1 === 'true',
     });
   } catch (error) {
     console.error('Error fetching device state from Tuya:', error);
@@ -299,9 +291,59 @@ devicesController.get('/metrics', async (req: WithAuthProp<Request>, res: Respon
   }
 });
 
-devicesController.post('/freeze-device/:deviceId', async (req: WithAuthProp<Request>, res: Response) => {
+devicesController.get('/metrics', async (req: WithAuthProp<Request>, res: Response) => {
+  const userId = req.auth.userId as string;
+
+  try {
+    // Fetch all devices for the user
+    const devices = await getDevices(userId);
+    console.log('Devices:', devices); // Log devices
+
+    const totalDevices = devices.length;
+    const connectedDevices = devices.filter((device) => device.isOnline).length;
+
+    console.log('Total Devices:', totalDevices);
+    console.log('Connected Devices:', connectedDevices);
+
+    // Fetch total energy consumption for the last week from the local database
+    const now = new Date();
+    const endTime = now.toISOString();
+    const startTime = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString(); // Last week
+
+    const energyConsumptionResults = await getDeviceEnergy(
+      devices.map((device) => device.id),
+      userId,
+      startTime,
+      endTime
+    );
+
+    // Calculate total load by summing up the totalEnergy values
+    const totalLoad = energyConsumptionResults.reduce((acc: number, curr: { energy: number }) => {
+      return acc + curr.energy;
+    }, 0);
+
+    console.log('Total Load:', totalLoad);
+
+    return res.status(HttpStatusCode.OK_200).json({
+      success: true,
+      metrics: {
+        total: { value: totalDevices, prevValue: 0 }, // Adjust prevValue as needed
+        connected: { value: connectedDevices, prevValue: 0 }, // Adjust prevValue as needed
+        totalLoad: { value: totalLoad, prevValue: 0 }, // Adjust prevValue as needed
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching metrics:', error);
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
+      success: false,
+      error: 'Failed to fetch metrics',
+    });
+  }
+});
+
+devicesController.post('/control/:deviceId', async (req: WithAuthProp<Request>, res: Response) => {
   const deviceId = req.params.deviceId;
-  const { state } = req.body;
+  const { status } = req.body;
 
   try {
     const device = await getDevice(req.auth.userId as string, deviceId);
@@ -312,16 +354,15 @@ devicesController.post('/freeze-device/:deviceId', async (req: WithAuthProp<Requ
       });
     }
 
-    const result = await tuyaConnector.freezeDevice(device.tuyaDeviceId, state);
+    const result = await tuyaConnector.controlDevice(device.tuyaDeviceId, status);
     return res.status(HttpStatusCode.OK_200).json({
       success: true,
       result,
     });
   } catch (error) {
-    console.error('Error freezing/unfreezing device:', error);
     return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
       success: false,
-      error: 'Failed to freeze/unfreeze device',
+      error: 'Failed to control device',
     });
   }
 });
