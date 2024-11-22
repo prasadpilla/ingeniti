@@ -1,22 +1,19 @@
-// apps/web/src/pages/ScheduleDetails.tsx
-
 import { DataTable } from '@/components/DataTable/DataTable';
+import ScheduleForm from '@/components/ScheduleForm';
+import { Button } from '@/shadcn/ui/button';
 import { makeApiCall } from '@/utils/api';
 import { useAuth } from '@clerk/clerk-react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { HttpStatusCode } from '@ingeniti/shared';
-import { Button } from '@/shadcn/ui/button'; // You can replace this with your button implementation
-import ScheduleForm from '@/components/ScheduleForm';
+import { Trash } from '@phosphor-icons/react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { useEffect, useState } from 'react';
-import { Trash } from '@phosphor-icons/react'; // Import the Trash icon
 
-// Define the type for a schedule
 interface Schedule {
   id: string;
   name: string;
   startTime: string;
   endTime: string;
-  deviceIds: string[]; // This will now contain device names
+  deviceIds: string[];
 }
 
 const ScheduleDetailsPage: React.FC = () => {
@@ -37,43 +34,39 @@ const ScheduleDetailsPage: React.FC = () => {
       }
 
       const data = await response.json();
-      console.log('Device Info:', data); // Log the result
+      console.log('Device Info:', data);
     } catch (error) {
       console.error('Error', error);
     }
   };
 
-  // Example usage of fetchDeviceInfo
   useEffect(() => {
-    const deviceId = 'bffc73fa-e21b-454e-922f-a31aca521365'; // Replace with the actual device ID you want to fetch
+    const deviceId = 'bffc73fa-e21b-454e-922f-a31aca521365';
     fetchDeviceInfo(deviceId);
   }, []);
 
   const {
-    data: scheduleData = [], // Default to an empty array
+    data: scheduleData = [],
     isLoading: isScheduleLoading,
     error,
   } = useQuery<Schedule[]>(['schedules'], async () => {
     const token = await getToken();
     const res = await makeApiCall(token, `/schedules`, 'GET');
 
-    // Log the response for debugging
     console.log('Response from /schedules:', res);
 
     if (res.status !== HttpStatusCode.OK_200) {
       throw new Error('Failed to fetch schedules');
     }
 
-    // Log the JSON data
     const data = await res.json();
-    console.log('Schedules data:', data); // Log the actual data returned
+    console.log('Schedules data:', data);
 
-    // Ensure the data is an array
     if (!Array.isArray(data.schedules)) {
       throw new Error('Expected an array of schedules');
     }
 
-    return data.schedules; // Return the schedules array
+    return data.schedules;
   });
 
   const deleteScheduleMutation = useMutation(
@@ -119,11 +112,7 @@ const ScheduleDetailsPage: React.FC = () => {
       header: 'Actions',
       cell: ({ row }) => (
         <div className="flex items-center">
-          <Button
-            variant="outline"
-            className="p-1"
-            onClick={() => handleDelete(row.original.id)} // Call delete directly
-          >
+          <Button variant="outline" className="p-1" onClick={() => handleDelete(row.original.id)}>
             <Trash className="h-5 w-5" aria-hidden="true" />
           </Button>
         </div>
@@ -131,13 +120,13 @@ const ScheduleDetailsPage: React.FC = () => {
     },
   ];
 
-  const hasSchedules = scheduleData.length > 0; // Check length directly
+  const hasSchedules = scheduleData.length > 0;
 
   return (
     <div>
       <div className="w-full flex justify-between">
         <h2 className="text-2xl font-bold">Schedule Lists</h2>
-        <Button onClick={() => setIsModalOpen(true)}>Add Schedule</Button> {/* Open the modal */}
+        <Button onClick={() => setIsModalOpen(true)}>Add Schedule</Button>
       </div>
       {error ? (
         <div className="text-center mt-16">
@@ -155,7 +144,7 @@ const ScheduleDetailsPage: React.FC = () => {
             name: schedule.name,
             startTime: new Date(schedule.startTime).toLocaleString(),
             endTime: new Date(schedule.endTime).toLocaleString(),
-            deviceIds: schedule.deviceIds, // This now contains device names
+            deviceIds: schedule.deviceIds,
           }))}
           isLoading={isScheduleLoading}
           error={error as string}
