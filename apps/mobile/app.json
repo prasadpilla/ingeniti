@@ -4,7 +4,7 @@
     "slug": "ingeniti",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/logo.png",
+    "icon": "./assets/logo.jpeg",
     "splash": {
       "image": "./assets/logo.jpeg",
       "resizeMode": "contain",
@@ -28,6 +28,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "817a3d3d-cc27-4173-b082-3e86f28d45fc"
+      }
+    },
+    "owner": "ingeniti-org"
   }
 }
