@@ -105,12 +105,12 @@ const ScheduleDetailsPage: React.FC = () => {
     {
       accessorKey: 'deviceIds',
       header: 'Devices',
-      cell: ({ row }) => row.original.deviceIds.join(', '),
+      cell: ({ row }: { row: any }) => row.original.deviceIds.join(', '),
     },
     {
       accessorKey: 'actions',
       header: 'Actions',
-      cell: ({ row }) => (
+      cell: ({ row }: { row: any }) => (
         <div className="flex items-center">
           <Button variant="outline" className="p-1" onClick={() => handleDelete(row.original.id)}>
             <Trash className="h-5 w-5" aria-hidden="true" />
