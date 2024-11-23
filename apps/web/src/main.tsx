@@ -17,6 +17,7 @@ import QueryProvider from './providers/QueryProvider';
 import { ThemeProvider, useTheme } from './providers/ThemeProvider';
 import { TooltipProvider } from './shadcn/ui/tooltip';
 import ScheduleDetailsPage from './pages/ScheduleList';
+import DevicesPage from './pages/Devices';
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 if (!PUBLISHABLE_KEY) {
@@ -56,6 +57,7 @@ const App = () => {
                     <Route element={<AppLayout />}>
                       <Route path="/" element={<Dashboard />} />
                       <Route path="/schedules" element={<ScheduleDetailsPage />} />
+                      <Route path="/devices" element={<DevicesPage />} />
                     </Route>
                     <Route element={<FullScreenAppLayout />}></Route>
                   </Route>

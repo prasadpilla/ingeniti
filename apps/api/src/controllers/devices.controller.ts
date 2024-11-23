@@ -249,6 +249,56 @@ devicesController.get('/get-device-state/:deviceId', async (req: WithAuthProp<Re
   }
 });
 
+devicesController.get('/metrics', async (req: WithAuthProp<Request>, res: Response) => {
+  const userId = req.auth.userId as string;
+
+  try {
+    // Fetch all devices for the user
+    const devices = await getDevices(userId);
+    console.log('Devices:', devices); // Log devices
+
+    const totalDevices = devices.length;
+    const connectedDevices = devices.filter((device) => device.isOnline).length;
+
+    console.log('Total Devices:', totalDevices);
+    console.log('Connected Devices:', connectedDevices);
+
+    // Fetch total energy consumption for the last week from the local database
+    const now = new Date();
+    const endTime = now.toISOString();
+    const startTime = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString(); // Last week
+
+    const energyConsumptionResults = await getDeviceEnergy(
+      devices.map((device) => device.id),
+      userId,
+      startTime,
+      endTime
+    );
+
+    // Calculate total load by summing up the totalEnergy values
+    const totalLoad = energyConsumptionResults.reduce((acc: number, curr: { energy: number }) => {
+      return acc + curr.energy;
+    }, 0);
+
+    console.log('Total Load:', totalLoad);
+
+    return res.status(HttpStatusCode.OK_200).json({
+      success: true,
+      metrics: {
+        total: { value: totalDevices, prevValue: 0 }, // Adjust prevValue as needed
+        connected: { value: connectedDevices, prevValue: 0 }, // Adjust prevValue as needed
+        totalLoad: { value: totalLoad, prevValue: 0 }, // Adjust prevValue as needed
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching metrics:', error);
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
+      success: false,
+      error: 'Failed to fetch metrics',
+    });
+  }
+});
+
 devicesController.post('/freeze-device/:deviceId', async (req: WithAuthProp<Request>, res: Response) => {
   const deviceId = req.params.deviceId;
   const { state } = req.body;

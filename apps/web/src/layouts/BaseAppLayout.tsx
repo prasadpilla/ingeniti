@@ -40,6 +40,14 @@ const BaseAppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                   >
                     Schedules
                   </Link>
+                  <Link
+                    to="/devices"
+                    className={`${navigationMenuTriggerStyle()} text-sm font-medium hover:underline underline-offset-4 ${
+                      pathname === '/devices' ? 'text-primary' : ''
+                    }`}
+                  >
+                    Devices
+                  </Link>
                 </NavigationMenuItem>
               </NavigationMenuList>
             </NavigationMenu>
