@@ -9,11 +9,20 @@ import {
 } from '@ingeniti/shared';
 import { Request, Response } from 'express';
 import { getDeviceEnergy } from '../models/deviceEnergy.model';
-import { getDevices, insertDevice, updateDevice } from '../models/devices.model';
+import { getDevice, getDevices, insertDevice, updateDevice } from '../models/devices.model';
+import { TuyaConnector } from '../services/tuyaConnector'; // Import TuyaConnector
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const express = require('express');
 const devicesController = express.Router();
+
+// Initialize TuyaConnector with configuration
+const tuyaConfig = {
+  accessKey: process.env.TUYA_CLIENT_ID || '',
+  secretKey: process.env.TUYA_SECRET || '',
+  baseUrl: 'https://openapi.tuyain.com',
+};
+const tuyaConnector = new TuyaConnector(tuyaConfig);
 
 devicesController.post(
   '/',
@@ -186,6 +195,112 @@ devicesController.put('/:id', async (req: WithAuthProp<Request>, res: Response<D
 
   const device = await updateDevice(userId, id, { isSwitchOn });
   res.status(HttpStatusCode.OK_200).json({ ...device, isSensor: false });
+});
+
+devicesController.get('/get-device-info/:deviceId', async (req: WithAuthProp<Request>, res: Response) => {
+  const deviceId = req.params.deviceId;
+
+  try {
+    const device = await getDevice(req.auth.userId as string, deviceId);
+    if (!device || !device.tuyaDeviceId) {
+      return res.status(HttpStatusCode.NOT_FOUND_404).json({
+        success: false,
+        error: 'Device not found or Tuya device ID is missing',
+      });
+    }
+
+    const deviceInfo = await tuyaConnector.getDeviceInfo(device.tuyaDeviceId);
+    return res.status(HttpStatusCode.OK_200).json({
+      success: true,
+      data: deviceInfo,
+    });
+  } catch (error) {
+    console.error('Error fetching device info from Tuya:', error);
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
+      success: false,
+      error: 'Failed to fetch device info',
+    });
+  }
+});
+
+devicesController.get('/get-device-state/:deviceId', async (req: WithAuthProp<Request>, res: Response) => {
+  const deviceId = req.params.deviceId;
+
+  try {
+    const device = await getDevice(req.auth.userId as string, deviceId);
+    if (!device || !device.tuyaDeviceId) {
+      return res.status(HttpStatusCode.NOT_FOUND_404).json({
+        success: false,
+        error: 'Device not found or Tuya device ID is missing',
+      });
+    }
+
+    const deviceState = await tuyaConnector.getDeviceState(device.tuyaDeviceId);
+    return res.status(HttpStatusCode.OK_200).json({
+      success: true,
+      state: deviceState,
+    });
+  } catch (error) {
+    console.error('Error fetching device state from Tuya:', error);
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
+      success: false,
+      error: 'Failed to fetch device state',
+    });
+  }
+});
+
+devicesController.post('/freeze-device/:deviceId', async (req: WithAuthProp<Request>, res: Response) => {
+  const deviceId = req.params.deviceId;
+  const { state } = req.body;
+
+  try {
+    const device = await getDevice(req.auth.userId as string, deviceId);
+    if (!device || !device.tuyaDeviceId) {
+      return res.status(HttpStatusCode.NOT_FOUND_404).json({
+        success: false,
+        error: 'Device not found or Tuya device ID is missing',
+      });
+    }
+
+    const result = await tuyaConnector.freezeDevice(device.tuyaDeviceId, state);
+    return res.status(HttpStatusCode.OK_200).json({
+      success: true,
+      result,
+    });
+  } catch (error) {
+    console.error('Error freezing/unfreezing device:', error);
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
+      success: false,
+      error: 'Failed to freeze/unfreeze device',
+    });
+  }
+});
+
+devicesController.get('/energy-consumption-ranking', async (req: WithAuthProp<Request>, res: Response) => {
+  const { energyType, energyAction, statisticsType, startTime, endTime, limit, containChilds } = req.query;
+
+  try {
+    const energyData = await tuyaConnector.getDeviceEnergy(
+      energyType as string,
+      energyAction as string,
+      statisticsType as string,
+      startTime as string,
+      endTime as string,
+      Number(limit) || 10,
+      containChilds === 'true'
+    );
+
+    return res.status(HttpStatusCode.OK_200).json({
+      success: true,
+      data: energyData.result,
+    });
+  } catch (error) {
+    console.error('Error fetching energy consumption ranking:', error);
+    return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
+      success: false,
+      error: 'Failed to fetch energy consumption ranking',
+    });
+  }
 });
 
 devicesController.get('/form-options', async (req: WithAuthProp<Request>, res: Response) => {

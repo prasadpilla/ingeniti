@@ -4,9 +4,10 @@ import cors from 'cors';
 import express, { Express } from 'express';
 import 'express-async-errors';
 import helmet from 'helmet';
-import { WEB_APP_URL } from './config';
+import { MOBILE_APP_URL, WEB_APP_URL } from './config';
 import devicesController from './controllers/devices.controller';
 import tasksController from './controllers/tasks.controller';
+import schedulesController from './controllers/schedules.controller';
 import errorHandler from './middlewares/errorHandler';
 import rateLimiter from './middlewares/rateLimiter';
 import prodRequestLogger from './middlewares/requestLogger';
@@ -15,7 +16,8 @@ const app: Express = express();
 
 const corsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    if (!origin || origin === WEB_APP_URL) {
+    console.log('CORS Origin:', WEB_APP_URL);
+    if (!origin || origin === WEB_APP_URL || origin === MOBILE_APP_URL) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
@@ -41,6 +43,7 @@ app.use(ClerkExpressRequireAuth());
 // Routes
 app.use('/devices', devicesController);
 app.use('/tasks', tasksController);
+app.use('/schedules', schedulesController);
 
 // !IMPORTANT: This must be the last middleware in the stack.
 // We're using it to handle 404s and 500s
