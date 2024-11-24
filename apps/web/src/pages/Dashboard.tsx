@@ -1,16 +1,45 @@
+import { useEffect, useState } from 'react';
+import { makeApiCall } from '@/utils/api'; // Import makeApiCall
 import { CheckCircle, Checks, Clock, Info } from '@phosphor-icons/react';
 import { Tooltip } from '@radix-ui/react-tooltip';
 import { Progress } from '@/shadcn/ui/progress';
 import { TooltipContent, TooltipTrigger } from '@/shadcn/ui/tooltip';
-
-const getMetrics = () => ({
-  total: { value: 450, prevValue: 440 },
-  connected: { value: 88.9, prevValue: 87.7 },
-  totalLoad: { value: 2.2, prevValue: 2.3 },
-});
+import { PowerConsumptionAreaChart } from '@/components/CaseStatusAreaChart';
+import { useAuth } from '@clerk/clerk-react'; // Import useAuth for token management
 
 const Dashboard = () => {
-  const metrics = getMetrics();
+  const { getToken } = useAuth(); // Get the token from Clerk
+  const [metrics, setMetrics] = useState({
+    total: { value: 0, prevValue: 0 },
+    connected: { value: 0, prevValue: 0 },
+    totalLoad: { value: 0, prevValue: 0 },
+  });
+  const [powerConsumptionData, setPowerConsumptionData] = useState([]); // State for power consumption data
+
+  useEffect(() => {
+    const fetchMetrics = async () => {
+      try {
+        const token = await getToken(); // Get the token
+        const response = await makeApiCall(token, '/devices/metrics', 'GET'); // Use makeApiCall
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            setMetrics(data.metrics);
+            setPowerConsumptionData(data.powerConsumptionData); // Set the power consumption data
+          } else {
+            console.error('Failed to fetch metrics:', data.error);
+          }
+        } else {
+          console.error('Failed to fetch metrics:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error fetching metrics:', error);
+      }
+    };
+
+    fetchMetrics();
+  }, [getToken]); // Add getToken as a dependency
 
   return (
     <main className="mx-auto max-w-7xl">
@@ -52,7 +81,7 @@ const Dashboard = () => {
                   </TooltipTrigger>
                   <TooltipContent side="bottom" sideOffset={5}>
                     {Object.entries(metrics).map(([key, value]) => {
-                      if (key === 'total') return;
+                      if (key === 'total') return null;
                       return (
                         <p key={key}>
                           <span className="text-muted-foreground">{key[0].toUpperCase() + key.slice(1)}</span>
@@ -63,16 +92,7 @@ const Dashboard = () => {
                   </TooltipContent>
                 </Tooltip>
               </div>
-              {metrics.connected.value && (
-                <p className="text-2xl font-bold mt-2">
-                  {metrics.connected.value > 0
-                    ? parseFloat(((metrics.connected.value / metrics.connected.prevValue) * 100).toFixed(1))
-                        .toString()
-                        .replace(/\.0$/, '')
-                    : 0}
-                  %
-                </p>
-              )}
+              {metrics.connected.value && <p className="text-2xl font-bold mt-2">{metrics.connected.value}</p>}
               <div className="mt-4">
                 <p>
                   <span
@@ -99,7 +119,7 @@ const Dashboard = () => {
               <div className="mt-4">
                 <p>
                   <span
-                    className={`${metrics.totalLoad.value - metrics.totalLoad.prevValue >= 0 ? 'text-green-5000' : 'text-red-500'}`}
+                    className={`${metrics.totalLoad.value - metrics.totalLoad.prevValue >= 0 ? 'text-green-500' : 'text-red-500'}`}
                   >
                     {`${metrics.totalLoad.value - metrics.totalLoad.prevValue >= 0 ? '+' : '-'}${Math.abs(metrics.totalLoad.value - metrics.totalLoad.prevValue).toFixed(1)} MWH`}
                   </span>
@@ -108,6 +128,11 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Power Consumption Chart Section */}
+        <div className="mt-8">
+          <PowerConsumptionAreaChart powerConsumptionData={powerConsumptionData} /> {/* Use fetched data */}
         </div>
       </div>
     </main>

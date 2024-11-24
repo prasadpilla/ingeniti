@@ -29,22 +29,22 @@ const DeviceToggle: React.FC<DeviceToggleProps> = ({ device }) => {
     },
   });
 
-  const freezeDevice = async (state: number) => {
+  const controlDevice = async (status: boolean) => {
     const token = await getToken();
-    const response = await makeApiCall(token, `/devices/freeze-device/${device.id}`, 'POST', { state });
-    console.log('Freeze Device Response:', response);
+    const response = await makeApiCall(token, `/devices/control/${device.id}`, 'POST', { status });
+    console.log('Control Device Response:', response);
     return response.json();
   };
 
   const fetchDeviceState = async () => {
     const token = await getToken();
-    const response = await makeApiCall(token, `/devices/get-device-state/${device.id}`, 'GET');
+    const response = await makeApiCall(token, `/devices/get-status/${device.id}`, 'GET');
     const data = await response.json();
-    console.log('Fetched Device State:', data);
+    console.log('Fetched Device status:', data);
     if (data.success) {
-      setIsSwitchOn(data.state);
+      setIsSwitchOn(data.status);
     } else {
-      console.error('Failed to fetch device state:', data.error);
+      console.error('Failed to fetch device status:', data.error);
     }
   };
 
@@ -53,24 +53,20 @@ const DeviceToggle: React.FC<DeviceToggleProps> = ({ device }) => {
   }, []);
 
   const handleSwitchChange = async (value: boolean) => {
-    const newState = value ? 0 : 1;
-    console.log('Switch changed to:', value);
     setIsSwitchOn(value);
 
     try {
-      const freezeResponse = await freezeDevice(newState);
-      console.log('Freeze Response:', freezeResponse);
-      if (freezeResponse.success) {
+      const controlResponse = await controlDevice(value);
+      if (controlResponse.success) {
         await updateDeviceMutation.mutateAsync({
           id: device.id,
           isSwitchOn: value,
         });
       } else {
-        console.log('Reverting switch state due to freeze failure');
         setIsSwitchOn(!value);
       }
     } catch (error) {
-      console.error('Error freezing/unfreezing device:', error);
+      console.error('Error controlling device:', error);
       setIsSwitchOn(!value);
     }
   };
