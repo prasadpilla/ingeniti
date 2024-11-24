@@ -9,3 +9,5 @@ db-svc-acc.json
 test-results
 storage-svc-acc.json
 .DS_Store
+staging-deploy-svc-acc.json
+prod-deploy-svc-acc.json

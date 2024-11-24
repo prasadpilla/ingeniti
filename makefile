@@ -4,8 +4,8 @@ ENV ?= staging
 
 ifeq ($(ENV),staging)
 PROJECT_ID := ingeniti-staging
-ACCOUNT := ingeniti-staging-deploy@ingeniti-staging.iam.gserviceaccount.com
-KEY_FILE := api/staging-deploy-svc-acc.json
+ACCOUNT := staging-deploy@ingeniti-staging.iam.gserviceaccount.com
+KEY_FILE := apps/api/staging-deploy-svc-acc.json
 else ifeq ($(ENV),prod)
 PROJECT_ID := ingeniti
 ACCOUNT := ingeniti-prod-deploy@ingeniti.iam.gserviceaccount.com
