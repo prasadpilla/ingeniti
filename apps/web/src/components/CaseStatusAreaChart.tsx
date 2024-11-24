@@ -1,6 +1,6 @@
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/shadcn/ui/chart';
 import { TrendUp } from '@phosphor-icons/react';
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts';
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/shadcn/ui/chart';
 
 export interface PowerConsumptionData {
   deviceId: string;
@@ -26,7 +26,7 @@ export function PowerConsumptionAreaChart({ powerConsumptionData }: { powerConsu
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center">
           <TrendUp className="h-6 w-6 text-gray-700 mr-2" />
-          <h2 className="text-2xl font-semibold">Device Power Consumption</h2>
+          <h2 className="text-lg font-medium">Energy Consumption</h2>
         </div>
       </div>
       <ChartContainer config={chartConfig} className="h-[300px] w-full mt-4">
