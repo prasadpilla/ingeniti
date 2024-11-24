@@ -1,0 +1,41 @@
+# Dependencies
+node_modules
+**/node_modules
+.pnpm-store
+
+# Build outputs
+**/dist
+**/.turbo
+**/build
+**/.next
+
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Development files
+**/*.log
+**/coverage
+**/.coverage
+**/__tests__
+**/*.test.*
+**/*.spec.*
+evals
+terraform
+
+# IDE and Editor files
+.idea
+.vscode
+**/.DS_Store
+
+# Documentation
+**/*.md
+**/docs
+
+# Other
+**/Dockerfile*
+**/.dockerignore
+**/.eslintrc*
+**/.prettierrc*
+**/.editorconfig

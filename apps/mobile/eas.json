@@ -23,14 +23,21 @@
         "resourceClass": "m1-medium"
       }
     },
-    "production": {
+    "alpha": {
+      "extends": "monorepo",
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "ios": {
+        "resourceClass": "m1-medium"
+      }
+    },
+    "release": {
       "extends": "monorepo",
       "distribution": "store",
       "android": {
         "buildType": "app-bundle"
-      },
-      "ios": {
-        "resourceClass": "m1-medium"
       }
     }
   }

@@ -1,7 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import crypto from 'crypto';
-import qs from 'qs';
-
+import querystring from 'querystring';
 interface Config {
   accessKey: string;
   secretKey: string;
@@ -48,15 +47,15 @@ export class TuyaConnector {
   ): Promise<RequestHeaders> {
     const t = Date.now().toString();
     const [uri, pathQuery] = path.split('?');
-    const queryMerged = { ...query, ...qs.parse(pathQuery) };
+    const queryMerged = { ...query, ...querystring.parse(pathQuery) };
     const sortedQuery: { [k: string]: string } = {};
 
     Object.keys(queryMerged)
       .sort()
       .forEach((i) => (sortedQuery[i] = queryMerged[i]));
 
-    const querystring = decodeURIComponent(qs.stringify(sortedQuery));
-    const url = querystring ? `${uri}?${querystring}` : uri;
+    const querystringVar = decodeURIComponent(querystring.stringify(sortedQuery));
+    const url = querystringVar ? `${uri}?${querystringVar}` : uri;
     const contentHash = crypto.createHash('sha256').update(JSON.stringify(body)).digest('hex');
     const stringToSign = [method, contentHash, '', url].join('\n');
     const signStr = this.config.accessKey + this.token + t + stringToSign;

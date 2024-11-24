@@ -60,3 +60,7 @@ xcuserdata
 # VSCode
 .history/
 
+.env
+.env.local
+.env.development
+.env.production

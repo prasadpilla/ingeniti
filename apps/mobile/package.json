@@ -8,6 +8,7 @@
     "build": "expo export --output-dir ./build --platform all",
     "start": "expo start --port 8071",
     "android": "expo run:android",
+    "android:release": "expo run:android --variant release",
     "ios": "expo run:ios --port 8071",
     "web": "expo start --web --port 8071",
     "eas-build-post-install": "pnpm run -w build:mobile"
