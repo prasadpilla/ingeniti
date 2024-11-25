@@ -10,7 +10,9 @@
         "paths": ["../../node_modules/.cache/turbo"]
       },
       "env": {
-        "EXPO_USE_FAST_RESOLVER": "true"
+        "EXPO_USE_FAST_RESOLVER": "true",
+        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_YWxpdmUtZ2xpZGVyLTUuY2xlcmsuYWNjb3VudHMuZGV2JA",
+        "EXPO_PUBLIC_API_BASE_URL": "https://api-418145820717.asia-south1.run.app"
       }
     },
     "development": {
