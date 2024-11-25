@@ -173,15 +173,6 @@ devicesController.get(
   }
 );
 
-devicesController.put('/:id', async (req: WithAuthProp<Request>, res: Response<Device | GenericError>) => {
-  const userId = req.auth.userId as string;
-  const { id } = req.params;
-  const { isSwitchOn } = req.body;
-
-  const device = await updateDevice(userId, id, { isSwitchOn });
-  res.status(HttpStatusCode.OK_200).json({ ...device, isSensor: false });
-});
-
 devicesController.get('/get-device-info/:deviceId', async (req: WithAuthProp<Request>, res: Response) => {
   const deviceId = req.params.deviceId;
 
@@ -348,6 +339,7 @@ devicesController.post('/control/:deviceId', async (req: WithAuthProp<Request>, 
     }
 
     const result = await tuyaConnector.controlDevice(device.tuyaDeviceId, status);
+    await updateDevice(req.auth.userId as string, deviceId, { isSwitchOn: status });
     return res.status(HttpStatusCode.OK_200).json({
       success: true,
       result,

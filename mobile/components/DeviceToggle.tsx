@@ -1,6 +1,6 @@
 import { useAuth } from '@clerk/clerk-expo';
 import { useMutation } from '@tanstack/react-query';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Switch } from 'react-native-paper';
 import { Device } from 'shared';
 import { makeApiCall } from '../utils/api';
@@ -11,64 +11,32 @@ interface DeviceToggleProps {
 
 const DeviceToggle: React.FC<DeviceToggleProps> = ({ device }) => {
   const { getToken } = useAuth();
-  const [isSwitchOn, setIsSwitchOn] = React.useState(false);
+  const [isSwitchOn, setIsSwitchOn] = React.useState(device.isSwitchOn ?? false);
 
-  const updateDeviceMutation = useMutation({
+  const controlDeviceMutation = useMutation({
     mutationFn: async (data: { id: string; isSwitchOn: boolean }) => {
+      setIsSwitchOn(data.isSwitchOn);
       const token = await getToken();
-      const response = await makeApiCall(token, `/devices/${data.id}`, 'PUT', { isSwitchOn: data.isSwitchOn });
-      console.log('Update Device Response:', response);
-      return response.json();
+      const response = await makeApiCall(token, `/devices/control/${device.id}`, 'POST', { status: data.isSwitchOn });
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error('Failed to control device');
     },
     onSuccess: (data: Device) => {
-      console.log('Device updated successfully:', data);
       setIsSwitchOn(data.isSwitchOn ?? false);
     },
     onError: (error) => {
-      console.error('Failed to update device:', error);
+      setIsSwitchOn(!isSwitchOn);
+      console.error('Failed to control device:', error);
     },
   });
 
-  const controlDevice = async (status: boolean) => {
-    const token = await getToken();
-    const response = await makeApiCall(token, `/devices/control/${device.id}`, 'POST', { status });
-    console.log('Control Device Response:', response);
-    return response.json();
-  };
-
-  const fetchDeviceState = async () => {
-    const token = await getToken();
-    const response = await makeApiCall(token, `/devices/get-status/${device.id}`, 'GET');
-    const data = await response.json();
-    console.log('Fetched Device status:', data);
-    if (data.success) {
-      setIsSwitchOn(data.status);
-    } else {
-      console.error('Failed to fetch device status:', data.error);
-    }
-  };
-
-  useEffect(() => {
-    fetchDeviceState();
-  }, []);
-
   const handleSwitchChange = async (value: boolean) => {
-    setIsSwitchOn(value);
-
-    try {
-      const controlResponse = await controlDevice(value);
-      if (controlResponse.success) {
-        await updateDeviceMutation.mutateAsync({
-          id: device.id,
-          isSwitchOn: value,
-        });
-      } else {
-        setIsSwitchOn(!value);
-      }
-    } catch (error) {
-      console.error('Error controlling device:', error);
-      setIsSwitchOn(!value);
-    }
+    await controlDeviceMutation.mutateAsync({
+      id: device.id,
+      isSwitchOn: value,
+    });
   };
 
   return <Switch value={isSwitchOn} onValueChange={handleSwitchChange} />;

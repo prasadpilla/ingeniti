@@ -197,6 +197,7 @@ export class TuyaConnector {
 
     return data;
   }
+
   async getDeviceEnergy(
     energyType: string,
     energyAction: string,
