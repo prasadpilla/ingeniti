@@ -10,19 +10,26 @@ interface DeviceListItemProps {
   device: Device;
 }
 
+const deviceTypeToIcon: Record<string, keyof typeof MaterialCommunityIcons.glyphMap> = {
+  'air-conditioner': 'air-conditioner',
+  'water-heater': 'water-boiler',
+  refrigerator: 'fridge',
+  washer: 'washing-machine',
+  dryer: 'tumble-dryer',
+  dishwasher: 'dishwasher',
+  default: 'power-plug',
+};
+
 const DeviceListItem = ({ device }: DeviceListItemProps) => {
   const theme = useTheme();
+  const iconName = deviceTypeToIcon[device.type] || deviceTypeToIcon.default;
 
   return (
     <View style={[styles.container, { borderColor: theme.colors.outlineVariant }]}>
       <View style={styles.leftContent}>
-        <MaterialCommunityIcons name="air-conditioner" size={24} color={theme.colors.primary} style={styles.icon} />
+        <MaterialCommunityIcons name={iconName} size={24} color={theme.colors.primary} style={styles.icon} />
         <View>
           <Paragraph style={styles.deviceName}>{device.name}</Paragraph>
-          <View style={styles.statusContainer}>
-            <View style={[styles.statusIndicator, { backgroundColor: device.isOnline ? 'green' : 'red' }]} />
-            <Paragraph style={styles.statusText}>{device.isOnline ? 'Online' : 'Offline'}</Paragraph>
-          </View>
         </View>
       </View>
       <View style={styles.toggleContainer}>
