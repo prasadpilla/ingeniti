@@ -1,3 +1,6 @@
 packages:
-  - 'apps/*'
+  - 'api'
+  - 'shared'
+  - 'web'
+  - 'mobile'
   - 'packages/**'

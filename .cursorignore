@@ -1,7 +1,8 @@
 # Monorepo
-apps/*/credentials.json
-apps/*/build
-packages/*/build
+api/credentials.json
+api/build
+mobile/build
+shared/build
 
 # Turborepo
 .turbo

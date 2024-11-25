@@ -4,22 +4,22 @@ pnpm-workspace.yaml
 package.json
 node_modules
 
-apps/web/dist
-apps/web/package.json
-apps/web/node_modules
-apps/web/src/shadcn
+web/dist
+web/package.json
+web/node_modules
+web/src/shadcn
 
-apps/mobile/package.json
-apps/mobile/dist
-apps/mobile/node_modules
-apps/mobile/.expo
-apps/mobile/android
-apps/mobile/ios
+mobile/package.json
+mobile/dist
+mobile/node_modules
+mobile/.expo
+mobile/android
+mobile/ios
 
-apps/api/package.json
-apps/api/dist
-apps/api/node_modules
-apps/api/tests
+api/package.json
+api/dist
+api/node_modules
+api/tests
 api/test-results
-apps/api/playwright-report
-apps/api/drizzle
+api/playwright-report
+api/drizzle

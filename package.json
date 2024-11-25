@@ -3,14 +3,14 @@
   "name": "@ingeniti/monorepo",
   "scripts": {
     "dev": "turbo dev",
-    "dev:mobile": "turbo dev --filter=\"{./apps/mobile}...\"",
-    "dev:web": "turbo dev --filter=\"{./apps/web}...\"",
+    "dev:mobile": "turbo dev --filter=mobile",
+    "dev:web": "turbo dev --filter=web",
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "turbo test",
     "build": "turbo build",
-    "build:mobile": "turbo build --filter=\"...{./apps/mobile}\"",
-    "build:web": "turbo build --filter=\"...{./apps/web}\""
+    "build:mobile": "turbo build --filter=mobile",
+    "build:web": "turbo build --filter=web"
   },
   "devDependencies": {
     "turbo": "^1.10.7",

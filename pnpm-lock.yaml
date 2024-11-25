@@ -36,7 +36,7 @@ importers:
         specifier: ^7.18.0
         version: 7.18.0(eslint@8.57.1)(typescript@4.9.5)
 
-  apps/api:
+  api:
     dependencies:
       '@clerk/clerk-sdk-node':
         specifier: ^5.0.5
@@ -47,9 +47,6 @@ importers:
       '@google-cloud/tasks':
         specifier: ^5.4.0
         version: 5.5.1
-      '@ingeniti/shared':
-        specifier: workspace:*
-        version: link:../../packages/shared
       '@types/node':
         specifier: ^20.12.7
         version: 20.17.6
@@ -95,6 +92,9 @@ importers:
       pino-http:
         specifier: ^10.1.0
         version: 10.3.0
+      shared:
+        specifier: workspace:*
+        version: link:../shared
       uuid:
         specifier: ^9.0.1
         version: 9.0.1
@@ -133,7 +133,7 @@ importers:
         specifier: ^5.4.5
         version: 5.6.3
 
-  apps/mobile:
+  mobile:
     dependencies:
       '@clerk/clerk-expo':
         specifier: ^2.2.0
@@ -147,9 +147,6 @@ importers:
       '@hookform/resolvers':
         specifier: ^3.3.4
         version: 3.9.1(react-hook-form@7.53.1(react@18.2.0))
-      '@ingeniti/shared':
-        specifier: workspace:*
-        version: link:../../packages/shared
       '@react-native-picker/picker':
         specifier: ^2.8.1
         version: 2.9.0(react-native@0.74.2(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@types/react@18.2.79)(react@18.2.0))(react@18.2.0)
@@ -249,6 +246,9 @@ importers:
       react-native-web:
         specifier: ^0.19.12
         version: 0.19.13(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      shared:
+        specifier: workspace:*
+        version: link:../shared
       zod:
         specifier: ^3.22.1
         version: 3.23.8
@@ -275,7 +275,23 @@ importers:
         specifier: ~5.3.3
         version: 5.3.3
 
-  apps/web:
+  shared:
+    dependencies:
+      zod:
+        specifier: ^3.22.1
+        version: 3.23.8
+    devDependencies:
+      typescript:
+        specifier: ^5.2.2
+        version: 5.6.3
+      vite:
+        specifier: ^5.2.0
+        version: 5.4.10(@types/node@20.17.6)(terser@5.36.0)
+      vite-plugin-dts:
+        specifier: ^3.9.1
+        version: 3.9.1(@types/node@20.17.6)(rollup@4.24.4)(typescript@5.6.3)(vite@5.4.10(@types/node@20.17.6)(terser@5.36.0))
+
+  web:
     dependencies:
       '@clerk/clerk-react':
         specifier: ^4.30.10
@@ -286,9 +302,6 @@ importers:
       '@hookform/resolvers':
         specifier: ^3.3.4
         version: 3.9.1(react-hook-form@7.53.1(react@18.2.0))
-      '@ingeniti/shared':
-        specifier: workspace:*
-        version: link:../../packages/shared
       '@phosphor-icons/react':
         specifier: ^2.1.5
         version: 2.1.7(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -391,6 +404,9 @@ importers:
       recharts:
         specifier: ^2.12.7
         version: 2.13.3(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      shared:
+        specifier: workspace:*
+        version: link:../shared
       tailwind-merge:
         specifier: ^2.2.2
         version: 2.5.4
@@ -454,22 +470,6 @@ importers:
         specifier: ^5.2.9
         version: 5.4.10(@types/node@20.17.6)(terser@5.36.0)
 
-  packages/shared:
-    dependencies:
-      zod:
-        specifier: ^3.22.1
-        version: 3.23.8
-    devDependencies:
-      typescript:
-        specifier: ^5.2.2
-        version: 5.6.3
-      vite:
-        specifier: ^5.2.0
-        version: 5.4.10(@types/node@20.17.6)(terser@5.36.0)
-      vite-plugin-dts:
-        specifier: ^3.9.1
-        version: 3.9.1(@types/node@20.17.6)(rollup@4.24.4)(typescript@5.6.3)(vite@5.4.10(@types/node@20.17.6)(terser@5.36.0))
-
 packages:
 
   '@alloc/quick-lru@5.2.0':
@@ -530,9 +530,6 @@ packages:
     resolution: {integrity: sha512-LV76g+C502biUK6AyZ3LK10vDpDyCzZnhZFXkH1L75zHPj68+qc8Zfpx2th+gzwA2MzyK+1g/3EPl62yFnVttQ==}
     peerDependencies:
       '@babel/core': ^7.4.0 || ^8.0.0-0 <8.0.0
-    peerDependenciesMeta:
-      '@babel/core':
-        optional: true
 
   '@babel/helper-environment-visitor@7.24.7':
     resolution: {integrity: sha512-DoiN84+4Gnd0ncbBOM9AZENV4a5ZiL39HYMyZJGZ/AZEykHYdJw0wW3kdcsh9/Kn+BRXHLkkklZ51ecPKmI1CQ==}
@@ -739,9 +736,6 @@ packages:
     resolution: {integrity: sha512-MXf5laXo6c1IbEbegDmzGPwGNTsHZmEy6QGznu5Sh2UCWvueywb2ee+CCE4zQiZstxU9BMoQO9i6zUFSY0Kj0Q==}
     peerDependencies:
       '@babel/core': ^7.0.0-0
-    peerDependenciesMeta:
-      '@babel/core':
-        optional: true
 
   '@babel/plugin-syntax-flow@7.26.0':
     resolution: {integrity: sha512-B+O2DnPc0iG+YXFqOxv2WNuNU97ToWjOomUQ78DouOENWUaM5sVrmet9mcomUGQFwpJd//gvUagXBSdzO1fRKg==}
@@ -1138,9 +1132,6 @@ packages:
     engines: {node: '>=6.9.0'}
     peerDependencies:
       '@babel/core': ^7.0.0-0
-    peerDependenciesMeta:
-      '@babel/core':
-        optional: true
 
   '@babel/plugin-transform-unicode-escapes@7.25.9':
     resolution: {integrity: sha512-s5EDrE6bW97LtxOcGj1Khcx5AaXwiMmi4toFWRDP9/y0Woo6pXC+iyPu/KuhKtfSrNFd7jJB+/fkOtZy6aIC6Q==}
@@ -8676,13 +8667,12 @@ snapshots:
 
   '@babel/helper-define-polyfill-provider@0.6.2(@babel/core@7.26.0)':
     dependencies:
+      '@babel/core': 7.26.0
       '@babel/helper-compilation-targets': 7.25.9
       '@babel/helper-plugin-utils': 7.25.9
       debug: 4.3.7(supports-color@5.5.0)
       lodash.debounce: 4.0.8
       resolve: 1.22.8
-    optionalDependencies:
-      '@babel/core': 7.26.0
     transitivePeerDependencies:
       - supports-color
 
@@ -8916,9 +8906,8 @@ snapshots:
 
   '@babel/plugin-syntax-export-namespace-from@7.8.3(@babel/core@7.26.0)':
     dependencies:
-      '@babel/helper-plugin-utils': 7.25.9
-    optionalDependencies:
       '@babel/core': 7.26.0
+      '@babel/helper-plugin-utils': 7.25.9
 
   '@babel/plugin-syntax-flow@7.26.0(@babel/core@7.26.0)':
     dependencies:
@@ -9340,13 +9329,12 @@ snapshots:
 
   '@babel/plugin-transform-typescript@7.25.9(@babel/core@7.26.0)':
     dependencies:
+      '@babel/core': 7.26.0
       '@babel/helper-annotate-as-pure': 7.25.9
       '@babel/helper-create-class-features-plugin': 7.25.9(@babel/core@7.26.0)
       '@babel/helper-plugin-utils': 7.25.9
       '@babel/helper-skip-transparent-expression-wrappers': 7.25.9
       '@babel/plugin-syntax-typescript': 7.25.9(@babel/core@7.26.0)
-    optionalDependencies:
-      '@babel/core': 7.26.0
     transitivePeerDependencies:
       - supports-color
 

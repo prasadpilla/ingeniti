@@ -5,7 +5,7 @@ ENV ?= staging
 ifeq ($(ENV),staging)
 PROJECT_ID := ingeniti-staging
 ACCOUNT := staging-deploy@ingeniti-staging.iam.gserviceaccount.com
-KEY_FILE := apps/api/staging-deploy-svc-acc.json
+KEY_FILE := api/staging-deploy-svc-acc.json
 else ifeq ($(ENV),prod)
 PROJECT_ID := ingeniti
 ACCOUNT := ingeniti-prod-deploy@ingeniti.iam.gserviceaccount.com
@@ -28,13 +28,13 @@ set-config:
 	gcloud config set account $(ACCOUNT)
 
 build-api:
-	docker build -f apps/Dockerfile --target server --tag $(API_IMAGE) --platform linux/amd64 .
+	docker build -f Dockerfile --target server --tag $(API_IMAGE) --platform linux/amd64 .
 
 build-migrations:
-	docker build -f apps/Dockerfile --target migrate --tag $(MIGRATIONS_IMAGE) --platform linux/amd64 .
+	docker build -f Dockerfile --target migrate --tag $(MIGRATIONS_IMAGE) --platform linux/amd64 .
 
 build-task-worker:
-	docker build -f apps/Dockerfile --target task-worker --tag $(TASK_WORKER_IMAGE) --platform linux/amd64 .
+	docker build -f Dockerfile --target task-worker --tag $(TASK_WORKER_IMAGE) --platform linux/amd64 .
 
 push-api:
 	docker push $(API_IMAGE)

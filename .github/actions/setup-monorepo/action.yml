@@ -50,5 +50,7 @@ runs:
           turbo-${{ runner.os }}
         path: |
           node_modules/.cache/turbo
-          apps/*/.turbo
-          packages/*/.turbo
+          api/.turbo
+          mobile/.turbo
+          shared/.turbo
+          web/.turbo
