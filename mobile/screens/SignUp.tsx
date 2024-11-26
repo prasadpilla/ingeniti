@@ -104,7 +104,7 @@ const SignUpScreen: React.FC<SignupProps> = ({ navigation }) => {
       if (err) {
         handleSignUpErrors([err]);
       } else {
-        setSignUpError(t('unexpected_error'));
+        setSignUpError(t('something_went_wrong'));
       }
     }
   };
