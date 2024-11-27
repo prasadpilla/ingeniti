@@ -1,9 +1,9 @@
-import { useClerk } from '@clerk/clerk-expo';
+import { useClerk, useUser } from '@clerk/clerk-expo';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ActivityIndicator, Appbar, Divider, Switch, Text, useTheme } from 'react-native-paper';
 
 import Background from '../components/Background';
@@ -16,6 +16,7 @@ export default function ProfileScreen() {
   const { t } = useTranslation();
   const { appThemeType, setAppTheme } = useAppTheme();
   const navigation = useNavigation();
+  const { user } = useUser();
 
   const [isSigningOut, setIsSigningOut] = useState<boolean>(false);
   const [pushNotifications, setPushNotifications] = useState(true);
@@ -40,6 +41,12 @@ export default function ProfileScreen() {
 
   const toggleTheme = () => {
     setAppTheme(appThemeType === 'light' ? 'dark' : 'light');
+  };
+
+  const getInitials = () => {
+    const firstName = user?.firstName || '';
+    const lastName = user?.lastName || '';
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
 
   const dynamicStyles = StyleSheet.create({
@@ -93,12 +100,16 @@ export default function ProfileScreen() {
       <Background>
         <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
           <View style={styles.profileSection}>
-            <Image source={{ uri: 'https://via.placeholder.com/100' }} style={styles.avatar} />
+            <View style={[styles.avatar, { backgroundColor: theme.colors.primaryContainer }]}>
+              <Text variant="headlineMedium" style={{ color: theme.colors.onPrimaryContainer }}>
+                {getInitials()}
+              </Text>
+            </View>
             <Text variant="headlineMedium" style={styles.name}>
-              Bhartendu Sinha
+              {user?.firstName} {user?.lastName}
             </Text>
             <Text variant="bodyLarge" style={dynamicStyles.email}>
-              bhartendu@ingeniti.com
+              {user?.emailAddresses[0]?.emailAddress}
             </Text>
             <View style={styles.statsContainer}>
               <View style={styles.statItem}>
@@ -233,6 +244,8 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 40,
     marginBottom: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   name: {
     marginBottom: 4,
