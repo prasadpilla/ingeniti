@@ -28,7 +28,11 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
   const [isBenefitsSmartPanelOpen, setIsBenefitsSmartPanelOpen] = useState(false);
   const [isConnectedToPrimaryDevice, setIsConnectedToPrimaryDevice] = useState(true);
 
-  const { data: formOptions, isLoading: isLoadingFormOptions } = useQuery({
+  const {
+    data: formOptions,
+    isLoading: isLoadingFormOptions,
+    error: formOptionsError,
+  } = useQuery({
     queryKey: ['formOptions'],
     queryFn: async () => {
       const token = await getToken();
@@ -98,7 +102,29 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
   }, [isConnectedToPrimaryDevice]);
 
   if (isLoadingFormOptions) {
-    return <ActivityIndicator />;
+    return (
+      <Background>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" />
+          <Paragraph style={{ marginTop: 10 }}>{t('loading')}</Paragraph>
+        </View>
+      </Background>
+    );
+  }
+
+  if (formOptionsError) {
+    return (
+      <Background>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Paragraph style={{ color: 'red', marginBottom: 20 }}>
+            Failed to load form options. Please try again.
+          </Paragraph>
+          <Button mode="contained" onPress={() => navigation.goBack()} style={styles.sectionButton}>
+            {t('go_back')}
+          </Button>
+        </View>
+      </Background>
+    );
   }
 
   return (
