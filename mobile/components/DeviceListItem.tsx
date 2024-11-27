@@ -28,8 +28,10 @@ const DeviceListItem = ({ device }: DeviceListItemProps) => {
     <View style={[styles.container, { borderColor: theme.colors.outlineVariant }]}>
       <View style={styles.leftContent}>
         <MaterialCommunityIcons name={iconName} size={24} color={theme.colors.primary} style={styles.icon} />
-        <View>
-          <Paragraph style={styles.deviceName}>{device.name}</Paragraph>
+        <View style={styles.textContainer}>
+          <Paragraph style={styles.deviceName} numberOfLines={1}>
+            {device.name}
+          </Paragraph>
         </View>
       </View>
       <View style={styles.toggleContainer}>
@@ -52,13 +54,18 @@ const styles = StyleSheet.create({
   leftContent: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
   },
   icon: {
     marginRight: 16,
   },
+  textContainer: {
+    flex: 1,
+  },
   deviceName: {
     fontSize: 16,
     fontWeight: 'bold',
+    flexShrink: 1,
   },
   statusContainer: {
     flexDirection: 'row',
