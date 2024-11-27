@@ -38,7 +38,7 @@ devicesController.post(
       countrySmartPanel: validatedBody.countrySmartPanel,
       meterServiceIdSmartPanel: validatedBody.meterServiceIdSmartPanel,
       maxLoad: validatedBody.maxLoad,
-      isSwitchOn: true,
+      isSwitchOn: false,
       isOnline: true,
     });
 
