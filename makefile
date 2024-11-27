@@ -27,6 +27,10 @@ set-config:
 	gcloud config set project $(PROJECT_ID)
 	gcloud config set account $(ACCOUNT)
 
+db-proxy:
+	cloud-sql-proxy --port 5430 --credentials-file=api/db-svc-acc.json $(PROJECT_ID):$(REGION):ingeniti-staging
+
+
 build-api:
 	docker build -f Dockerfile --target server --tag $(API_IMAGE) --platform linux/amd64 .
 
