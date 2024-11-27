@@ -1,6 +1,7 @@
 import { useAuth } from '@clerk/clerk-expo';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import React from 'react';
+import { Alert } from 'react-native';
 import { Switch } from 'react-native-paper';
 import { Device } from 'shared';
 import { useDeviceStore } from '../stores/deviceStore';
@@ -46,6 +47,7 @@ const DeviceToggle: React.FC<DeviceToggleProps> = ({ device }) => {
         queryClient.setQueryData(['devices'], context.previousDevices);
       }
       setDeviceState(device.id, !isSwitchOn);
+      Alert.alert('Failed to control device', 'Please try again later');
       console.error('Failed to control device:', error);
     },
     onSettled: () => {
