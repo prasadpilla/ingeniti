@@ -31,10 +31,9 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     flexGrow: 1,
-    paddingHorizontal: 4,
+    paddingHorizontal: 10,
     paddingVertical: 10,
     width: '100%',
-    maxWidth: 340,
     alignSelf: 'center',
     alignItems: 'center',
     justifyContent: 'center',
