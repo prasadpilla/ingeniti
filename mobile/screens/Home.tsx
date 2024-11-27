@@ -1,12 +1,20 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Image,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 import { Appbar, Menu, Paragraph, Text, Title, useTheme } from 'react-native-paper';
 
 import { useAuth, useUser } from '@clerk/clerk-expo';
 import { useQuery } from '@tanstack/react-query';
 import { Device } from 'shared/dist/schemas/mobile/devices.schema';
-import Background from '../components/Background';
 import Button from '../components/Button';
 import DeviceListItem from '../components/DeviceListItem';
 import AddDevicePopover from '../components/DeviceRegistration/AddDevicePopover';
@@ -20,6 +28,7 @@ const HomeScreen = ({ navigation }: HomeProps) => {
   const [isDevicePopoverVisible, setIsDevicePopoverVisible] = useState(false);
   const [activeTab, setActiveTab] = useState<'Devices' | 'Sensors'>('Devices');
   const [isMoreMenuVisible, setIsMoreMenuVisible] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const {
     isLoading,
@@ -64,6 +73,12 @@ const HomeScreen = ({ navigation }: HomeProps) => {
       ? devices.filter((device: Device) => !device.isSensor)
       : devices.filter((device: Device) => device.isSensor);
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refetchDevices();
+    setRefreshing(false);
+  };
+
   return (
     <>
       <Appbar.Header
@@ -100,7 +115,11 @@ const HomeScreen = ({ navigation }: HomeProps) => {
           containerStyles={styles.popoverContainer}
         />
       )}
-      <Background>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollViewContent}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      >
         <TouchableWithoutFeedback onPress={handleBackgroundPress}>
           <View style={styles.contentWrapper}>
             <View>
@@ -198,7 +217,7 @@ const HomeScreen = ({ navigation }: HomeProps) => {
             )}
           </View>
         </TouchableWithoutFeedback>
-      </Background>
+      </ScrollView>
     </>
   );
 };
@@ -312,6 +331,15 @@ const styles = StyleSheet.create({
   },
   menuItemTitle: {
     fontSize: 14,
+  },
+  scrollView: {
+    flex: 1,
+    width: '100%',
+  },
+  scrollViewContent: {
+    flexGrow: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
   },
 });
 
