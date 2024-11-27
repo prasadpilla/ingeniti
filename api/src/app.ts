@@ -16,7 +16,6 @@ const app: Express = express();
 
 const corsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    console.log('CORS Origin:', WEB_APP_URL);
     if (!origin || origin === WEB_APP_URL || origin === MOBILE_APP_URL) {
       callback(null, true);
     } else {

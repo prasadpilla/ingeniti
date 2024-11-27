@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 import { Switch } from 'react-native-paper';
 import { Device } from 'shared';
+import { useDeviceStore } from '../stores/deviceStore';
 import { makeApiCall } from '../utils/api';
 
 interface DeviceToggleProps {
@@ -12,7 +13,9 @@ interface DeviceToggleProps {
 const DeviceToggle: React.FC<DeviceToggleProps> = ({ device }) => {
   const { getToken } = useAuth();
   const queryClient = useQueryClient();
-  const [isSwitchOn, setIsSwitchOn] = React.useState(device.isSwitchOn ?? false);
+  const { setDeviceState, getDeviceState } = useDeviceStore();
+
+  const isSwitchOn = getDeviceState(device.id, device.isSwitchOn ?? false);
 
   const controlDeviceMutation = useMutation({
     mutationFn: async (data: { id: string; isSwitchOn: boolean }) => {
@@ -26,30 +29,26 @@ const DeviceToggle: React.FC<DeviceToggleProps> = ({ device }) => {
       return data.isSwitchOn;
     },
     onMutate: async (data) => {
-      // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['devices'] });
+      const previousDevices = queryClient.getQueryData<Device[]>(['devices']);
 
-      // Snapshot the previous value
-      const previousDevices = queryClient.getQueryData(['devices']);
+      setDeviceState(device.id, data.isSwitchOn);
 
-      // Optimistically update the cache
-      queryClient.setQueryData(['devices'], (old: Device[]) => {
+      queryClient.setQueryData<Device[]>(['devices'], (old) => {
+        if (!old) return previousDevices;
         return old.map((d) => (d.id === device.id ? { ...d, isSwitchOn: data.isSwitchOn } : d));
       });
 
-      setIsSwitchOn(data.isSwitchOn);
       return { previousDevices };
     },
     onError: (error, variables, context) => {
-      // Revert back to the previous value if there's an error
       if (context?.previousDevices) {
         queryClient.setQueryData(['devices'], context.previousDevices);
       }
-      setIsSwitchOn(!isSwitchOn);
+      setDeviceState(device.id, !isSwitchOn);
       console.error('Failed to control device:', error);
     },
     onSettled: () => {
-      // Refetch after error or success
       queryClient.invalidateQueries({ queryKey: ['devices'] });
     },
   });

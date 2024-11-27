@@ -18,6 +18,7 @@ import { Device } from 'shared/dist/schemas/mobile/devices.schema';
 import Button from '../components/Button';
 import DeviceListItem from '../components/DeviceListItem';
 import AddDevicePopover from '../components/DeviceRegistration/AddDevicePopover';
+import { useDeviceStore } from '../stores/deviceStore';
 import { HomeProps } from '../types';
 import { makeApiCall } from '../utils/api';
 
@@ -29,6 +30,7 @@ const HomeScreen = ({ navigation }: HomeProps) => {
   const [activeTab, setActiveTab] = useState<'Devices' | 'Sensors'>('Devices');
   const [isMoreMenuVisible, setIsMoreMenuVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const { setDeviceState } = useDeviceStore();
 
   const {
     isLoading,
@@ -39,7 +41,13 @@ const HomeScreen = ({ navigation }: HomeProps) => {
     queryFn: async () => {
       const token = await getToken();
       const response = await makeApiCall(token, '/devices', 'GET');
-      return response.json();
+      const devices = await response.json();
+
+      devices.forEach((device: Device) => {
+        setDeviceState(device.id, device.isSwitchOn ?? false);
+      });
+
+      return devices;
     },
     onError: (error) => {
       console.error(error);
