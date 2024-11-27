@@ -328,6 +328,7 @@ devicesController.get('/metrics', async (req: WithAuthProp<Request>, res: Respon
 devicesController.post('/control/:deviceId', async (req: WithAuthProp<Request>, res: Response) => {
   const deviceId = req.params.deviceId;
   const { status } = req.body;
+  req.log.info({ deviceId, status }, 'Control device request received');
 
   try {
     const device = await getDevice(req.auth.userId as string, deviceId);

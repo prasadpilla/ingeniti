@@ -15,16 +15,17 @@ const DeviceToggle: React.FC<DeviceToggleProps> = ({ device }) => {
 
   const controlDeviceMutation = useMutation({
     mutationFn: async (data: { id: string; isSwitchOn: boolean }) => {
-      setIsSwitchOn(data.isSwitchOn);
       const token = await getToken();
       const response = await makeApiCall(token, `/devices/control/${device.id}`, 'POST', { status: data.isSwitchOn });
-      if (response.ok) {
-        return response.json();
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.log('Failed to control device:', response.status, response.statusText, errorData);
+        throw new Error('Failed to control device');
       }
-      throw new Error('Failed to control device');
+      return data.isSwitchOn;
     },
-    onSuccess: (data: Device) => {
-      setIsSwitchOn(data.isSwitchOn ?? false);
+    onMutate: (data) => {
+      setIsSwitchOn(data.isSwitchOn);
     },
     onError: (error) => {
       setIsSwitchOn(!isSwitchOn);
