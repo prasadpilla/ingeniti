@@ -86,21 +86,16 @@ export class TuyaConnector {
       sign: await this.encryptStr(signStr, this.config.secretKey),
     };
 
-    console.log('Token Request Headers:', headers);
-
     const { data: login } = await this.httpClient.get<ApiResponse<{ access_token: string }>>(
       '/v1.0/token?grant_type=1',
       { headers }
     );
-
-    console.log('Token Response:', login);
 
     if (!login || !login.success) {
       throw Error(`fetch failed: ${login.msg}`);
     }
 
     this.token = login.result.access_token;
-    console.log('Fetched Token:', this.token);
   }
 
   async getDeviceInfo(deviceId: string) {
