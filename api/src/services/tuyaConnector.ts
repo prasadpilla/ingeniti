@@ -95,15 +95,13 @@ export class TuyaConnector {
       throw Error(`fetch failed: ${login.msg}`);
     }
 
+    console.log('RECEIVED TOKEN:', login.result);
+
     this.token = login.result.access_token;
   }
 
   async getDeviceInfo(deviceId: string) {
-    if (!this.token) {
-      console.log('Token is not set, fetching token...');
-      await this.getToken();
-    }
-
+    await this.getToken();
     const query = {};
     const method = 'GET';
     const url = `/v2.0/cloud/thing/${deviceId}`;
@@ -130,9 +128,7 @@ export class TuyaConnector {
   }
 
   async getDeviceStatus(deviceId: string) {
-    if (!this.token) {
-      await this.getToken();
-    }
+    await this.getToken();
 
     const query = {};
     const method = 'GET';
@@ -158,9 +154,7 @@ export class TuyaConnector {
   }
 
   async controlDevice(deviceId: string, status: boolean) {
-    if (!this.token) {
-      await this.getToken();
-    }
+    await this.getToken();
 
     const method = 'POST';
     const url = `/v1.0/devices/${deviceId}/commands`;
@@ -204,9 +198,7 @@ export class TuyaConnector {
   ) {
     const method = 'GET';
     const url = `/v1.0/iot-03/energy/${energyType}/space/statistics/devices-top`;
-    if (!this.token) {
-      await this.getToken();
-    }
+    await this.getToken();
     const query = {
       energy_action: energyAction,
       statistics_type: statisticsType,
@@ -248,10 +240,7 @@ export class TuyaConnector {
   ): Promise<ApiResponse<any>> {
     const method = 'POST';
     const url = '/v1.0/m/energy/statistics/device/datadate';
-    if (!this.token) {
-      console.log('Token is not set, fetching token...');
-      await this.getToken();
-    }
+    await this.getToken();
 
     const body = {
       dev_id: deviceId,
@@ -295,10 +284,7 @@ export class TuyaConnector {
   ): Promise<ApiResponse<number>> {
     const method = 'GET';
     const url = `/v1.0/iot-03/energy/${energyType}/device/nodes/statistics-sum`;
-    if (!this.token) {
-      console.log('Token is not set, fetching token...');
-      await this.getToken();
-    }
+    await this.getToken();
 
     const query = {
       energy_action: energyAction,
