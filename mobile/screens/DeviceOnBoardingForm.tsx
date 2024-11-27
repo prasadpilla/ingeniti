@@ -48,7 +48,7 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
     resolver: zodResolver(deviceOnBoardingFormSchema),
     defaultValues: {
       serialNumber: 'PEONRI289923UCDJ',
-      location: '1234 Main St, Anytown, USA',
+      location: '#567, 12th Main, 1st Cross, 1st Stage, HSR Layout, Bengaluru, Karnataka, India',
       usage: '',
       type: '',
       name: '',
