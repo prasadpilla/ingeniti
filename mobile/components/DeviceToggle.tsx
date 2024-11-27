@@ -1,5 +1,5 @@
 import { useAuth } from '@clerk/clerk-expo';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 import { Switch } from 'react-native-paper';
 import { Device } from 'shared';
@@ -11,6 +11,7 @@ interface DeviceToggleProps {
 
 const DeviceToggle: React.FC<DeviceToggleProps> = ({ device }) => {
   const { getToken } = useAuth();
+  const queryClient = useQueryClient();
   const [isSwitchOn, setIsSwitchOn] = React.useState(device.isSwitchOn ?? false);
 
   const controlDeviceMutation = useMutation({
@@ -24,12 +25,32 @@ const DeviceToggle: React.FC<DeviceToggleProps> = ({ device }) => {
       }
       return data.isSwitchOn;
     },
-    onMutate: (data) => {
+    onMutate: async (data) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['devices'] });
+
+      // Snapshot the previous value
+      const previousDevices = queryClient.getQueryData(['devices']);
+
+      // Optimistically update the cache
+      queryClient.setQueryData(['devices'], (old: Device[]) => {
+        return old.map((d) => (d.id === device.id ? { ...d, isSwitchOn: data.isSwitchOn } : d));
+      });
+
       setIsSwitchOn(data.isSwitchOn);
+      return { previousDevices };
     },
-    onError: (error) => {
+    onError: (error, variables, context) => {
+      // Revert back to the previous value if there's an error
+      if (context?.previousDevices) {
+        queryClient.setQueryData(['devices'], context.previousDevices);
+      }
       setIsSwitchOn(!isSwitchOn);
       console.error('Failed to control device:', error);
+    },
+    onSettled: () => {
+      // Refetch after error or success
+      queryClient.invalidateQueries({ queryKey: ['devices'] });
     },
   });
 
