@@ -22,11 +22,11 @@ const WelcomeScreen: React.FC<WelcomeProps> = ({ navigation }) => {
   return (
     <Background>
       <Image
-        source={require('../assets/logo.jpeg')}
+        source={require('../assets/logo.png')}
         style={{ width: 100, height: 100, borderRadius: 10, marginBottom: 20 }}
       />
       <Header>
-        <Image source={require('../assets/logo-title.jpeg')} style={{ width: 200, height: 50 }} />
+        <Image source={require('../assets/logo-title.png')} style={{ width: 200, height: 50 }} />
       </Header>
       <Paragraph style={{ marginTop: 10, marginBottom: 20, fontStyle: 'italic' }}>{t('tagline')}</Paragraph>
       <Button mode="contained" onPress={() => navigation.navigate('Login')}>

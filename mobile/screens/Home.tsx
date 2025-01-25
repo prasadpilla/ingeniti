@@ -99,10 +99,10 @@ const HomeScreen = ({ navigation }: HomeProps) => {
         }}
       >
         <TouchableOpacity style={{ padding: 8 }}>
-          <Image source={require('../assets/logo.jpeg')} style={{ width: 32, height: 32 }} />
+          <Image source={require('../assets/logo.png')} style={{ width: 32, height: 32 }} />
         </TouchableOpacity>
         <View style={{ flexDirection: 'row' }}>
-          <Appbar.Action icon="account-plus" onPress={() => {}} />
+          <Appbar.Action icon="account-plus" onPress={() => { }} />
           <Appbar.Action
             icon="plus-circle"
             onPress={() => {

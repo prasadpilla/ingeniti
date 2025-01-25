@@ -17,7 +17,7 @@ const BaseAppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       <div className="w-full h-full">
         <header className="flex h-16 shrink-0 items-center border-b px-4 md:px-6 sticky top-0 z-[50] bg-background">
           <Link className="flex items-center gap-1 mr-6" to="/">
-            <img src="/logo.jpeg" alt="Logo" className="h-6 w-6 rounded-md" />
+            <img src="/logo.png" alt="Logo" className="h-6 w-6 rounded-md" />
             <span className="font-semibold">inGeniti</span>
           </Link>
           <nav className="ml-auto flex items-center gap-6">
@@ -26,25 +26,22 @@ const BaseAppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 <NavigationMenuItem>
                   <Link
                     to="/"
-                    className={`${navigationMenuTriggerStyle()} text-sm font-medium hover:underline underline-offset-4 ${
-                      pathname === '/' ? 'text-primary' : ''
-                    }`}
+                    className={`${navigationMenuTriggerStyle()} text-sm font-medium hover:underline underline-offset-4 ${pathname === '/' ? 'text-primary' : ''
+                      }`}
                   >
                     Dashboard
                   </Link>
                   <Link
                     to="/schedules"
-                    className={`${navigationMenuTriggerStyle()} text-sm font-medium hover:underline underline-offset-4 ${
-                      pathname === '/schedules' ? 'text-primary' : ''
-                    }`}
+                    className={`${navigationMenuTriggerStyle()} text-sm font-medium hover:underline underline-offset-4 ${pathname === '/schedules' ? 'text-primary' : ''
+                      }`}
                   >
                     Schedules
                   </Link>
                   <Link
                     to="/devices"
-                    className={`${navigationMenuTriggerStyle()} text-sm font-medium hover:underline underline-offset-4 ${
-                      pathname === '/devices' ? 'text-primary' : ''
-                    }`}
+                    className={`${navigationMenuTriggerStyle()} text-sm font-medium hover:underline underline-offset-4 ${pathname === '/devices' ? 'text-primary' : ''
+                      }`}
                   >
                     Devices
                   </Link>
