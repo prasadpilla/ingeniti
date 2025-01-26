@@ -16,8 +16,6 @@ endif
 
 REGION := asia-south1
 API_IMAGE := asia-south1-docker.pkg.dev/$(PROJECT_ID)/api/image
-MIGRATIONS_IMAGE := asia-south1-docker.pkg.dev/$(PROJECT_ID)/migrations/image
-TASK_WORKER_IMAGE := asia-south1-docker.pkg.dev/$(PROJECT_ID)/task-worker/image
 API_SERVICE_NAME := api
 MIGRATIONS_JOB_NAME := run-migrations
 TASK_WORKER_SERVICE_NAME := task-worker
@@ -30,41 +28,39 @@ set-config:
 db-proxy:
 	cloud-sql-proxy --port 5430 --credentials-file=api/db-svc-acc.json $(PROJECT_ID):$(REGION):ingeniti-staging
 
+build:
+	docker build -f Dockerfile --target app --tag $(API_IMAGE) --platform linux/amd64 .
 
-build-api:
-	docker build -f Dockerfile --target server --tag $(API_IMAGE) --platform linux/amd64 .
-
-build-migrations:
-	docker build -f Dockerfile --target migrate --tag $(MIGRATIONS_IMAGE) --platform linux/amd64 .
-
-build-task-worker:
-	docker build -f Dockerfile --target task-worker --tag $(TASK_WORKER_IMAGE) --platform linux/amd64 .
-
-push-api:
+push:
 	docker push $(API_IMAGE)
 
-push-migrations:
-	docker push $(MIGRATIONS_IMAGE)
-
-push-task-worker:
-	docker push $(TASK_WORKER_IMAGE)
-
 run-migrations: set-config
-	gcloud run jobs execute $(MIGRATIONS_JOB_NAME) --region $(REGION) --wait
+	gcloud run jobs execute $(MIGRATIONS_JOB_NAME) \
+		--region $(REGION) \
+		--wait \
+		--args="-r,dotenv/config,/app/dist/src/db/migrate.js"
 
 deploy-api: set-config
-	gcloud run deploy $(API_SERVICE_NAME) --image $(API_IMAGE) --region $(REGION)
+	gcloud run deploy $(API_SERVICE_NAME) \
+		--image $(API_IMAGE) \
+		--region $(REGION) \
+		--command="node" \
+		--args="-r,dotenv/config,/app/dist/src/server.js"
 
 deploy-task-worker: set-config
-	gcloud run deploy $(TASK_WORKER_SERVICE_NAME) --image $(TASK_WORKER_IMAGE) --region $(REGION)
+	gcloud run deploy $(TASK_WORKER_SERVICE_NAME) \
+		--image $(API_IMAGE) \
+		--region $(REGION) \
+		--command="node" \
+		--args="-r,dotenv/config,/app/dist/src/taskWorker.js"
 
-release-migrations: set-config build-migrations push-migrations run-migrations
+release-migrations: set-config build push run-migrations
 
-release-api: set-config build-api push-api deploy-api
+release-api: set-config build push deploy-api
 
-release-task-worker: set-config build-task-worker push-task-worker deploy-task-worker
+release-task-worker: set-config build push deploy-task-worker
 
-release-backend: release-migrations release-api release-runner release-task-worker
+release-backend: release-migrations release-api release-task-worker
 
 release-frontend: 
 	pnpm --filter=frontend build-deploy:$(ENV)
