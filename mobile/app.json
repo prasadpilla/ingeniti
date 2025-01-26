@@ -2,7 +2,7 @@
   "expo": {
     "name": "inGeniti",
     "slug": "ingeniti",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "orientation": "portrait",
     "icon": "./assets/logo.jpeg",
     "splash": {
@@ -13,10 +13,12 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "bundleIdentifier": "com.ingeniti.app",
-      "buildNumber": "0.0.1",
+      "buildNumber": "0.0.4",
       "supportsTablet": true
     },
     "android": {
