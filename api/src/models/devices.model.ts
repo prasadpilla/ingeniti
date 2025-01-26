@@ -32,7 +32,9 @@ export const devices = pgTable(
       .notNull()
       .defaultNow()
       .$onUpdate(() => new Date()),
-    tuyaDeviceId: text('tuya_device_id'),
+    connector: text('connector').notNull(),
+    connectorDeviceId: text('connector_device_id'),
+    connectorMetadata: text('connector_metadata'),
   },
   (table) => ({
     userIdIndex: index('user_id_idx').on(table.userId),
@@ -58,15 +60,36 @@ export async function getDevice(userId: string, deviceId: string): Promise<Selec
 export async function updateDevice(
   userId: string,
   deviceId: string,
-  deviceData: { isSwitchOn: boolean; tuyaDeviceId?: string }
+  deviceData: {
+    isSwitchOn?: boolean;
+    connectorDeviceId?: string;
+    connectorMetadata?: Record<string, any>
+  }
 ): Promise<SelectedDevice> {
+  const updateData: any = {
+    updatedAt: new Date()
+  };
+
+  if (deviceData.isSwitchOn !== undefined) {
+    updateData.isSwitchOn = deviceData.isSwitchOn;
+  }
+  if (deviceData.connectorDeviceId !== undefined) {
+    updateData.connectorDeviceId = deviceData.connectorDeviceId;
+  }
+  if (deviceData.connectorMetadata !== undefined) {
+    const [existingDevice] = await db
+      .select()
+      .from(devices)
+      .where(and(eq(devices.id, deviceId), eq(devices.userId, userId)))
+      .limit(1);
+    const existingMetadata = existingDevice?.connectorMetadata ? JSON.parse(existingDevice.connectorMetadata) : {};
+    const mergedMetadata = { ...existingMetadata, ...deviceData.connectorMetadata };
+    updateData.connectorMetadata = JSON.stringify(mergedMetadata);
+  }
+
   const [device] = await db
     .update(devices)
-    .set({
-      isSwitchOn: deviceData.isSwitchOn,
-      updatedAt: new Date(),
-      tuyaDeviceId: deviceData.tuyaDeviceId,
-    })
+    .set(updateData)
     .where(and(eq(devices.id, deviceId), eq(devices.userId, userId)))
     .returning();
 
@@ -95,13 +118,16 @@ export async function insertDevice(deviceData: {
   maxLoad: number | undefined;
   isSwitchOn: boolean;
   isOnline: boolean;
-  tuyaDeviceId?: string;
+  connector: string;
+  connectorDeviceId?: string;
+  connectorMetadata?: Record<string, any>;
 }): Promise<SelectedDevice> {
   const device = await db
     .insert(devices)
     .values({
       userId: deviceData.userId,
       name: deviceData.name,
+      connector: deviceData.connector,
       identifier: deviceData.identifier,
       serialNumber: deviceData.serialNumber,
       usage: deviceData.usage,
@@ -123,7 +149,8 @@ export async function insertDevice(deviceData: {
       isOnline: deviceData.isOnline,
       createdAt: new Date(),
       updatedAt: new Date(),
-      tuyaDeviceId: deviceData.tuyaDeviceId,
+      connectorDeviceId: deviceData.connectorDeviceId,
+      connectorMetadata: deviceData.connectorMetadata ? JSON.stringify(deviceData.connectorMetadata) : null
     })
     .returning();
 

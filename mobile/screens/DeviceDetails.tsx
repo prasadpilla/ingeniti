@@ -60,8 +60,12 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({ route }) => {
 
 const DetailItem = ({ label, value }: { label: string; value: string }) => (
   <View style={styles.detailItem}>
-    <Paragraph style={styles.label}>{label}:</Paragraph>
-    <Paragraph>{value}</Paragraph>
+    <View style={styles.labelContainer}>
+      <Paragraph style={styles.label}>{label}:</Paragraph>
+    </View>
+    <View style={styles.valueContainer}>
+      <Paragraph style={styles.value} numberOfLines={2}>{value}</Paragraph>
+    </View>
   </View>
 );
 
@@ -92,11 +96,20 @@ const styles = StyleSheet.create({
   },
   detailItem: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: 12,
+    flexWrap: 'wrap',
+  },
+  labelContainer: {
+    flex: 0.4,
+  },
+  valueContainer: {
+    flex: 0.6,
   },
   label: {
     fontWeight: 'bold',
+  },
+  value: {
+    flexWrap: 'wrap',
   },
 });
 

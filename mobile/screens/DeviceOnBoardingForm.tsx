@@ -53,21 +53,19 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
       type: '',
       name: '',
       averageEnergyCost: 0,
-
       minOffTime: 3,
       brownOutVoltageChange: 20,
       brownOutFrequencyChange: 4,
-
       utility: '',
       country: '',
       meterServiceId: '',
-
       isConnectedToPrimaryDevice: true,
       utilitySmartPanel: '',
       countrySmartPanel: '',
       meterServiceIdSmartPanel: '',
       maxLoad: 0,
       identifier: '',
+      connector: '',
     },
     mode: 'onChange',
   });
@@ -193,6 +191,26 @@ const DeviceOnBoardingFormScreen: React.FC<DeviceOnBoardingFormProps> = ({ navig
                     selectedValue={value}
                     onSelect={onChange}
                     placeholder="Type"
+                    hasError={!!error?.message}
+                    errorText={error?.message}
+                  />
+                </View>
+              )}
+            />
+
+            <Controller
+              control={deviceOnBoardingForm.control}
+              name="connector"
+              render={({ field: { value, onChange }, fieldState: { error } }) => (
+                <View style={styles.dropdownContainer}>
+                  <Dropdown
+                    options={[
+                      { id: 1, label: 'Tuya', value: 'tuya' },
+                      { id: 2, label: 'inGeniti', value: 'ingeniti' },
+                    ]}
+                    selectedValue={value}
+                    onSelect={onChange}
+                    placeholder="Select Connector"
                     hasError={!!error?.message}
                     errorText={error?.message}
                   />

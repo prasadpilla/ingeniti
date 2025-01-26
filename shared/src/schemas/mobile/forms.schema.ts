@@ -60,6 +60,7 @@ const deviceOnBoardingFormSchema = z
     meterServiceIdSmartPanel: z.string().optional(),
     maxLoad: z.number().optional(),
     identifier: z.string().optional(),
+    connector: z.string(),
   })
   .superRefine((data, ctx) => {
     if (data.isConnectedToPrimaryDevice) {

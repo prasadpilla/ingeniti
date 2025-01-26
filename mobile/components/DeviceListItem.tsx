@@ -61,6 +61,7 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flex: 1,
+    alignItems: 'flex-start',
   },
   deviceName: {
     fontSize: 16,

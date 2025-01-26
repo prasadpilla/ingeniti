@@ -85,6 +85,20 @@
       "when": 1732014148352,
       "tag": "0011_dusty_sister_grimm",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1737873568209,
+      "tag": "0012_sweet_jackpot",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1737885681161,
+      "tag": "0013_high_grandmaster",
+      "breakpoints": true
     }
   ]
 }

@@ -31,9 +31,9 @@ tasksController.post('/checkSchedule', async (req: Request, res: Response) => {
     if (isBefore(now, startDateTime) && isBefore(startDateTime, twoMinutesFromNow)) {
       for (const deviceId of deviceIds) {
         const device = await getDevice(schedule.userId, deviceId);
-        if (device && device.tuyaDeviceId) {
-          await tuyaConnector.controlDevice(device.tuyaDeviceId, true);
-          console.log('Device Turned On:', device.tuyaDeviceId);
+        if (device && device.connectorDeviceId) {
+          await tuyaConnector.controlDevice(device.connectorDeviceId, true);
+          console.log('Device Turned On:', device.connectorDeviceId);
         } else {
           console.log('No Tuya device ID found for device:', deviceId);
         }
@@ -43,9 +43,9 @@ tasksController.post('/checkSchedule', async (req: Request, res: Response) => {
     if (isEqual(twoMinutesFromNow, endDateTime)) {
       for (const deviceId of deviceIds) {
         const device = await getDevice(schedule.userId, deviceId);
-        if (device && device.tuyaDeviceId) {
-          await tuyaConnector.controlDevice(device.tuyaDeviceId, false);
-          console.log('Device Turned Off:', device.tuyaDeviceId);
+        if (device && device.connectorDeviceId) {
+          await tuyaConnector.controlDevice(device.connectorDeviceId, false);
+          console.log('Device Turned Off:', device.connectorDeviceId);
         } else {
           console.log('No Tuya device ID found for device:', deviceId);
         }
@@ -70,7 +70,7 @@ tasksController.get('/totalEnergyConsumption', async (req: Request, res: Respons
 
   try {
     const devices = await getAllDevices();
-    const deviceIds = devices.map((device) => device.tuyaDeviceId).filter((id): id is string => id !== null);
+    const deviceIds = devices.map((device) => device.connectorDeviceId).filter((id): id is string => id !== null);
 
     if (deviceIds.length === 0) {
       return res.status(404).json({

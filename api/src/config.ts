@@ -19,6 +19,9 @@ export const TASK_WORKER_URL = process.env.TASK_WORKER_URL;
 export const GCP_PROJECT_ID = process.env.GCP_PROJECT_ID;
 export const GCP_LOCATION = process.env.GCP_LOCATION;
 export const GCP_TASK_QUEUE_ID = process.env.GCP_TASK_QUEUE_ID;
+export const MQTT_BROKER_URL = process.env.MQTT_BROKER_URL;
+export const MQTT_USERNAME = process.env.MQTT_USERNAME;
+export const MQTT_PASSWORD = process.env.MQTT_PASSWORD;
 // Initialize TuyaConnector with configuration
 const tuyaConfig = {
   accessKey: process.env.TUYA_CLIENT_ID || '',

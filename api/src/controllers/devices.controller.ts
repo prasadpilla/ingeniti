@@ -4,6 +4,8 @@ import { Device, deviceOnBoardingFormSchema, EnergyData, EnergyResponse, Generic
 import { tuyaConnector } from '../config';
 import { getDeviceEnergy } from '../models/deviceEnergy.model';
 import { getDevice, getDevices, insertDevice, updateDevice } from '../models/devices.model';
+import { MQTTConnector } from '../services/mqttConnector';
+import { logError, logInfo } from '../utils/logger';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const express = require('express');
@@ -38,6 +40,7 @@ devicesController.post(
       countrySmartPanel: validatedBody.countrySmartPanel,
       meterServiceIdSmartPanel: validatedBody.meterServiceIdSmartPanel,
       maxLoad: validatedBody.maxLoad,
+      connector: validatedBody.connector,
       isSwitchOn: false,
       isOnline: true,
     });
@@ -178,14 +181,14 @@ devicesController.get('/get-device-info/:deviceId', async (req: WithAuthProp<Req
 
   try {
     const device = await getDevice(req.auth.userId as string, deviceId);
-    if (!device || !device.tuyaDeviceId) {
+    if (!device || !device.connectorDeviceId) {
       return res.status(HttpStatusCode.NOT_FOUND_404).json({
         success: false,
         error: 'Device not found or Tuya device ID is missing',
       });
     }
 
-    const deviceInfo = await tuyaConnector.getDeviceInfo(device.tuyaDeviceId);
+    const deviceInfo = await tuyaConnector.getDeviceInfo(device.connectorDeviceId);
     return res.status(HttpStatusCode.OK_200).json({
       success: true,
       data: deviceInfo,
@@ -204,14 +207,14 @@ devicesController.get('/get-status/:deviceId', async (req: WithAuthProp<Request>
 
   try {
     const device = await getDevice(req.auth.userId as string, deviceId);
-    if (!device || !device.tuyaDeviceId) {
+    if (!device || !device.connectorDeviceId) {
       return res.status(HttpStatusCode.NOT_FOUND_404).json({
         success: false,
         error: 'Device not found or Tuya device ID is missing',
       });
     }
 
-    const deviceStatus = await tuyaConnector.getDeviceStatus(device.tuyaDeviceId);
+    const deviceStatus = await tuyaConnector.getDeviceStatus(device.connectorDeviceId);
     return res.status(HttpStatusCode.OK_200).json({
       success: true,
       status: deviceStatus.result[0].switch_1 === 'true',
@@ -261,9 +264,9 @@ devicesController.get('/metrics', async (req: WithAuthProp<Request>, res: Respon
     return res.status(HttpStatusCode.OK_200).json({
       success: true,
       metrics: {
-        total: { value: totalDevices, prevValue: 0 }, // Adjust prevValue as needed
-        connected: { value: connectedDevices, prevValue: 0 }, // Adjust prevValue as needed
-        totalLoad: { value: totalLoad, prevValue: 0 }, // Adjust prevValue as needed
+        total: { value: totalDevices, prevValue: 0 },
+        connected: { value: connectedDevices, prevValue: 0 },
+        totalLoad: { value: totalLoad, prevValue: 0 },
       },
     });
   } catch (error) {
@@ -311,9 +314,9 @@ devicesController.get('/metrics', async (req: WithAuthProp<Request>, res: Respon
     return res.status(HttpStatusCode.OK_200).json({
       success: true,
       metrics: {
-        total: { value: totalDevices, prevValue: 0 }, // Adjust prevValue as needed
-        connected: { value: connectedDevices, prevValue: 0 }, // Adjust prevValue as needed
-        totalLoad: { value: totalLoad, prevValue: 0 }, // Adjust prevValue as needed
+        total: { value: totalDevices, prevValue: 0 },
+        connected: { value: connectedDevices, prevValue: 0 },
+        totalLoad: { value: totalLoad, prevValue: 0 },
       },
     });
   } catch (error) {
@@ -332,20 +335,28 @@ devicesController.post('/control/:deviceId', async (req: WithAuthProp<Request>, 
 
   try {
     const device = await getDevice(req.auth.userId as string, deviceId);
-    if (!device || !device.tuyaDeviceId) {
+    if (!device) {
       return res.status(HttpStatusCode.NOT_FOUND_404).json({
         success: false,
-        error: 'Device not found or Tuya device ID is missing',
+        error: 'Device not found',
       });
     }
 
-    const result = await tuyaConnector.controlDevice(device.tuyaDeviceId, status);
+    if (device.connector === 'ingeniti') {
+      await MQTTConnector.getInstance(req.log).controlDevice(req.auth.userId as string, device.id, status);
+    } else if (device.connector === 'tuya' && device.connectorDeviceId) {
+      await tuyaConnector.controlDevice(device.connectorDeviceId, status);
+    } else {
+      throw new Error('Invalid device connector configuration');
+    }
+
     await updateDevice(req.auth.userId as string, deviceId, { isSwitchOn: status });
+    req.log.info(`Device ${deviceId} controlled successfully`);
     return res.status(HttpStatusCode.OK_200).json({
       success: true,
-      result,
     });
   } catch (error) {
+    logError(error as Error, 'Error controlling device');
     return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR_500).json({
       success: false,
       error: 'Failed to control device',
